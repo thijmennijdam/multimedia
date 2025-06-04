@@ -9,7 +9,7 @@ dependencies = [
     "matplotlib>=3.7.5",
     "pandas>=2.0.3",
     "plotly>=6.1.2",
-    "torch>=2.5.1",
+    "torch==2.2.2",
     "tqdm>=4.67.1",
 ]
 
