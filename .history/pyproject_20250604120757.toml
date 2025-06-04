@@ -11,9 +11,9 @@ dependencies = [
     "pandas>=2.0.3",
     "plotly>=6.1.2",
     "scikit-learn>=1.6.1",
-    "seaborn>=0.13.2",
     "torch==2.2.2",
     "tqdm>=4.67.1",
+    "umap>=0.1.1",
     "umap-learn>=0.5.7",
 ]
 
