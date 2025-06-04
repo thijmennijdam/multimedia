@@ -8,7 +8,7 @@ from pathlib import Path
 project_root = Path(__file__).parent.parent
 sys.path.append(str(project_root))
 
-from src.visualization.dashboard import Dashboard
+from src.app.dashboard import EmbeddingDashboard
 
 def main():
     """
@@ -17,7 +17,7 @@ def main():
     print("Starting Hyperbolic Learning Dashboard...")
     
     # Initialize and run the dashboard
-    dashboard = Dashboard()
+    dashboard = EmbeddingDashboard.from_backend(dataset_name="iris", reduction="PCA")
     dashboard.run(debug=True, port=8050)
 
 if __name__ == "__main__":

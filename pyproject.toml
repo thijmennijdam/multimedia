@@ -7,10 +7,14 @@ requires-python = ">=3.11"
 dependencies = [
     "dash>=3.0.4",
     "matplotlib>=3.7.5",
+    "numba>=0.61.2",
     "pandas>=2.0.3",
     "plotly>=6.1.2",
+    "scikit-learn>=1.6.1",
+    "seaborn>=0.13.2",
     "torch==2.2.2",
     "tqdm>=4.67.1",
+    "umap-learn>=0.5.7",
 ]
 
 [build-system]
