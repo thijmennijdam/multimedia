@@ -33,22 +33,50 @@ from sklearn.metrics import pairwise_distances
 # ---------------------------------------------------------------------------
 
 os.environ.setdefault("NUMBA_DISABLE_JIT", "1")  # no JIT → no thread issues
-try:
-    import umap  # noqa: F401  – optional
-except ImportError:  # pragma: no cover – UMAP really is optional
-    umap = None
+
+import umap
 
 # ---------------------------------------------------------------------------
 #  Projection & distance registry
 # ---------------------------------------------------------------------------
 
-ProjectionFn = Callable[[np.ndarray], np.ndarray]
+# ...existing code...
 
-PROJECTIONS: Mapping[str, ProjectionFn] = {
-    "PCA": lambda x: PCA(n_components=3, random_state=0).fit_transform(x),
-}
+from tqdm import tqdm  # Add this import
+
 if umap is not None:
-    PROJECTIONS["UMAP"] = lambda x: umap.UMAP(n_components=3, random_state=0).fit_transform(x)
+    # --- UMAP variants ---------------------------------------------------
+
+    def _umap_euclidean(x: np.ndarray) -> np.ndarray:
+        for _ in tqdm(range(1), desc="UMAP (Euclidean)"):
+            return umap.UMAP(n_components=2, random_state=0).fit_transform(x)
+
+    def _umap_sphere(x: np.ndarray) -> np.ndarray:
+        for _ in tqdm(range(1), desc="UMAP (Sphere)"):
+            ll = umap.UMAP(
+                n_components=2, output_metric="haversine", random_state=0
+            ).fit_transform(x)
+            lat, lon = ll.T  # radians
+            xs = np.sin(lat) * np.cos(lon)
+            ys = np.sin(lat) * np.sin(lon)
+            zs = np.cos(lat)
+            return np.column_stack([xs, ys, zs])
+
+    def _umap_hyperbolic(x: np.ndarray) -> np.ndarray:
+        for _ in tqdm(range(1), desc="UMAP (Hyperbolic)"):
+            xy = umap.UMAP(
+                n_components=2, output_metric="hyperboloid", random_state=0
+            ).fit_transform(x)
+            x_, y_ = xy.T
+            z_ = np.sqrt(1 + np.sum(xy**2, axis=1))
+            return np.column_stack([x_, y_, z_])
+
+    PROJECTIONS = {
+        "UMAP (Euclidean)": _umap_euclidean,
+        # "UMAP (Sphere)": _umap_sphere,
+        # "UMAP (Hyperbolic)": _umap_hyperbolic,
+    }
+# ...existing code...
 
 # ---------------------------------------------------------------------------
 #  UI helpers
@@ -60,12 +88,10 @@ def _config_panel(feat_names: list[str], distances: Mapping[str, str]) -> html.D
             html.H4("Configuration"),
             html.Label("Projection"),
             dcc.Dropdown(
-                id="proj", options=[{"label": k, "value": k} for k in PROJECTIONS], value="PCA", clearable=False
-            ),
-            html.Br(),
-            html.Label("Distance"),
-            dcc.Dropdown(
-                id="metric", options=[{"label": k, "value": v} for k, v in distances.items()], value="euclidean"
+                id="proj",
+                options=[{"label": k, "value": k} for k in PROJECTIONS],
+                value=list(PROJECTIONS.keys())[0],  # Default to first UMAP projection
+                clearable=False
             ),
             html.Br(),
             html.P(f"Features: {', '.join(feat_names)}"),
@@ -73,7 +99,6 @@ def _config_panel(feat_names: list[str], distances: Mapping[str, str]) -> html.D
         ],
         style={"width": 240, "padding": "1rem", "borderRight": "1px solid #e2e2e2"},
     )
-
 
 def _centre_panel() -> html.Div:
     return html.Div(
@@ -135,10 +160,6 @@ class EmbeddingDashboard:
         @self.app.callback(Output("emb", "data"), Input("proj", "value"))
         def _compute(method):  # noqa: ANN001
             return PROJECTIONS[method](self.data).tolist()
-
-        @self.app.callback(Output("metric_store", "data"), Input("metric", "value"))
-        def _set_metric(val):  # noqa: ANN001
-            return val
 
         @self.app.callback(Output("scatter", "figure"), Input("emb", "data"), Input("scatter", "clickData"))
         def _scatter(edata, click):  # noqa: ANN001
@@ -212,7 +233,7 @@ if __name__ == "__main__":
     import argparse
 
     p = argparse.ArgumentParser()
-    p.add_argument("--dataset", choices=["iris", "wine"], default="iris")
+    p.add_argument("--dataset", choices=["iris", "wine", "digits"], default="iris")
     p.add_argument("--debug", action="store_true")
     args = p.parse_args()
 
