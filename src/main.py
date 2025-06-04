@@ -17,7 +17,7 @@ def main():
     print("Starting Hyperbolic Learning Dashboard...")
     
     # Initialize and run the dashboard
-    dashboard = EmbeddingDashboard.from_backend("iris")
+    dashboard = EmbeddingDashboard.from_backend("digits")
     dashboard.run(debug=True, port=8050)
 
 if __name__ == "__main__":

@@ -19,6 +19,10 @@ Requirements
 
 from dataclasses import dataclass, field
 from typing import Callable, Mapping
+import warnings
+
+# Filter out sklearn deprecation warning
+warnings.filterwarnings("ignore", message="'force_all_finite' was renamed to 'ensure_all_finite'")
 
 import os
 import dash
@@ -31,50 +35,29 @@ from sklearn.metrics import pairwise_distances
 # ---------------------------------------------------------------------------
 #  Disable Numba before UMAP import
 # ---------------------------------------------------------------------------
-
 os.environ.setdefault("NUMBA_DISABLE_JIT", "1")  # no JIT → no thread issues
 
+# Remove Numba JIT disabling since it's causing issues
 import umap
 
-# ---------------------------------------------------------------------------
-#  Projection & distance registry
-# ---------------------------------------------------------------------------
-
-# ...existing code...
 
 from tqdm import tqdm  # Add this import
 
 if umap is not None:
-    # --- UMAP variants ---------------------------------------------------
-
+    # --- UMAP with Euclidean distance only ---------------------------------------------------
     def _umap_euclidean(x: np.ndarray) -> np.ndarray:
-        for _ in tqdm(range(1), desc="UMAP (Euclidean)"):
-            return umap.UMAP(n_components=2, random_state=0).fit_transform(x)
-
-    def _umap_sphere(x: np.ndarray) -> np.ndarray:
-        for _ in tqdm(range(1), desc="UMAP (Sphere)"):
-            ll = umap.UMAP(
-                n_components=2, output_metric="haversine", random_state=0
-            ).fit_transform(x)
-            lat, lon = ll.T  # radians
-            xs = np.sin(lat) * np.cos(lon)
-            ys = np.sin(lat) * np.sin(lon)
-            zs = np.cos(lat)
-            return np.column_stack([xs, ys, zs])
-
-    def _umap_hyperbolic(x: np.ndarray) -> np.ndarray:
-        for _ in tqdm(range(1), desc="UMAP (Hyperbolic)"):
-            xy = umap.UMAP(
-                n_components=2, output_metric="hyperboloid", random_state=0
-            ).fit_transform(x)
-            x_, y_ = xy.T
-            z_ = np.sqrt(1 + np.sum(xy**2, axis=1))
-            return np.column_stack([x_, y_, z_])
+        # Remove tqdm since it's causing repeated prints
+        return umap.UMAP(
+            n_components=3,
+            n_neighbors=10,
+            min_dist=0.3,
+            n_epochs=100,
+            n_jobs=1,  # Force single thread to avoid warnings
+            random_state=0
+        ).fit_transform(x)
 
     PROJECTIONS = {
         "UMAP (Euclidean)": _umap_euclidean,
-        # "UMAP (Sphere)": _umap_sphere,
-        # "UMAP (Hyperbolic)": _umap_hyperbolic,
     }
 # ...existing code...
 
@@ -181,10 +164,10 @@ class EmbeddingDashboard:
             f"{i}: {self.target_names[self.labels[i]]}" if self.target_names is not None else f"{i}: {self.labels[i]}"
             for i in range(len(self.labels))
         ]
-        base = go.Scatter3d(
+        base = go.Scatter3d(  # Changed back to Scatter3d
             x=emb[:, 0],
             y=emb[:, 1],
-            z=emb[:, 2],
+            z=emb[:, 2],  # Added z-coordinate
             mode="markers",
             text=labels_txt,
             hoverinfo="text",
@@ -193,7 +176,13 @@ class EmbeddingDashboard:
         data = [base]
         if idx is not None:
             data.append(
-                go.Scatter3d(x=[emb[idx, 0]], y=[emb[idx, 1]], z=[emb[idx, 2]], mode="markers", marker=dict(size=10))
+                go.Scatter3d(  # Changed back to Scatter3d
+                    x=[emb[idx, 0]],
+                    y=[emb[idx, 1]],
+                    z=[emb[idx, 2]],  # Added z-coordinate
+                    mode="markers",
+                    marker=dict(size=10)
+                )
             )
         return go.Figure(data=data).update_layout(margin=dict(l=0, r=0, b=0, t=0))
 
