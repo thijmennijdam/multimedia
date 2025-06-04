@@ -19,6 +19,10 @@ Requirements
 
 from dataclasses import dataclass, field
 from typing import Callable, Mapping
+import warnings
+
+# Filter out sklearn deprecation warning
+warnings.filterwarnings("ignore", message="'force_all_finite' was renamed to 'ensure_all_finite'")
 
 import os
 import dash
@@ -31,24 +35,31 @@ from sklearn.metrics import pairwise_distances
 # ---------------------------------------------------------------------------
 #  Disable Numba before UMAP import
 # ---------------------------------------------------------------------------
-
 os.environ.setdefault("NUMBA_DISABLE_JIT", "1")  # no JIT → no thread issues
-try:
-    import umap  # noqa: F401  – optional
-except ImportError:  # pragma: no cover – UMAP really is optional
-    umap = None
 
-# ---------------------------------------------------------------------------
-#  Projection & distance registry
-# ---------------------------------------------------------------------------
+# Remove Numba JIT disabling since it's causing issues
+import umap
 
-ProjectionFn = Callable[[np.ndarray], np.ndarray]
 
-PROJECTIONS: Mapping[str, ProjectionFn] = {
-    "PCA": lambda x: PCA(n_components=3, random_state=0).fit_transform(x),
-}
+from tqdm import tqdm  # Add this import
+
 if umap is not None:
-    PROJECTIONS["UMAP"] = lambda x: umap.UMAP(n_components=3, random_state=0).fit_transform(x)
+    # --- UMAP with Euclidean distance only ---------------------------------------------------
+    def _umap_euclidean(x: np.ndarray) -> np.ndarray:
+        # Remove tqdm since it's causing repeated prints
+        return umap.UMAP(
+            n_components=3,
+            n_neighbors=10,
+            min_dist=0.3,
+            n_epochs=100,
+            n_jobs=1,  # Force single thread to avoid warnings
+            random_state=0
+        ).fit_transform(x)
+
+    PROJECTIONS = {
+        "UMAP (Euclidean)": _umap_euclidean,
+    }
+# ...existing code...
 
 # ---------------------------------------------------------------------------
 #  UI helpers
@@ -60,12 +71,10 @@ def _config_panel(feat_names: list[str], distances: Mapping[str, str]) -> html.D
             html.H4("Configuration"),
             html.Label("Projection"),
             dcc.Dropdown(
-                id="proj", options=[{"label": k, "value": k} for k in PROJECTIONS], value="PCA", clearable=False
-            ),
-            html.Br(),
-            html.Label("Distance"),
-            dcc.Dropdown(
-                id="metric", options=[{"label": k, "value": v} for k, v in distances.items()], value="euclidean"
+                id="proj",
+                options=[{"label": k, "value": k} for k in PROJECTIONS],
+                value=list(PROJECTIONS.keys())[0],  # Default to first UMAP projection
+                clearable=False
             ),
             html.Br(),
             html.P(f"Features: {', '.join(feat_names)}"),
@@ -73,7 +82,6 @@ def _config_panel(feat_names: list[str], distances: Mapping[str, str]) -> html.D
         ],
         style={"width": 240, "padding": "1rem", "borderRight": "1px solid #e2e2e2"},
     )
-
 
 def _centre_panel() -> html.Div:
     return html.Div(
@@ -136,10 +144,6 @@ class EmbeddingDashboard:
         def _compute(method):  # noqa: ANN001
             return PROJECTIONS[method](self.data).tolist()
 
-        @self.app.callback(Output("metric_store", "data"), Input("metric", "value"))
-        def _set_metric(val):  # noqa: ANN001
-            return val
-
         @self.app.callback(Output("scatter", "figure"), Input("emb", "data"), Input("scatter", "clickData"))
         def _scatter(edata, click):  # noqa: ANN001
             emb = np.asarray(edata)
@@ -160,10 +164,10 @@ class EmbeddingDashboard:
             f"{i}: {self.target_names[self.labels[i]]}" if self.target_names is not None else f"{i}: {self.labels[i]}"
             for i in range(len(self.labels))
         ]
-        base = go.Scatter3d(
+        base = go.Scatter3d(  # Changed back to Scatter3d
             x=emb[:, 0],
             y=emb[:, 1],
-            z=emb[:, 2],
+            z=emb[:, 2],  # Added z-coordinate
             mode="markers",
             text=labels_txt,
             hoverinfo="text",
@@ -172,7 +176,13 @@ class EmbeddingDashboard:
         data = [base]
         if idx is not None:
             data.append(
-                go.Scatter3d(x=[emb[idx, 0]], y=[emb[idx, 1]], z=[emb[idx, 2]], mode="markers", marker=dict(size=10))
+                go.Scatter3d(  # Changed back to Scatter3d
+                    x=[emb[idx, 0]],
+                    y=[emb[idx, 1]],
+                    z=[emb[idx, 2]],  # Added z-coordinate
+                    mode="markers",
+                    marker=dict(size=10)
+                )
             )
         return go.Figure(data=data).update_layout(margin=dict(l=0, r=0, b=0, t=0))
 
@@ -212,7 +222,7 @@ if __name__ == "__main__":
     import argparse
 
     p = argparse.ArgumentParser()
-    p.add_argument("--dataset", choices=["iris", "wine"], default="iris")
+    p.add_argument("--dataset", choices=["iris", "wine", "digits"], default="iris")
     p.add_argument("--debug", action="store_true")
     args = p.parse_args()
 

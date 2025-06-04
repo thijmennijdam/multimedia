@@ -27,7 +27,14 @@ class Datasets:
         return list(self.datasets.keys())
     
     def get_umap_embedding(self, data, n_components=3, random_state=42):
-        reducer = umap.UMAP(n_components=n_components, random_state=random_state)
+        reducer = umap.UMAP(
+            n_components=n_components,
+            n_neighbors=10,
+            min_dist=0.3,
+            n_epochs=100,
+            n_jobs=1,
+            random_state=random_state
+        )
         return reducer.fit_transform(data)
     
     
