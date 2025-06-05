@@ -1,18 +1,8 @@
 from __future__ import annotations
-"""Embedding projector with pair‑wise comparison.
-
-* Two **projection** options (Euclidean / Hyperbolic).
-* Two **view** modes toggled in the centre panel:
-    • **3‑D scatter** (default)
-    • **Poincaré disk** – a top‑down 2‑D view; for hyperbolic embeddings the
-      hyperboloid → disk mapping is applied, for Euclidean we simply drop the
-      *z* coordinate.
-
-The file retains the *layout first, run last* structure.
-"""
-
 import argparse
 import warnings
+import base64
+import io
 from pathlib import Path
 
 import numpy as np
@@ -36,7 +26,7 @@ warnings.filterwarnings(
 
 
 def _umap_euclidean(x: np.ndarray) -> np.ndarray:  # noqa: ANN001
-    """3‑D Euclidean UMAP embedding."""
+    """3D Euclidean UMAP embedding."""
     return (
         umap.UMAP(
             n_components=3,
@@ -65,7 +55,7 @@ def _hyperboloid_2d(x: np.ndarray) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
 
 
 def _umap_hyperbolic(x: np.ndarray) -> np.ndarray:  # noqa: ANN001
-    """3‑D hyperbolic (hyperboloid model) embedding."""
+    """3D hyperbolic (hyperboloid model) embedding."""
     xh, yh, zh = _hyperboloid_2d(x)
     return np.column_stack((xh, yh, zh))
 
@@ -94,7 +84,14 @@ def _load_dataset(name: str):
 
     feat_names = getattr(ds, "feature_names", [f"f{i}" for i in range(ds.data.shape[1])])
     targ_names = getattr(ds, "target_names", None)
-    return ds.data.astype(np.float32), ds.target.astype(int), list(feat_names), targ_names
+    images = getattr(ds, "images", None)  # (n, 8, 8) for digits, else None
+    return (
+        ds.data.astype(np.float32),
+        ds.target.astype(int),
+        list(feat_names),
+        targ_names,
+        images,
+    )
 
 
 parser = argparse.ArgumentParser()
@@ -102,10 +99,10 @@ parser.add_argument("--dataset", choices=["iris", "wine", "digits"], default="di
 parser.add_argument("--debug", action="store_true")
 ARGS = parser.parse_args()
 
-DATA, LABELS, FEATURE_NAMES, TARGET_NAMES = _load_dataset(ARGS.dataset)
+DATA, LABELS, FEATURE_NAMES, TARGET_NAMES, IMAGES = _load_dataset(ARGS.dataset)
 
 # ---------------------------------------------------------------------------
-#  UI helper components (pure functions → no side‑effects)
+#  UI helper components (pure functions → no side-effects)
 # ---------------------------------------------------------------------------
 
 
@@ -131,7 +128,7 @@ def _centre_panel() -> html.Div:
     view_toggle = dcc.RadioItems(
         id="view",
         options=[
-            {"label": "3‑D", "value": "3d"},
+            {"label": "3D", "value": "3d"},
             {"label": "Poincaré disk", "value": "disk"},
         ],
         value="3d",
@@ -314,13 +311,26 @@ def register_callbacks(app: dash.Dash) -> None:
         if sel is None or len(sel) < 2:
             return html.P("Select two distinct points.")
         i, j = sel[:2]
-       
         li = TARGET_NAMES[LABELS[i]] if TARGET_NAMES is not None else LABELS[i]
         lj = TARGET_NAMES[LABELS[j]] if TARGET_NAMES is not None else LABELS[j]
-        return [
-            html.P(f"Point {i} label: {li}"),
-            html.P(f"Point {j} label: {lj}"),
-        ]
+
+        def _img_tag(idx: int) -> html.Img | html.Span:
+            if IMAGES is None:
+                return html.Span()
+            pil = Image.fromarray((IMAGES[idx] * 16).astype("uint8"), mode="L").resize((64, 64), Image.NEAREST)
+            buf = io.BytesIO()
+            pil.save(buf, format="PNG")
+            uri = "data:image/png;base64," + base64.b64encode(buf.getvalue()).decode()
+            return html.Img(src=uri, style={"marginRight": "0.5rem", "border": "1px solid #bbb"})
+
+        return html.Div([
+            html.Div([
+                _img_tag(i), html.P(f"Point {i} label: {li}")
+            ], style={"display": "flex", "alignItems": "center"}),
+            html.Div([
+                _img_tag(j), html.P(f"Point {j} label: {lj}")
+            ], style={"display": "flex", "alignItems": "center"})
+        ])
 
 
 # ---------------------------------------------------------------------------
