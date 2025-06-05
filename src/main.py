@@ -116,11 +116,25 @@ def _config_panel() -> html.Div:
                 options=[{"label": k, "value": k} for k in PROJECTIONS],
                 value=next(iter(PROJECTIONS)),
                 clearable=False,
+                style={
+                    "backgroundColor": "white",
+                    "border": "1px solid #ccc",
+                    "borderRadius": "6px",
+                    "color": "black",
+                },
             ),
+
             html.Br(),
             html.P("Select two points for comparison."),
         ],
-        style={"width": 240, "padding": "1rem", "borderRight": "1px solid #e2e2e2"},
+        style={
+                "width": 240,
+                "padding": "1rem",
+                "borderRight": "1px solid #ddd",
+                "backgroundColor": "white",
+                "borderRadius": "8px",
+                "margin": "1rem"
+            },
     )
 
 
@@ -133,7 +147,13 @@ def _centre_panel() -> html.Div:
         ],
         value="3d",
         inline=True,
-        style={"marginBottom": "0.5rem"},
+        style={
+    "marginBottom": "0.5rem",
+    "display": "flex",
+    "gap": "1rem",
+    "color": "rgb(33, 43, 181)",
+    "fontWeight": "bold"
+},
     )
 
     graph = dcc.Graph(
@@ -144,14 +164,28 @@ def _centre_panel() -> html.Div:
 
     return html.Div(
         dcc.Loading(id="loading-scatter", type="circle", children=[view_toggle, graph]),
-        style={"flex": 1, "padding": "1rem"},
+        style={
+                "flex": 1,
+                "padding": "1rem",
+                "margin": "1rem",
+                "backgroundColor": "white",
+                "borderRadius": "8px",
+            }
+
     )
 
 
 def _cmp_panel() -> html.Div:
     return html.Div(
         [html.H4("Point comparison"), html.Div(id="cmp")],
-        style={"width": 320, "padding": "1rem", "borderLeft": "1px solid #e2e2e2"},
+        style={
+    "width": 320,
+    "padding": "1rem",
+    "borderLeft": "1px solid #ddd",
+    "backgroundColor": "white",
+    "borderRadius": "8px",
+    "margin": "1rem"
+},
     )
 
 
@@ -163,7 +197,17 @@ def _cmp_panel() -> html.Div:
 def make_layout() -> html.Div:
     return html.Div(
         [
-            html.Div(html.H2("Embedding Projector"), style={"padding": "0.5rem 1rem"}),
+            html.Div(
+                html.H2("Embedding Projector", style={
+                    "color": "white",
+                    "margin": 0
+                }),
+                style={
+                    "padding": "0.5rem 1rem",
+                    "backgroundColor": "rgb(33, 43, 181)",
+                    "boxShadow": "0 2px 8px rgba(0,0,0,0.1)"
+                }
+            ),
             dcc.Store(id="emb"),
             dcc.Store(id="sel", data=[]),
             html.Div(
@@ -171,7 +215,13 @@ def make_layout() -> html.Div:
                 style={"display": "flex"},
             ),
         ],
-        style={"display": "flex", "flexDirection": "column", "height": "100vh"},
+       style={
+                "display": "flex",
+                "flexDirection": "column",
+                "height": "100vh",
+                "fontFamily": "Inter, sans-serif",
+                "backgroundColor": "#f7f9fc"
+            },
     )
 
 
@@ -221,7 +271,11 @@ def _fig3d(emb: np.ndarray, sel: list[int]) -> go.Figure:
             )
         )
     fig = go.Figure(data=traces)
-    fig.update_layout(margin=dict(l=0, r=0, b=0, t=0), uirevision="embedding")
+    fig.update_layout(
+    margin=dict(l=0, r=0, b=0, t=0),
+    uirevision="embedding",
+    showlegend=False,
+)
     return fig
 
 
@@ -249,11 +303,12 @@ def _fig_disk(x: np.ndarray, y: np.ndarray, sel: list[int]) -> go.Figure:
         )
     fig = go.Figure(data=traces)
     fig.update_layout(
-        xaxis=dict(scaleanchor="y", scaleratio=1),
-        yaxis=dict(scaleanchor="x", scaleratio=1),
-        margin=dict(l=0, r=0, b=0, t=0),
-        uirevision="embedding",
-    )
+    xaxis=dict(scaleanchor="y", scaleratio=1),
+    yaxis=dict(scaleanchor="x", scaleratio=1),
+    margin=dict(l=0, r=0, b=0, t=0),
+    uirevision="embedding",
+    showlegend=False,
+)
     return fig
 
 
