@@ -136,7 +136,15 @@ def _config_panel() -> html.Div:
                 "margin": "1rem"
             },
     )
-
+    
+def _empty_fig3d() -> go.Figure:
+    fig = go.Figure(data=[go.Scatter3d(x=[], y=[], z=[], mode="markers")])
+    fig.update_layout(
+        margin=dict(l=0, r=0, b=0, t=0),
+        uirevision="embedding",
+        showlegend=False,
+    )
+    return fig
 
 def _centre_panel() -> html.Div:
     view_toggle = dcc.RadioItems(
@@ -148,30 +156,38 @@ def _centre_panel() -> html.Div:
         value="3d",
         inline=True,
         style={
-    "marginBottom": "0.5rem",
-    "display": "flex",
-    "gap": "1rem",
-    "color": "rgb(33, 43, 181)",
-    "fontWeight": "bold"
-},
-    )
-
-    graph = dcc.Graph(
-        id="scatter",
-        style={"height": "78vh"},
-        config={"displayModeBar": False},
+            "marginBottom": "0.5rem",
+            "display": "flex",
+            "gap": "1rem",
+            "color": "rgb(33, 43, 181)",
+            "fontWeight": "bold"
+        },
     )
 
     return html.Div(
-        dcc.Loading(id="loading-scatter", type="circle", children=[view_toggle, graph]),
+        dcc.Loading(
+            id="loading-scatter",
+            type="circle",
+            children=[
+                view_toggle,
+                html.Div(
+                    dcc.Graph(
+                        id="scatter",
+                        figure=_empty_fig3d(),
+                        style={"height": "78vh"},
+                        config={"displayModeBar": False},
+                    ),
+                    id="scatter-container"
+                )
+            ]
+        ),
         style={
-                "flex": 1,
-                "padding": "1rem",
-                "margin": "1rem",
-                "backgroundColor": "white",
-                "borderRadius": "8px",
-            }
-
+            "flex": 1,
+            "padding": "1rem",
+            "margin": "1rem",
+            "backgroundColor": "white",
+            "borderRadius": "8px",
+        }
     )
 
 
@@ -318,6 +334,33 @@ def _fig_disk(x: np.ndarray, y: np.ndarray, sel: list[int]) -> go.Figure:
 
 
 def register_callbacks(app: dash.Dash) -> None:
+    @app.callback(
+        Output("scatter-container", "children"),
+        Input("emb", "data"),
+        Input("sel", "data"),
+        Input("view", "value"),
+        Input("proj", "value"),
+    )
+    def _scatter(edata, sel, view, proj):
+        if edata is None:
+            return None  # Don't render the graph at all
+        emb = np.asarray(edata, dtype=np.float32)
+        if view == "3d":
+            fig = _fig3d(emb, sel or [])
+        elif "Hyperbolic" in proj:
+            xh, yh, zh = emb[:, 0], emb[:, 1], emb[:, 2]
+            dx, dy = xh / (1.0 + zh), yh / (1.0 + zh)
+            fig = _fig_disk(dx, dy, sel or [])
+        else:
+            dx, dy = emb[:, 0], emb[:, 1]
+            fig = _fig_disk(dx, dy, sel or [])
+        return dcc.Graph(
+            id="scatter",
+            figure=fig,
+            style={"height": "78vh"},
+            config={"displayModeBar": False},
+        )
+        
     @app.callback(Output("emb", "data"), Input("proj", "value"))
     def _compute(method):
         return PROJECTIONS[method](DATA).tolist()
@@ -340,26 +383,6 @@ def register_callbacks(app: dash.Dash) -> None:
             if len(sel) > 2:
                 sel = sel[-2:]
         return sel
-
-    @app.callback(
-        Output("scatter", "figure"),
-        Input("emb", "data"),
-        Input("sel", "data"),
-        Input("view", "value"),
-        Input("proj", "value"),
-    )
-    def _scatter(edata, sel, view, proj):
-        if edata is None:
-            return go.Figure()
-        emb = np.asarray(edata, dtype=np.float32)
-        if view == "3d":
-            return _fig3d(emb, sel or [])
-        if "Hyperbolic" in proj:
-            xh, yh, zh = emb[:, 0], emb[:, 1], emb[:, 2]
-            dx, dy = xh / (1.0 + zh), yh / (1.0 + zh)
-        else:
-            dx, dy = emb[:, 0], emb[:, 1]
-        return _fig_disk(dx, dy, sel or [])
 
     @app.callback(Output("cmp", "children"), Input("sel", "data"))
     def _compare(sel):
