@@ -20,6 +20,8 @@ import dash
 from dash import dcc, html, Input, Output, State
 import plotly.graph_objs as go
 from sklearn.datasets import load_digits, load_iris, load_wine
+from PIL import Image
+
 
 import umap
 
