@@ -107,7 +107,12 @@ This dashboard provides an interactive interface for exploring data embedded in 
 
 ## Getting Started
 
-*[To be added as development progresses]*
+```bash
+uv venv 
+source .venv/bin/activate
+uv sync
+```
+
 
 ## Contributing
 
