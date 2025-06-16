@@ -256,6 +256,7 @@ def _centre_panel() -> html.Div:
                             "aspectRatio": "1 / 1",
                             "maxWidth": "600px",
                             "marginRight": "1rem",
+                            "marginTop": "2rem",
                         },
                     ),
                     # 2D Plot
@@ -271,6 +272,7 @@ def _centre_panel() -> html.Div:
                             "minWidth": 0,
                             "aspectRatio": "1 / 1",
                             "maxWidth": "600px",
+                            "marginTop": "2rem",
                         },
                     ),
                 ],
@@ -327,7 +329,16 @@ def _decode_point(idx: int, show_features: bool = True) -> html.Div:
         html.P(f"Label: {label}", style={"color": "#007bff", "margin": "0 0 0.5rem 0"}),
         # Features (only if show_features is True)
         features if features is not None else None
-    ], style={"padding": "0.5rem", "border": "1px solid #eee", "borderRadius": "4px"})
+    ], style={
+        "padding": "0.5rem", 
+        "border": "1px solid #eee", 
+        "borderRadius": "4px",
+        "cursor": "pointer",  # Add cursor pointer to indicate clickability
+        "transition": "background-color 0.2s",  # Smooth transition for hover effect
+        "hover": {
+            "backgroundColor": "#f8f9fa"  # Light background on hover
+        }
+    }, id={"type": "point-card", "index": idx})  # Add a pattern-matching ID for the click handler
 
 
 def _tree_node(title: str, content: html.Div, is_current: bool = False) -> html.Div:
@@ -543,6 +554,37 @@ def _create_interpolated_img_tag(i: int, j: int, t_value: float) -> html.Img | h
         style={"marginRight": "0.5rem", "border": "2px solid orange"},
     )
 
+
+def _create_close_button(idx: int) -> html.Button:
+    """Create a styled close button for removing points from selection."""
+    return html.Button(
+        "×",  # × symbol
+        id={"type": "close-button", "index": idx},
+        style={
+            "position": "absolute",
+            "top": "0.25rem",
+            "right": "0.25rem",
+            "width": "1.5rem",
+            "height": "1.5rem",
+            "borderRadius": "50%",
+            "border": "none",
+            "backgroundColor": "#ff4444",
+            "color": "white",
+            "fontSize": "1rem",
+            "lineHeight": "1",
+            "cursor": "pointer",
+            "display": "flex",
+            "alignItems": "center",
+            "justifyContent": "center",
+            "padding": "0",
+            "transition": "background-color 0.2s",
+            "hover": {
+                "backgroundColor": "#cc0000"
+            }
+        }
+    )
+
+
 # ---------------------------------------------------------------------------
 # Drawing helpers
 # ---------------------------------------------------------------------------
@@ -698,8 +740,8 @@ def register_callbacks(app: dash.Dash) -> None:
         fig_disk = _fig_disk(dx, dy, sel, interp_transformed)
         
         # Add titles to distinguish the views
-        fig_3d.update_layout(title="3D View")
-        fig_disk.update_layout(title="Poincaré Disk View" if "Hyperbolic" in proj else "2D View")
+        # fig_3d.update_layout(title="3D View")
+        # fig_disk.update_layout(title="Poincaré Disk View" if "Hyperbolic" in proj else "2D View")
 
         return fig_3d, fig_disk
 
@@ -725,36 +767,63 @@ def register_callbacks(app: dash.Dash) -> None:
 
     @app.callback(
         Output("sel", "data"),
-        [Input("scatter-3d", "clickData"), Input("scatter-disk", "clickData")],
+        [
+            Input("scatter-3d", "clickData"),
+            Input("scatter-disk", "clickData"),
+            Input({"type": "close-button", "index": dash.ALL}, "n_clicks")
+        ],
         State("sel", "data"),
         State("mode", "data"),
         prevent_initial_call=True,
     )
-    def _select(click_3d, click_disk, sel, mode):
+    def _select(click_3d, click_disk, close_clicks, sel, mode):
         ctx = callback_context
-        if not ctx.triggered:
-            return sel
-        
-        # Use whichever graph was clicked
-        click = click_3d if ctx.triggered[0]["prop_id"] == "scatter-3d.clickData" else click_disk
-        idx = _clicked(click)
-        if idx is None:
-            return sel
-        
-        sel = sel or []
-        if idx in sel:
-            sel.remove(idx)
-        else:
-            sel.append(idx)
-            if mode == "compare":
-                max_points = 5
-            elif mode == "interpolate":
-                max_points = 2
-            else:  # tree mode
+        if not ctx.triggered or not ctx.triggered_id:
+            return dash.no_update
+
+        triggered_id = ctx.triggered_id
+        current_sel = sel or []
+
+        # Handle clicks from the plots
+        if triggered_id in ["scatter-3d", "scatter-disk"]:
+            click_data = ctx.inputs[f"{triggered_id}.clickData"]
+            idx = _clicked(click_data)
+            if idx is None:
+                return dash.no_update
+
+            if idx in current_sel:
+                # Create a new list excluding the item
+                new_sel = [i for i in current_sel if i != idx]
+            else:
+                # Create a new list by concatenating
+                new_sel = current_sel + [idx]
+                
+                # Determine max points based on mode
                 max_points = 1
-            if len(sel) > max_points:
-                sel = sel[-max_points:]
-        return sel
+                if mode == "compare":
+                    max_points = 5
+                elif mode == "interpolate":
+                    max_points = 2
+                
+                # Slicing creates a new list, which is correct
+                if len(new_sel) > max_points:
+                    new_sel = new_sel[-max_points:]
+            return new_sel
+
+        # Handle clicks from close buttons
+        # Check if the trigger is from a pattern-matching ID, which is a dict
+        elif isinstance(triggered_id, dict) and triggered_id.get("type") == "close-button":
+            # Ensure a button was actually clicked (n_clicks is not None)
+            if not ctx.triggered[0]['value']:
+                return dash.no_update
+            
+            idx_to_remove = triggered_id.get("index")
+            if idx_to_remove in current_sel:
+                # Create a new list that excludes the removed item
+                new_sel = [i for i in current_sel if i != idx_to_remove]
+                return new_sel
+
+        return dash.no_update
 
     @app.callback(
         Output("run-interpolate-btn", "disabled"),
@@ -832,8 +901,20 @@ def register_callbacks(app: dash.Dash) -> None:
                 )
                 components.append(
                     html.Div(
-                        [_create_img_tag(idx), html.P(f"Point {idx} label: {label}")],
-                        style={"display": "flex", "alignItems": "center"},
+                        [
+                            _create_close_button(idx),
+                            _create_img_tag(idx), 
+                            html.P(f"Point {idx} label: {label}")
+                        ],
+                        style={
+                            "display": "flex", 
+                            "alignItems": "center",
+                            "padding": "0.5rem",
+                            "borderRadius": "4px",
+                            "position": "relative",  # For absolute positioning of close button
+                            "backgroundColor": "#f8f9fa",
+                            "marginBottom": "0.5rem"
+                        }
                     )
                 )
             return html.Div(components)
@@ -847,12 +928,36 @@ def register_callbacks(app: dash.Dash) -> None:
 
             components = [
                 html.Div(
-                    [_create_img_tag(i), html.P(f"Point {i} label: {li}")],
-                    style={"display": "flex", "alignItems": "center"},
+                    [
+                        _create_close_button(i),
+                        _create_img_tag(i), 
+                        html.P(f"Point {i} label: {li}")
+                    ],
+                    style={
+                        "display": "flex", 
+                        "alignItems": "center",
+                        "padding": "0.5rem",
+                        "borderRadius": "4px",
+                        "position": "relative",
+                        "backgroundColor": "#f8f9fa",
+                        "marginBottom": "0.5rem"
+                    }
                 ),
                 html.Div(
-                    [_create_img_tag(j), html.P(f"Point {j} label: {lj}")],
-                    style={"display": "flex", "alignItems": "center"},
+                    [
+                        _create_close_button(j),
+                        _create_img_tag(j), 
+                        html.P(f"Point {j} label: {lj}")
+                    ],
+                    style={
+                        "display": "flex", 
+                        "alignItems": "center",
+                        "padding": "0.5rem",
+                        "borderRadius": "4px",
+                        "position": "relative",
+                        "backgroundColor": "#f8f9fa",
+                        "marginBottom": "0.5rem"
+                    }
                 ),
             ]
 
