@@ -218,46 +218,63 @@ def _empty_fig3d() -> go.Figure:
 
 
 def _centre_panel() -> html.Div:
-    view_toggle = dcc.RadioItems(
-        id="view",
-        options=[
-            {"label": "3D", "value": "3d"},
-            {"label": "Poincaré disk", "value": "disk"},
-        ],
-        value="3d",
-        inline=True,
-        style={
-            "marginBottom": "0.5rem",
-            "display": "flex",
-            "gap": "1rem",
-            "color": "rgb(33, 43, 181)",
-            "fontWeight": "bold",
-        },
-    )
-
     return html.Div(
-        dcc.Loading(
-            id="loading-scatter",
-            type="circle",
-            children=[
-                view_toggle,
-                html.Div(
-                    dcc.Graph(
-                        id="scatter",
-                        figure=_empty_fig3d(),
-                        style={"height": "78vh"},
-                        config={"displayModeBar": False},
+        [
+            html.Div(
+                [
+                    # 3D Plot
+                    html.Div(
+                        dcc.Graph(
+                            id="scatter-3d",
+                            figure=_empty_fig3d(),
+                            style={"width": "100%", "height": "100%", "aspectRatio": "1"},
+                            config={"displayModeBar": False},
+                        ),
+                        style={
+                            "flex": 1,
+                            "minWidth": "0",
+                            "aspectRatio": "1 / 1",  # Ensures square aspect
+                            "maxWidth": "600px",     # Optional: limit max size
+                            "marginRight": "1rem"
+                        },
                     ),
-                    id="scatter-container",
-                ),
-            ],
-        ),
+                    # 2D Plot
+                    html.Div(
+                        dcc.Graph(
+                            id="scatter-disk",
+                            figure=_empty_fig3d(),
+                            style={"width": "100%", "height": "100%", "aspectRatio": "1"},
+                            config={"displayModeBar": False},
+                        ),
+                        style={
+                            "flex": 1,
+                            "minWidth": "0",
+                            "aspectRatio": "1 / 1",
+                            "maxWidth": "600px",
+                        },
+                    ),
+                ],
+                style={
+                    "display": "flex",
+                    "flexDirection": "row",
+                    "justifyContent": "center",
+                    "alignItems": "flex-start",
+                    "gap": "1rem",
+                    "width": "100%",
+                    "height": "600px",  # Fixed or calculated height for the plots
+                },
+            ),
+            html.Div(style={"height": "2rem"}),  # Spacer
+            # (Add any other widgets below, or leave blank for now)
+        ],
         style={
             "flex": 1,
             "padding": "1rem",
             "margin": "1rem",
             "backgroundColor": "white",
             "borderRadius": "8px",
+            "display": "flex",
+            "flexDirection": "column",
         },
     )
 
@@ -498,27 +515,29 @@ def _fig_disk(
 
 def register_callbacks(app: dash.Dash) -> None:
     @app.callback(
-        Output("scatter-container", "children"),
+        [Output("scatter-3d", "figure"), Output("scatter-disk", "figure")],
         Input("emb", "data"),
         Input("sel", "data"),
-        Input("view", "value"),
         Input("proj", "value"),
         Input("interpolated-point", "data"),
     )
-    def _scatter(edata, sel, view, proj, interpolated_point):
+    def _scatter(edata, sel, proj, interpolated_point):
         if edata is None:
-            return None
+            return _empty_fig3d(), _empty_fig3d()
+        
         emb = np.asarray(edata, dtype=np.float32)
-
+        sel = sel or []
         interp_point = (
             np.asarray(interpolated_point, dtype=np.float32)
             if interpolated_point is not None
             else None
         )
 
-        if view == "3d":
-            fig = _fig3d(emb, sel or [], interp_point)
-        elif "Hyperbolic" in proj:
+        # Always create 3D view
+        fig_3d = _fig3d(emb, sel, interp_point)
+
+        # Create Poincaré disk view for hyperbolic projection, otherwise use 2D projection
+        if "Hyperbolic" in proj:
             xh, yh, zh = emb[:, 0], emb[:, 1], emb[:, 2]
             dx, dy = xh / (1.0 + zh), yh / (1.0 + zh)
             interp_transformed = None
@@ -526,18 +545,17 @@ def register_callbacks(app: dash.Dash) -> None:
                 interp_dx = interp_point[0] / (1.0 + interp_point[2])
                 interp_dy = interp_point[1] / (1.0 + interp_point[2])
                 interp_transformed = np.array([interp_dx, interp_dy])
-            fig = _fig_disk(dx, dy, sel or [], interp_transformed)
         else:
             dx, dy = emb[:, 0], emb[:, 1]
             interp_transformed = interp_point[:2] if interp_point is not None else None
-            fig = _fig_disk(dx, dy, sel or [], interp_transformed)
+        
+        fig_disk = _fig_disk(dx, dy, sel, interp_transformed)
+        
+        # Add titles to distinguish the views
+        fig_3d.update_layout(title="3D View")
+        fig_disk.update_layout(title="Poincaré Disk View" if "Hyperbolic" in proj else "2D View")
 
-        return dcc.Graph(
-            id="scatter",
-            figure=fig,
-            style={"height": "78vh"},
-            config={"displayModeBar": False},
-        )
+        return fig_3d, fig_disk
 
     @app.callback(Output("emb", "data"), Input("proj", "value"))
     def _compute(method):
@@ -545,15 +563,22 @@ def register_callbacks(app: dash.Dash) -> None:
 
     @app.callback(
         Output("sel", "data"),
-        Input("scatter", "clickData"),
+        [Input("scatter-3d", "clickData"), Input("scatter-disk", "clickData")],
         State("sel", "data"),
         State("mode", "data"),
         prevent_initial_call=True,
     )
-    def _select(click, sel, mode):
+    def _select(click_3d, click_disk, sel, mode):
+        ctx = callback_context
+        if not ctx.triggered:
+            return sel
+        
+        # Use whichever graph was clicked
+        click = click_3d if ctx.triggered[0]["prop_id"] == "scatter-3d.clickData" else click_disk
         idx = _clicked(click)
         if idx is None:
             return sel
+        
         sel = sel or []
         if idx in sel:
             sel.remove(idx)
