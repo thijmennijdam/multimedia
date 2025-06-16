@@ -3,12 +3,10 @@ import argparse
 import warnings
 import base64
 import io
-from pathlib import Path
 
 import numpy as np
 import dash
 from dash import dcc, html, Input, Output, State, callback_context
-import dash_daq as daq
 import plotly.graph_objs as go
 from sklearn.datasets import load_digits, load_iris, load_wine
 from PIL import Image
