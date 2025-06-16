@@ -21,6 +21,7 @@ warnings.filterwarnings(
     message="'force_all_finite' was renamed to 'ensure_all_finite'",
 )
 
+
 # ---------------------------------------------------------------------------
 # Projection helpers
 # ---------------------------------------------------------------------------
@@ -114,18 +115,25 @@ def _config_panel() -> html.Div:
         [
             html.H4("Configuration"),
             html.Label("Projection"),
-            dcc.Dropdown(
-                id="proj",
-                options=[{"label": k, "value": k} for k in PROJECTIONS],
-                value=next(iter(PROJECTIONS)),
-                clearable=False,
-                style={
-                    "backgroundColor": "white",
-                    "border": "1px solid #ccc",
-                    "borderRadius": "6px",
-                    "color": "black",
-                },
-            ),
+            html.Div([
+                dcc.Dropdown(
+                    id="proj",
+                    options=[{"label": k, "value": k} for k in PROJECTIONS],
+                    value=next(iter(PROJECTIONS)),
+                    clearable=False,
+                    style={
+                        "backgroundColor": "white",
+                        "border": "1px solid #ccc",
+                        "borderRadius": "6px",
+                        "color": "black",
+                    },
+                ),
+                dcc.Loading(
+                    id="proj-loading",
+                    type="circle",
+                    style={"position": "absolute", "right": "10px", "top": "50%", "transform": "translateY(-50%)"},
+                ),
+            ], style={"position": "relative"}),
             html.Br(),
             html.Label("Mode"),
             html.Div(
@@ -140,7 +148,7 @@ def _config_panel() -> html.Div:
                             "padding": "0.5rem 1rem",
                             "borderRadius": "6px",
                             "cursor": "pointer",
-                            "width": "50%",
+                            "width": "33.3%",
                         },
                     ),
                     html.Button(
@@ -153,7 +161,20 @@ def _config_panel() -> html.Div:
                             "padding": "0.5rem 1rem",
                             "borderRadius": "6px",
                             "cursor": "pointer",
-                            "width": "50%",
+                            "width": "33.3%",
+                        },
+                    ),
+                    html.Button(
+                        "Tree",
+                        id="tree-mode-btn",
+                        style={
+                            "backgroundColor": "#007bff",
+                            "color": "white",
+                            "border": "none",
+                            "padding": "0.5rem 1rem",
+                            "borderRadius": "6px",
+                            "cursor": "pointer",
+                            "width": "33.3%",
                         },
                     ),
                 ],
@@ -221,26 +242,6 @@ def _empty_fig3d() -> go.Figure:
 def _centre_panel() -> html.Div:
     return html.Div(
         [
-            # Toggle button container
-            html.Div(
-                daq.ToggleSwitch(
-                    id='tree-toggle',
-                    value=False,
-                    color='#007bff',
-                    size=50,
-                    label='Select Tree',
-                    labelPosition='top',
-                ),
-                style={
-                    'display': 'flex',
-                    'justifyContent': 'center',
-                    'marginBottom': '1rem',
-                    'padding': '0.5rem',
-                    'backgroundColor': 'white',
-                    'borderRadius': '8px',
-                    'boxShadow': '0 2px 4px rgba(0,0,0,0.1)',
-                }
-            ),
             html.Div(
                 [
                     # 3D Plot
@@ -300,9 +301,121 @@ def _centre_panel() -> html.Div:
     )
 
 
+def _decode_point(idx: int, show_features: bool = True) -> html.Div:
+    """Create a detailed view of a data point showing its features."""
+    if idx is None:
+        return html.Div("No point selected", style={"color": "#666", "fontStyle": "italic"})
+    
+    # Get the point's data and label
+    point_data = DATA[idx]
+    label = TARGET_NAMES[LABELS[idx]] if TARGET_NAMES is not None else LABELS[idx]
+    
+    # Create feature list only if show_features is True
+    features = None
+    if show_features:
+        features = html.Div([
+            html.Div([
+                html.Span(f"{name}: ", style={"fontWeight": "bold", "color": "#444"}),
+                html.Span(f"{value:.3f}", style={"color": "#666"})
+            ], style={"marginBottom": "0.25rem"})
+            for name, value in zip(FEATURE_NAMES, point_data)
+        ], style={"fontSize": "0.9rem", "marginTop": "0.5rem"})
+    
+    return html.Div([
+        # Image (if available)
+        _create_img_tag(idx),
+        # Label
+        html.P(f"Point {idx}", style={"fontWeight": "bold", "margin": "0.5rem 0 0.25rem 0"}),
+        html.P(f"Label: {label}", style={"color": "#007bff", "margin": "0 0 0.5rem 0"}),
+        # Features (only if show_features is True)
+        features if features is not None else None
+    ], style={"padding": "0.5rem", "border": "1px solid #eee", "borderRadius": "4px"})
+
+
+def _tree_node(title: str, content: html.Div, is_current: bool = False) -> html.Div:
+    """Create a styled tree node with title and content."""
+    return html.Div([
+        html.H6(
+            title,
+            style={
+                "color": "#007bff" if is_current else "#666",
+                "fontWeight": "bold" if is_current else "normal",
+                "margin": "0 0 0.5rem 0",
+                "padding": "0.5rem",
+                "backgroundColor": "#f8f9fa" if is_current else "transparent",
+                "borderRadius": "4px",
+            }
+        ),
+        content
+    ], style={
+        "marginBottom": "1rem",
+        "position": "relative",
+        "padding": "0.5rem",
+        "backgroundColor": "white",
+        "borderRadius": "8px",
+        "boxShadow": "0 1px 3px rgba(0,0,0,0.1)",
+    })
+
+
 def _cmp_panel() -> html.Div:
     return html.Div(
-        [html.H4("Point comparison"), html.Div(id="cmp")],
+        [
+            html.H4("Point comparison"),
+            # Tree traversal section (hidden by default)
+            html.Div(
+                [
+                    html.H5(
+                        "Tree Traversal",
+                        style={
+                            "marginTop": "1rem",
+                            "color": "#007bff",
+                            "padding": "0.5rem",
+                            "borderBottom": "2px solid #007bff",
+                            "marginBottom": "1rem"
+                        }
+                    ),
+                    html.Div(
+                        [
+                            # Visual tree container
+                            html.Div(
+                                [
+                                    # Parent node
+                                    _tree_node("Parent Node", html.Div(id="tree-parent")),
+                                    # Connection line
+                                    html.Div(
+                                        style={
+                                            "height": "2rem",
+                                            "width": "2px",
+                                            "backgroundColor": "#007bff",
+                                            "margin": "0 auto",
+                                            "position": "relative",
+                                        }
+                                    ),
+                                    # Current node
+                                    _tree_node("Current Node", html.Div(id="tree-current"), is_current=True),
+                                    # Connection line
+                                    html.Div(
+                                        style={
+                                            "height": "2rem",
+                                            "width": "2px",
+                                            "backgroundColor": "#007bff",
+                                            "margin": "0 auto",
+                                            "position": "relative",
+                                        }
+                                    ),
+                                    # Child node
+                                    _tree_node("Child Node", html.Div(id="tree-child")),
+                                ],
+                                id="tree-traversal",
+                                style={"display": "none"},  # Hidden by default
+                            ),
+                        ],
+                    ),
+                ],
+            ),
+            # Regular comparison view
+            html.Div(id="cmp"),
+        ],
         style={
             "width": 320,
             "padding": "1rem",
@@ -578,9 +691,26 @@ def register_callbacks(app: dash.Dash) -> None:
 
         return fig_3d, fig_disk
 
-    @app.callback(Output("emb", "data"), Input("proj", "value"))
+    @app.callback(
+        [Output("emb", "data"),
+         Output("proj", "disabled"),
+         Output("proj-loading", "parent_style")],
+        Input("proj", "value"),
+        prevent_initial_call=True,
+    )
     def _compute(method):
-        return PROJECTIONS[method](DATA).tolist()
+        # Show loading state and disable dropdown
+        loading_style = {"display": "block"}
+        try:
+            # Compute the embedding
+            result = PROJECTIONS[method](DATA).tolist()
+            # Hide loading state and enable dropdown
+            loading_style = {"display": "none"}
+            return result, False, loading_style
+        except Exception as e:
+            print(f"Error computing projection: {e}")
+            # In case of error, re-enable the dropdown but keep loading state
+            return dash.no_update, False, loading_style
 
     @app.callback(
         Output("sel", "data"),
@@ -605,7 +735,12 @@ def register_callbacks(app: dash.Dash) -> None:
             sel.remove(idx)
         else:
             sel.append(idx)
-            max_points = 5 if mode == "compare" else 2
+            if mode == "compare":
+                max_points = 5
+            elif mode == "interpolate":
+                max_points = 2
+            else:  # tree mode
+                max_points = 1
             if len(sel) > max_points:
                 sel = sel[-max_points:]
         return sel
@@ -644,6 +779,26 @@ def register_callbacks(app: dash.Dash) -> None:
         return interpolated.tolist()
 
     @app.callback(
+        [Output("tree-parent", "children"),
+         Output("tree-current", "children"),
+         Output("tree-child", "children")],
+        Input("sel", "data"),
+        Input("mode", "data"),
+    )
+    def _update_tree_view(sel, mode):
+        if mode != "tree" or not sel or len(sel) != 1:
+            return _decode_point(None), _decode_point(None), _decode_point(None)
+        
+        # Get the selected point
+        idx = sel[0]
+        
+        # For now, show the same point in all three positions
+        # In the future, this is where we'd look up the actual parent and child
+        # Don't show features in tree mode
+        decoded_point = _decode_point(idx, show_features=False)
+        return decoded_point, decoded_point, decoded_point
+
+    @app.callback(
         Output("cmp", "children"),
         Input("sel", "data"),
         Input("interpolated-point", "data"),
@@ -651,6 +806,9 @@ def register_callbacks(app: dash.Dash) -> None:
         Input("mode", "data"),
     )
     def _compare(sel, interpolated_point, t_value, mode):
+        if mode == "tree":
+            return None  # Hide regular comparison when tree view is enabled
+            
         sel = sel or []
 
         if mode == "compare":
@@ -710,16 +868,19 @@ def register_callbacks(app: dash.Dash) -> None:
         Output("mode", "data"),
         Output("compare-btn", "style"),
         Output("interpolate-mode-btn", "style"),
+        Output("tree-mode-btn", "style"),
         Output("interpolate-controls", "style"),
+        Output("tree-traversal", "style"),
         Output("mode-instructions", "children"),
         # IMPORTANT: These two outputs clear the selections when the mode changes.
         Output("sel", "data", allow_duplicate=True),
         Output("interpolated-point", "data", allow_duplicate=True),
         Input("compare-btn", "n_clicks"),
         Input("interpolate-mode-btn", "n_clicks"),
+        Input("tree-mode-btn", "n_clicks"),
         prevent_initial_call=True,
     )
-    def _update_mode(compare_clicks, interpolate_clicks):
+    def _update_mode(compare_clicks, interpolate_clicks, tree_clicks):
         """
         Handles mode switching. Crucially, it clears any existing point 
         selections to prevent carry-over between modes.
@@ -733,14 +894,16 @@ def register_callbacks(app: dash.Dash) -> None:
             "padding": "0.5rem 1rem",
             "borderRadius": "6px",
             "cursor": "pointer",
-            "width": "50%",
+            "width": "33.3%",
         }
         compare_style = {**base_style, "backgroundColor": "#007bff"}
         interpolate_style = {**base_style, "backgroundColor": "#007bff"}
+        tree_style = {**base_style, "backgroundColor": "#007bff"}
         selected_style = {**base_style, "backgroundColor": "green"}
 
         mode = "compare"
         interpolate_controls_style = {"display": "none"}
+        tree_traversal_style = {"display": "none"}
         instructions = "Select up to 5 points to compare."
 
         if triggered_id == "interpolate-mode-btn":
@@ -748,6 +911,11 @@ def register_callbacks(app: dash.Dash) -> None:
             interpolate_style = selected_style
             interpolate_controls_style = {"display": "block"}
             instructions = "Select 2 points to interpolate."
+        elif triggered_id == "tree-mode-btn":
+            mode = "tree"
+            tree_style = selected_style
+            tree_traversal_style = {"display": "block"}
+            instructions = "Select 1 point to view its lineage."
         else:  # Default to compare mode
             compare_style = selected_style
 
@@ -757,7 +925,9 @@ def register_callbacks(app: dash.Dash) -> None:
             mode,
             compare_style,
             interpolate_style,
+            tree_style,
             interpolate_controls_style,
+            tree_traversal_style,
             instructions,
             [],  # Clear selected points
             None,  # Clear any interpolated point
