@@ -710,7 +710,6 @@ def register_callbacks(app: dash.Dash) -> None:
          Output("proj", "disabled"),
          Output("proj-loading", "parent_style")],
         Input("proj", "value"),
-        prevent_initial_call=True,
     )
     def _compute(method):
         # Show loading state and disable dropdown
