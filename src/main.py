@@ -219,12 +219,12 @@ def _config_panel() -> html.Div:
             ),
         ],
         style={
-            "width": 240,
+            "width": "240px",
             "padding": "1rem",
-            "borderRight": "1px solid #ddd",
             "backgroundColor": "white",
             "borderRadius": "8px",
-            "margin": "1rem",
+            "boxShadow": "0 1px 3px rgba(0,0,0,0.1)",
+            "flexShrink": 0,  # Prevent panel from shrinking
         },
     )
 
@@ -249,15 +249,15 @@ def _centre_panel() -> html.Div:
                         dcc.Graph(
                             id="scatter-3d",
                             figure=_empty_fig3d(),
-                            style={"width": "100%", "height": "100%", "aspectRatio": "1"},
+                            style={"width": "100%", "height": "100%"},
                             config={"displayModeBar": False},
                         ),
                         style={
                             "flex": 1,
-                            "minWidth": "0",
-                            "aspectRatio": "1 / 1",  # Ensures square aspect
-                            "maxWidth": "600px",     # Optional: limit max size
-                            "marginRight": "1rem"
+                            "minWidth": 0,
+                            "aspectRatio": "1 / 1",
+                            "maxWidth": "600px",
+                            "marginRight": "1rem",
                         },
                     ),
                     # 2D Plot
@@ -265,12 +265,12 @@ def _centre_panel() -> html.Div:
                         dcc.Graph(
                             id="scatter-disk",
                             figure=_empty_fig3d(),
-                            style={"width": "100%", "height": "100%", "aspectRatio": "1"},
+                            style={"width": "100%", "height": "100%"},
                             config={"displayModeBar": False},
                         ),
                         style={
                             "flex": 1,
-                            "minWidth": "0",
+                            "minWidth": 0,
                             "aspectRatio": "1 / 1",
                             "maxWidth": "600px",
                         },
@@ -283,20 +283,20 @@ def _centre_panel() -> html.Div:
                     "alignItems": "flex-start",
                     "gap": "1rem",
                     "width": "100%",
-                    "height": "600px",  # Fixed or calculated height for the plots
+                    "height": "100%",
                 },
             ),
-            html.Div(style={"height": "2rem"}),  # Spacer
-            # (Add any other widgets below, or leave blank for now)
         ],
         style={
             "flex": 1,
             "padding": "1rem",
-            "margin": "1rem",
             "backgroundColor": "white",
             "borderRadius": "8px",
+            "boxShadow": "0 1px 3px rgba(0,0,0,0.1)",
             "display": "flex",
             "flexDirection": "column",
+            "minHeight": 0,  # Important for flex child
+            "overflow": "hidden",  # Prevent scrollbars
         },
     )
 
@@ -417,12 +417,13 @@ def _cmp_panel() -> html.Div:
             html.Div(id="cmp"),
         ],
         style={
-            "width": 320,
+            "width": "320px",
             "padding": "1rem",
-            "borderLeft": "1px solid #ddd",
             "backgroundColor": "white",
             "borderRadius": "8px",
-            "margin": "1rem",
+            "boxShadow": "0 1px 3px rgba(0,0,0,0.1)",
+            "flexShrink": 0,  # Prevent panel from shrinking
+            "overflowY": "auto",  # Allow scrolling if content overflows
         },
     )
 
@@ -438,12 +439,15 @@ def make_layout() -> html.Div:
             html.Div(
                 html.H2(
                     "Embedding Projector",
-                    style={"color": "white", "margin": 0},
+                    style={"color": "white", "margin": 0, "padding": "0.5rem 0"},
                 ),
                 style={
-                    "padding": "0.5rem 1rem",
+                    "padding": "0 1rem",
                     "backgroundColor": "rgb(33, 43, 181)",
                     "boxShadow": "0 2px 8px rgba(0,0,0,0.1)",
+                    "height": "48px",
+                    "display": "flex",
+                    "alignItems": "center",
                 },
             ),
             dcc.Store(id="emb"),
@@ -452,15 +456,25 @@ def make_layout() -> html.Div:
             dcc.Store(id="interpolated-point"),
             html.Div(
                 [_config_panel(), _centre_panel(), _cmp_panel()],
-                style={"display": "flex"},
+                style={
+                    "display": "flex",
+                    "flex": 1,
+                    "minHeight": 0,  # Important for flex child
+                    "padding": "0.5rem",
+                    "gap": "0.5rem",
+                },
             ),
         ],
         style={
             "display": "flex",
             "flexDirection": "column",
             "height": "100vh",
+            "width": "100vw",
+            "margin": 0,
+            "padding": 0,
             "fontFamily": "Inter, sans-serif",
             "backgroundColor": "#f7f9fc",
+            "overflow": "hidden",  # Prevent scrollbars
         },
     )
 
