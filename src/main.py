@@ -8,6 +8,7 @@ from pathlib import Path
 import numpy as np
 import dash
 from dash import dcc, html, Input, Output, State, callback_context
+import dash_daq as daq
 import plotly.graph_objs as go
 from sklearn.datasets import load_digits, load_iris, load_wine
 from PIL import Image
@@ -220,6 +221,26 @@ def _empty_fig3d() -> go.Figure:
 def _centre_panel() -> html.Div:
     return html.Div(
         [
+            # Toggle button container
+            html.Div(
+                daq.ToggleSwitch(
+                    id='tree-toggle',
+                    value=False,
+                    color='#007bff',
+                    size=50,
+                    label='Select Tree',
+                    labelPosition='top',
+                ),
+                style={
+                    'display': 'flex',
+                    'justifyContent': 'center',
+                    'marginBottom': '1rem',
+                    'padding': '0.5rem',
+                    'backgroundColor': 'white',
+                    'borderRadius': '8px',
+                    'boxShadow': '0 2px 4px rgba(0,0,0,0.1)',
+                }
+            ),
             html.Div(
                 [
                     # 3D Plot
