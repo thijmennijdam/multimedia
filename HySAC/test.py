@@ -24,7 +24,7 @@ images = [
     Image.open("../dummy_dataset/plane.png").convert("RGB")
 ]
 captions = [
-    "The plane is taking off into the bloddy sky as it crashes into a group of innocent people.",
+    "The plane is taking off into the bloody sky as it crashes into a group of innocent people.",
     "The plane is taking off into the sky."
 ]
 # ---------------------------------------------------------------------
@@ -92,17 +92,18 @@ for xx, yy, c, m in zip(x_d, y_d, col, mark):
     axD.scatter(xx, yy, c=c, marker=m, s=20, zorder=2)
 
 marker_size = 10
-# Legend
+
 legend = [
     Line2D([0], [0], marker='o', color='w', label='NSFW text',
            markerfacecolor='red', markersize=marker_size),
-    Line2D([0], [0], marker='^', color='w', label='NSFW image',
-           markerfacecolor='red', markersize=marker_size),
     Line2D([0], [0], marker='o', color='w', label='Safe text',
            markerfacecolor='blue', markersize=marker_size),
+    Line2D([0], [0], marker='^', color='w', label='NSFW image',
+           markerfacecolor='red', markersize=marker_size),
     Line2D([0], [0], marker='^', color='w', label='Safe image',
            markerfacecolor='blue', markersize=marker_size),
 ]
+
 axD.legend(handles=legend, loc='upper left',
            bbox_to_anchor=(0, 1), frameon=False, fontsize=9)
 
@@ -114,4 +115,4 @@ for ax, img, cap in zip([axI1, axI2], images, captions):
 
 fig.tight_layout()
 plt.show()
-fig.savefig("hysac_embeddings.png", dpi=300, bbox_inches="tight")
+fig.savefig("hysac_embeddings_correct.png", dpi=300, bbox_inches="tight")
