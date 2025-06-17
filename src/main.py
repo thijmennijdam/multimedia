@@ -11,7 +11,6 @@ import plotly.graph_objs as go
 from sklearn.datasets import load_digits, load_iris, load_wine
 from PIL import Image
 
-
 import umap
 
 warnings.filterwarnings(
@@ -63,7 +62,7 @@ PROJECTIONS: dict[str, callable[[np.ndarray], np.ndarray]] = {
 }
 
 # ---------------------------------------------------------------------------
-# Dataset loading (global so callbacks can access)
+# Dataset loading
 # ---------------------------------------------------------------------------
 
 
@@ -100,7 +99,7 @@ parser.add_argument("--dataset", choices=["iris", "wine", "digits"], default="di
 parser.add_argument("--debug", action="store_true")
 ARGS = parser.parse_args()
 
-DATA, LABELS, FEATURE_NAMES, TARGET_NAMES, IMAGES = _load_dataset(ARGS.dataset)
+# MODIFIED: Global data is no longer loaded here. It will be managed by Dash Stores.
 
 # ---------------------------------------------------------------------------
 # UI helper components (pure functions → no side-effects)
@@ -112,6 +111,25 @@ def _config_panel() -> html.Div:
     return html.Div(
         [
             html.H4("Configuration"),
+            # ADDED: Dataset Dropdown
+            html.Label("Dataset"),
+            dcc.Dropdown(
+                id="dataset-dropdown",
+                options=[
+                    {"label": "Digits", "value": "digits"},
+                    {"label": "Wine", "value": "wine"},
+                    {"label": "Iris", "value": "iris"},
+                ],
+                value=ARGS.dataset,  # Use parsed arg as default
+                clearable=False,
+                style={
+                    "backgroundColor": "white",
+                    "border": "1px solid #ccc",
+                    "borderRadius": "6px",
+                    "color": "black",
+                    # "marginBottom": "1rem",
+                },
+            ),
             html.Label("Projection"),
             html.Div([
                 dcc.Dropdown(
@@ -301,15 +319,24 @@ def _centre_panel() -> html.Div:
     )
 
 
-def _decode_point(idx: int, show_features: bool = True) -> html.Div:
+# MODIFIED: Helper function now takes all data as arguments instead of using globals.
+def _decode_point(
+    idx: int,
+    data: np.ndarray,
+    labels: np.ndarray,
+    feature_names: list[str],
+    target_names: list[str],
+    images: np.ndarray | None,
+    show_features: bool = True,
+) -> html.Div:
     """Create a detailed view of a data point showing its features."""
     if idx is None:
         return html.Div("No point selected", style={"color": "#666", "fontStyle": "italic"})
-    
+
     # Get the point's data and label
-    point_data = DATA[idx]
-    label = TARGET_NAMES[LABELS[idx]] if TARGET_NAMES is not None else LABELS[idx]
-    
+    point_data = data[idx]
+    label = target_names[labels[idx]] if target_names is not None else labels[idx]
+
     # Create feature list only if show_features is True
     features = None
     if show_features:
@@ -318,27 +345,27 @@ def _decode_point(idx: int, show_features: bool = True) -> html.Div:
                 html.Span(f"{name}: ", style={"fontWeight": "bold", "color": "#444"}),
                 html.Span(f"{value:.3f}", style={"color": "#666"})
             ], style={"marginBottom": "0.25rem"})
-            for name, value in zip(FEATURE_NAMES, point_data)
+            for name, value in zip(feature_names, point_data)
         ], style={"fontSize": "0.9rem", "marginTop": "0.5rem"})
-    
+
     return html.Div([
         # Image (if available)
-        _create_img_tag(idx),
+        _create_img_tag(idx, images),
         # Label
         html.P(f"Point {idx}", style={"fontWeight": "bold", "margin": "0.5rem 0 0.25rem 0"}),
         html.P(f"Label: {label}", style={"color": "#007bff", "margin": "0 0 0.5rem 0"}),
         # Features (only if show_features is True)
         features if features is not None else None
     ], style={
-        "padding": "0.5rem", 
-        "border": "1px solid #eee", 
+        "padding": "0.5rem",
+        "border": "1px solid #eee",
         "borderRadius": "4px",
-        "cursor": "pointer",  # Add cursor pointer to indicate clickability
-        "transition": "background-color 0.2s",  # Smooth transition for hover effect
+        "cursor": "pointer",
+        "transition": "background-color 0.2s",
         "hover": {
-            "backgroundColor": "#f8f9fa"  # Light background on hover
+            "backgroundColor": "#f8f9fa"
         }
-    }, id={"type": "point-card", "index": idx})  # Add a pattern-matching ID for the click handler
+    }, id={"type": "point-card", "index": idx})
 
 
 def _tree_node(title: str, content: html.Div, is_current: bool = False) -> html.Div:
@@ -447,7 +474,7 @@ def make_layout() -> html.Div:
         [
             html.Div(
                 html.H2(
-                    "Embedding Projector",
+                    "HIVE: Hyperbolic Interactive Visualization Explorer",
                     style={"color": "white", "margin": 0, "padding": "0.5rem 0"},
                 ),
                 style={
@@ -459,6 +486,13 @@ def make_layout() -> html.Div:
                     "alignItems": "center",
                 },
             ),
+            # ADDED: Data Stores to manage state dynamically
+            dcc.Store(id="data-store"),
+            dcc.Store(id="labels-store"),
+            dcc.Store(id="feature-names-store"),
+            dcc.Store(id="target-names-store"),
+            dcc.Store(id="images-store"),
+            # Existing Stores
             dcc.Store(id="emb"),
             dcc.Store(id="sel", data=[]),
             dcc.Store(id="mode", data="compare"),  # Default mode
@@ -522,12 +556,14 @@ def _interpolate_hyperbolic(p1: np.ndarray, p2: np.ndarray, t: float) -> np.ndar
     coeff2 = np.sinh(t * d) / sinh_d
     return coeff1 * p1 + coeff2 * p2
 
-# FIX: Moved image creation logic to top-level helper functions to resolve NameError.
-def _create_img_tag(idx: int) -> html.Img | html.Span:
+# MODIFIED: Helper function now takes `images` data as an argument.
+def _create_img_tag(idx: int, images: np.ndarray | None) -> html.Img | html.Span:
     """Creates a base64 encoded image tag from the IMAGES dataset."""
-    if IMAGES is None:
+    if images is None:
         return html.Span()
-    pil = Image.fromarray((IMAGES[idx] * 16).astype("uint8"), mode="L").resize(
+    
+    images_np = np.asarray(images)
+    pil = Image.fromarray((images_np[idx] * 16).astype("uint8"), mode="L").resize(
         (64, 64), Image.NEAREST
     )
     buf = io.BytesIO()
@@ -535,13 +571,15 @@ def _create_img_tag(idx: int) -> html.Img | html.Span:
     uri = "data:image/png;base64," + base64.b64encode(buf.getvalue()).decode()
     return html.Img(src=uri, style={"marginRight": "0.5rem", "border": "1px solid #bbb"})
 
-
-def _create_interpolated_img_tag(i: int, j: int, t_value: float) -> html.Img | html.Span:
+# MODIFIED: Helper function now takes `images` data as an argument.
+def _create_interpolated_img_tag(i: int, j: int, t_value: float, images: np.ndarray | None) -> html.Img | html.Span:
     """Creates an image tag for the interpolated point."""
-    if IMAGES is None:
+    if images is None:
         return html.Span()
-    img1 = IMAGES[i].astype(np.float32)
-    img2 = IMAGES[j].astype(np.float32)
+    
+    images_np = np.asarray(images)
+    img1 = images_np[i].astype(np.float32)
+    img2 = images_np[j].astype(np.float32)
     interpolated_img_data = (1 - t_value) * img1 + t_value * img2
     pil = Image.fromarray(
         (interpolated_img_data * 16).astype("uint8"), mode="L"
@@ -589,13 +627,17 @@ def _create_close_button(idx: int) -> html.Button:
 # Drawing helpers
 # ---------------------------------------------------------------------------
 
-
+# MODIFIED: Helper function now takes `labels` and `target_names` as arguments.
 def _fig3d(
-    emb: np.ndarray, sel: list[int], interpolated_point: np.ndarray = None
+    emb: np.ndarray,
+    sel: list[int],
+    labels: np.ndarray,
+    target_names: list[str] | None,
+    interpolated_point: np.ndarray = None,
 ) -> go.Figure:
     labels_txt = [
-        f"{i}: {TARGET_NAMES[LABELS[i]] if TARGET_NAMES is not None else LABELS[i]}"
-        for i in range(len(LABELS))
+        f"{i}: {target_names[labels[i]] if target_names is not None else labels[i]}"
+        for i in range(len(labels))
     ]
     base = go.Scatter3d(
         x=emb[:, 0],
@@ -604,7 +646,7 @@ def _fig3d(
         mode="markers",
         text=labels_txt,
         hoverinfo="text",
-        marker=dict(size=6, opacity=0.8, color=LABELS, colorscale="Viridis"),
+        marker=dict(size=6, opacity=0.8, color=labels, colorscale="Viridis"),
         name="Data points",
     )
     traces = [base]
@@ -643,20 +685,25 @@ def _fig3d(
     )
     return fig
 
-
+# MODIFIED: Helper function now takes `labels` and `target_names` as arguments.
 def _fig_disk(
-    x: np.ndarray, y: np.ndarray, sel: list[int], interpolated_point: np.ndarray = None
+    x: np.ndarray,
+    y: np.ndarray,
+    sel: list[int],
+    labels: np.ndarray,
+    target_names: list[str] | None,
+    interpolated_point: np.ndarray = None,
 ) -> go.Figure:
     base = go.Scatter(
         x=x,
         y=y,
         mode="markers",
         text=[
-            f"{i}: {TARGET_NAMES[LABELS[i]] if TARGET_NAMES is not None else LABELS[i]}"
-            for i in range(len(LABELS))
+            f"{i}: {target_names[labels[i]] if target_names is not None else labels[i]}"
+            for i in range(len(labels))
         ],
         hoverinfo="text",
-        marker=dict(size=6, opacity=0.8, color=LABELS, colorscale="Viridis"),
+        marker=dict(size=6, opacity=0.8, color=labels, colorscale="Viridis"),
         name="Data points",
     )
     traces = [base]
@@ -702,18 +749,51 @@ def _fig_disk(
 
 
 def register_callbacks(app: dash.Dash) -> None:
+    # ADDED: This callback loads dataset data into stores when the dropdown changes.
+    @app.callback(
+        Output("data-store", "data"),
+        Output("labels-store", "data"),
+        Output("feature-names-store", "data"),
+        Output("target-names-store", "data"),
+        Output("images-store", "data"),
+        Output("sel", "data", allow_duplicate=True),
+        Output("interpolated-point", "data", allow_duplicate=True),
+        Output("emb", "data", allow_duplicate=True),
+        Input("dataset-dropdown", "value"),
+        prevent_initial_call=False,  # IMPORTANT: Load default dataset on startup
+    )
+    def _update_dataset_stores(dataset_name):
+        if not dataset_name:
+            return dash.no_update
+
+        data, labels, feature_names, target_names, images = _load_dataset(dataset_name)
+
+        # Serialize numpy arrays to lists for storing in dcc.Store
+        data_list = data.tolist()
+        labels_list = labels.tolist()
+        target_names_list = target_names.tolist() if target_names is not None else None
+        images_list = images.tolist() if images is not None else None
+
+        # Reset selection, interpolation, and embedding when dataset changes
+        return data_list, labels_list, feature_names, target_names_list, images_list, [], None, None
+
+
+    # MODIFIED: Callback now reads from stores instead of globals.
     @app.callback(
         [Output("scatter-3d", "figure"), Output("scatter-disk", "figure")],
         Input("emb", "data"),
         Input("sel", "data"),
         Input("proj", "value"),
         Input("interpolated-point", "data"),
+        State("labels-store", "data"),
+        State("target-names-store", "data"),
     )
-    def _scatter(edata, sel, proj, interpolated_point):
-        if edata is None:
+    def _scatter(edata, sel, proj, interpolated_point, labels_data, target_names):
+        if edata is None or labels_data is None:
             return _empty_fig3d(), _empty_fig3d()
         
         emb = np.asarray(edata, dtype=np.float32)
+        labels = np.asarray(labels_data, dtype=int)
         sel = sel or []
         interp_point = (
             np.asarray(interpolated_point, dtype=np.float32)
@@ -721,10 +801,8 @@ def register_callbacks(app: dash.Dash) -> None:
             else None
         )
 
-        # Always create 3D view
-        fig_3d = _fig3d(emb, sel, interp_point)
+        fig_3d = _fig3d(emb, sel, labels, target_names, interp_point)
 
-        # Create Poincaré disk view for hyperbolic projection, otherwise use 2D projection
         if "Hyperbolic" in proj:
             xh, yh, zh = emb[:, 0], emb[:, 1], emb[:, 2]
             dx, dy = xh / (1.0 + zh), yh / (1.0 + zh)
@@ -737,33 +815,31 @@ def register_callbacks(app: dash.Dash) -> None:
             dx, dy = emb[:, 0], emb[:, 1]
             interp_transformed = interp_point[:2] if interp_point is not None else None
         
-        fig_disk = _fig_disk(dx, dy, sel, interp_transformed)
+        fig_disk = _fig_disk(dx, dy, sel, labels, target_names, interp_transformed)
         
-        # Add titles to distinguish the views
-        # fig_3d.update_layout(title="3D View")
-        # fig_disk.update_layout(title="Poincaré Disk View" if "Hyperbolic" in proj else "2D View")
-
         return fig_3d, fig_disk
 
+    # MODIFIED: Callback now triggers on data change and reads from store.
     @app.callback(
-        [Output("emb", "data"),
-         Output("proj", "disabled"),
-         Output("proj-loading", "parent_style")],
+        Output("emb", "data"),
+        Output("proj-loading", "parent_style"),
         Input("proj", "value"),
+        Input("data-store", "data"),
+        prevent_initial_call=True,
     )
-    def _compute(method):
-        # Show loading state and disable dropdown
+    def _compute(method, data):
+        if data is None:
+            return None, {"display": "none"}
+            
         loading_style = {"display": "block"}
         try:
-            # Compute the embedding
-            result = PROJECTIONS[method](DATA).tolist()
-            # Hide loading state and enable dropdown
+            data_np = np.asarray(data, dtype=np.float32)
+            result = PROJECTIONS[method](data_np).tolist()
             loading_style = {"display": "none"}
-            return result, False, loading_style
+            return result, loading_style
         except Exception as e:
             print(f"Error computing projection: {e}")
-            # In case of error, re-enable the dropdown but keep loading state
-            return dash.no_update, False, loading_style
+            return None, {"display": "none"}
 
     @app.callback(
         Output("sel", "data"),
@@ -784,7 +860,6 @@ def register_callbacks(app: dash.Dash) -> None:
         triggered_id = ctx.triggered_id
         current_sel = sel or []
 
-        # Handle clicks from the plots
         if triggered_id in ["scatter-3d", "scatter-disk"]:
             click_data = ctx.inputs[f"{triggered_id}.clickData"]
             idx = _clicked(click_data)
@@ -792,34 +867,24 @@ def register_callbacks(app: dash.Dash) -> None:
                 return dash.no_update
 
             if idx in current_sel:
-                # Create a new list excluding the item
                 new_sel = [i for i in current_sel if i != idx]
             else:
-                # Create a new list by concatenating
                 new_sel = current_sel + [idx]
                 
-                # Determine max points based on mode
                 max_points = 1
-                if mode == "compare":
-                    max_points = 5
-                elif mode == "interpolate":
-                    max_points = 2
+                if mode == "compare": max_points = 5
+                elif mode == "interpolate": max_points = 2
                 
-                # Slicing creates a new list, which is correct
                 if len(new_sel) > max_points:
                     new_sel = new_sel[-max_points:]
             return new_sel
 
-        # Handle clicks from close buttons
-        # Check if the trigger is from a pattern-matching ID, which is a dict
         elif isinstance(triggered_id, dict) and triggered_id.get("type") == "close-button":
-            # Ensure a button was actually clicked (n_clicks is not None)
             if not ctx.triggered[0]['value']:
                 return dash.no_update
             
             idx_to_remove = triggered_id.get("index")
             if idx_to_remove in current_sel:
-                # Create a new list that excludes the removed item
                 new_sel = [i for i in current_sel if i != idx_to_remove]
                 return new_sel
 
@@ -858,123 +923,91 @@ def register_callbacks(app: dash.Dash) -> None:
             interpolated = _interpolate_points(p1, p2, t)
         return interpolated.tolist()
 
+    # MODIFIED: Callback now reads from stores to get data for decoding.
     @app.callback(
         [Output("tree-parent", "children"),
          Output("tree-current", "children"),
          Output("tree-child", "children")],
         Input("sel", "data"),
         Input("mode", "data"),
+        State("data-store", "data"),
+        State("labels-store", "data"),
+        State("feature-names-store", "data"),
+        State("target-names-store", "data"),
+        State("images-store", "data"),
     )
-    def _update_tree_view(sel, mode):
-        if mode != "tree" or not sel or len(sel) != 1:
-            return _decode_point(None), _decode_point(None), _decode_point(None)
+    def _update_tree_view(sel, mode, data, labels, feature_names, target_names, images):
+        if mode != "tree" or not sel or len(sel) != 1 or data is None:
+            no_data_args = (None, None, None, None, None, None)
+            return _decode_point(*no_data_args), _decode_point(*no_data_args), _decode_point(*no_data_args)
         
-        # Get the selected point
         idx = sel[0]
+        data_args = (np.asarray(data), np.asarray(labels), feature_names, target_names, images)
         
-        # For now, show the same point in all three positions
-        # In the future, this is where we'd look up the actual parent and child
-        # Don't show features in tree mode
-        decoded_point = _decode_point(idx, show_features=False)
+        decoded_point = _decode_point(idx, *data_args, show_features=False)
         return decoded_point, decoded_point, decoded_point
 
+    # MODIFIED: Callback now reads from stores to get data for comparison.
     @app.callback(
         Output("cmp", "children"),
         Input("sel", "data"),
         Input("interpolated-point", "data"),
         Input("interpolation-slider", "value"),
         Input("mode", "data"),
+        State("labels-store", "data"),
+        State("target-names-store", "data"),
+        State("images-store", "data"),
     )
-    def _compare(sel, interpolated_point, t_value, mode):
-        if mode == "tree":
-            return None  # Hide regular comparison when tree view is enabled
-            
+    def _compare(sel, interpolated_point, t_value, mode, labels_data, target_names, images):
+        if labels_data is None:
+            return html.P("Select a dataset to begin.")
+
+        labels = np.asarray(labels_data)
         sel = sel or []
 
+        if mode == "tree":
+            return None
+            
         if mode == "compare":
-            if not sel:
-                return html.P("Select up to 5 points to compare.")
+            if not sel: return html.P("Select up to 5 points to compare.")
             components = []
             for idx in sel:
-                label = (
-                    TARGET_NAMES[LABELS[idx]] if TARGET_NAMES is not None else LABELS[idx]
-                )
+                label = target_names[labels[idx]] if target_names is not None else labels[idx]
                 components.append(
-                    html.Div(
-                        [
-                            _create_close_button(idx),
-                            _create_img_tag(idx), 
-                            html.P(f"Point {idx} label: {label}")
-                        ],
-                        style={
-                            "display": "flex", 
-                            "alignItems": "center",
-                            "padding": "0.5rem",
-                            "borderRadius": "4px",
-                            "position": "relative",  # For absolute positioning of close button
-                            "backgroundColor": "#f8f9fa",
-                            "marginBottom": "0.5rem"
-                        }
-                    )
+                    html.Div([
+                        _create_close_button(idx),
+                        _create_img_tag(idx, images), 
+                        html.P(f"Point {idx} label: {label}")
+                    ], style={"display": "flex", "alignItems": "center", "padding": "0.5rem", "borderRadius": "4px", "position": "relative", "backgroundColor": "#f8f9fa", "marginBottom": "0.5rem"})
                 )
             return html.Div(components)
 
         if mode == "interpolate":
-            if len(sel) < 2:
-                return html.P("Select two distinct points to interpolate.")
+            if len(sel) < 2: return html.P("Select two distinct points to interpolate.")
             i, j = sel[:2]
-            li = TARGET_NAMES[LABELS[i]] if TARGET_NAMES is not None else LABELS[i]
-            lj = TARGET_NAMES[LABELS[j]] if TARGET_NAMES is not None else LABELS[j]
+            li = target_names[labels[i]] if target_names is not None else labels[i]
+            lj = target_names[labels[j]] if target_names is not None else labels[j]
 
             components = [
-                html.Div(
-                    [
-                        _create_close_button(i),
-                        _create_img_tag(i), 
-                        html.P(f"Point {i} label: {li}")
-                    ],
-                    style={
-                        "display": "flex", 
-                        "alignItems": "center",
-                        "padding": "0.5rem",
-                        "borderRadius": "4px",
-                        "position": "relative",
-                        "backgroundColor": "#f8f9fa",
-                        "marginBottom": "0.5rem"
-                    }
-                ),
-                html.Div(
-                    [
-                        _create_close_button(j),
-                        _create_img_tag(j), 
-                        html.P(f"Point {j} label: {lj}")
-                    ],
-                    style={
-                        "display": "flex", 
-                        "alignItems": "center",
-                        "padding": "0.5rem",
-                        "borderRadius": "4px",
-                        "position": "relative",
-                        "backgroundColor": "#f8f9fa",
-                        "marginBottom": "0.5rem"
-                    }
-                ),
+                html.Div([
+                    _create_close_button(i),
+                    _create_img_tag(i, images), 
+                    html.P(f"Point {i} label: {li}")
+                ], style={"display": "flex", "alignItems": "center", "padding": "0.5rem", "borderRadius": "4px", "position": "relative", "backgroundColor": "#f8f9fa", "marginBottom": "0.5rem"}),
+                html.Div([
+                    _create_close_button(j),
+                    _create_img_tag(j, images), 
+                    html.P(f"Point {j} label: {lj}")
+                ], style={"display": "flex", "alignItems": "center", "padding": "0.5rem", "borderRadius": "4px", "position": "relative", "backgroundColor": "#f8f9fa", "marginBottom": "0.5rem"}),
             ]
 
             if interpolated_point is not None:
-                interpolated_img = _create_interpolated_img_tag(i, j, t_value)
+                interpolated_img = _create_interpolated_img_tag(i, j, t_value, images)
                 components.append(
-                    html.Div(
-                        [
-                            interpolated_img,
-                            html.P(f"Interpolated point (t={t_value:.1f})"),
-                        ],
-                        style={
-                            "display": "flex",
-                            "alignItems": "center",
-                            "marginTop": "0.5rem",
-                        },
-                    )
+                    html.Div([
+                        interpolated_img,
+                        html.P(f"Interpolated point (t={t_value:.1f})"),
+                    ], style={"display": "flex", "alignItems": "center", "marginTop": "0.5rem"})
                 )
             return html.Div(components)
         
@@ -988,7 +1021,6 @@ def register_callbacks(app: dash.Dash) -> None:
         Output("interpolate-controls", "style"),
         Output("tree-traversal", "style"),
         Output("mode-instructions", "children"),
-        # IMPORTANT: These two outputs clear the selections when the mode changes.
         Output("sel", "data", allow_duplicate=True),
         Output("interpolated-point", "data", allow_duplicate=True),
         Input("compare-btn", "n_clicks"),
@@ -997,21 +1029,10 @@ def register_callbacks(app: dash.Dash) -> None:
         prevent_initial_call=True,
     )
     def _update_mode(compare_clicks, interpolate_clicks, tree_clicks):
-        """
-        Handles mode switching. Crucially, it clears any existing point 
-        selections to prevent carry-over between modes.
-        """
         ctx = callback_context
         triggered_id = ctx.triggered[0]["prop_id"].split(".")[0]
 
-        base_style = {
-            "color": "white",
-            "border": "none",
-            "padding": "0.5rem 1rem",
-            "borderRadius": "6px",
-            "cursor": "pointer",
-            "width": "33.3%",
-        }
+        base_style = {"color": "white", "border": "none", "padding": "0.5rem 1rem", "borderRadius": "6px", "cursor": "pointer", "width": "33.3%"}
         compare_style = {**base_style, "backgroundColor": "#007bff"}
         interpolate_style = {**base_style, "backgroundColor": "#007bff"}
         tree_style = {**base_style, "backgroundColor": "#007bff"}
@@ -1032,22 +1053,10 @@ def register_callbacks(app: dash.Dash) -> None:
             tree_style = selected_style
             tree_traversal_style = {"display": "block"}
             instructions = "Select 1 point to view its lineage."
-        else:  # Default to compare mode
+        else:
             compare_style = selected_style
 
-        # Return an empty list for 'sel' and None for 'interpolated-point'
-        # to ensure a clean state every time the user switches modes.
-        return (
-            mode,
-            compare_style,
-            interpolate_style,
-            tree_style,
-            interpolate_controls_style,
-            tree_traversal_style,
-            instructions,
-            [],  # Clear selected points
-            None,  # Clear any interpolated point
-        )
+        return (mode, compare_style, interpolate_style, tree_style, interpolate_controls_style, tree_traversal_style, instructions, [], None)
 
 
 # ---------------------------------------------------------------------------
@@ -1056,7 +1065,6 @@ def register_callbacks(app: dash.Dash) -> None:
 
 
 def build_app(debug: bool = False) -> dash.Dash:
-    # Use prevent_initial_callbacks to handle outputs with allow_duplicate=True
     app = dash.Dash(__name__, prevent_initial_callbacks="initial_duplicate")
     app.layout = make_layout()
     register_callbacks(app)
