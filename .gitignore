@@ -10,3 +10,5 @@ wheels/
 .venv
 .history
 uv.lock
+
+ILSVRC2012_img_val.tar

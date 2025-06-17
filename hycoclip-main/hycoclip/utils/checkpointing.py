@@ -142,7 +142,7 @@ class CheckpointManager:
         rank = dist.get_rank()
 
         logger.info(f"Rank {rank}: Loading checkpoint from {path}")
-        checkpoint = torch.load(path, map_location="cpu")
+        checkpoint = torch.load(path, map_location="cpu", weights_only=False)
         iteration = checkpoint.pop("iteration", -1)
 
         # Keep flags of all checkpointables to lo which ones were not loaded.
