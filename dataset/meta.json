@@ -1,0 +1,44 @@
+{
+  "n01440764": {
+    "synset_id": "n01440764",
+    "name": "tench",
+    "description": "freshwater dace-like game fish of Europe and western Asia noted for ability to survive outside water",
+    "first_image_path": "n01440764/ILSVRC2012_val_00000293.JPEG"
+  },
+  "n01443537": {
+    "synset_id": "n01443537",
+    "name": "goldfish",
+    "description": "small golden or orange-red freshwater fishes of Eurasia used as pond or aquarium fishes",
+    "first_image_path": "n01443537/ILSVRC2012_val_00000236.JPEG"
+  },
+  "n01484850": {
+    "synset_id": "n01484850",
+    "name": "great_white_shark",
+    "description": "large aggressive shark widespread in warm seas; known to attack humans",
+    "first_image_path": "n01484850/ILSVRC2012_val_00002338.JPEG"
+  },
+  "n01491361": {
+    "synset_id": "n01491361",
+    "name": "tiger_shark",
+    "description": "large dangerous warm-water shark with striped or spotted body",
+    "first_image_path": "n01491361/ILSVRC2012_val_00002922.JPEG"
+  },
+  "n01494475": {
+    "synset_id": "n01494475",
+    "name": "hammerhead",
+    "description": "medium-sized live-bearing shark with eyes at either end of a flattened hammer-shaped head; worldwide in warm waters; can be dangerous",
+    "first_image_path": "n01494475/ILSVRC2012_val_00001676.JPEG"
+  },
+  "n01496331": {
+    "synset_id": "n01496331",
+    "name": "electric_ray",
+    "description": "any sluggish bottom-dwelling ray of the order Torpediniformes having a rounded body and electric organs on each side of the head capable of emitting strong electric discharges",
+    "first_image_path": "n01496331/ILSVRC2012_val_00000921.JPEG"
+  },
+  "n01498041": {
+    "synset_id": "n01498041",
+    "name": "stingray",
+    "description": "large venomous ray with large barbed spines near the base of a thin whiplike tail capable of inflicting severe wounds",
+    "first_image_path": "n01498041/ILSVRC2012_val_00001935.JPEG"
+  }
+}

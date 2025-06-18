@@ -3,6 +3,8 @@ import argparse
 import warnings
 import base64
 import io
+import json
+from pathlib import Path
 
 import numpy as np
 import dash
@@ -95,7 +97,7 @@ def _load_dataset(name: str):
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument("--dataset", choices=["iris", "wine", "digits"], default="digits")
+parser.add_argument("--dataset", choices=["iris", "wine", "digits", "imagenet"], default="digits")
 parser.add_argument("--debug", action="store_true")
 ARGS = parser.parse_args()
 
@@ -119,6 +121,7 @@ def _config_panel() -> html.Div:
                     {"label": "Digits", "value": "digits"},
                     {"label": "Wine", "value": "wine"},
                     {"label": "Iris", "value": "iris"},
+                    {"label": "ImageNet subset", "value": "imagenet"},
                 ],
                 value=ARGS.dataset,  # Use parsed arg as default
                 clearable=False,
@@ -492,6 +495,8 @@ def make_layout() -> html.Div:
             dcc.Store(id="feature-names-store"),
             dcc.Store(id="target-names-store"),
             dcc.Store(id="images-store"),
+            dcc.Store(id="meta-store"),
+            dcc.Store(id="points-store"),
             # Existing Stores
             dcc.Store(id="emb"),
             dcc.Store(id="sel", data=[]),
@@ -556,20 +561,65 @@ def _interpolate_hyperbolic(p1: np.ndarray, p2: np.ndarray, t: float) -> np.ndar
     coeff2 = np.sinh(t * d) / sinh_d
     return coeff1 * p1 + coeff2 * p2
 
+
+# ---------------------------------------------------------------------------
+# Image encoding helper (for datasets that reference image files on disk)
+# ---------------------------------------------------------------------------
+
+_IMAGENET_ROOT = Path("imagenet-subset")
+
+
+def _encode_image(rel_path: str) -> str:
+    """Return base64 data URI for *rel_path* (relative to *_IMAGENET_ROOT*)."""
+    img_path = _IMAGENET_ROOT / rel_path
+    mime = {
+        ".jpeg": "jpeg",
+        ".jpg": "jpeg",
+        ".png": "png",
+    }.get(img_path.suffix.lower(), "jpeg")
+
+    try:
+        with open(img_path, "rb") as f_img:
+            enc = base64.b64encode(f_img.read()).decode()
+    except FileNotFoundError:
+        # If image not found, return empty string to avoid broken UI
+        return ""
+
+    return f"data:image/{mime};base64,{enc}"
+
+
 # MODIFIED: Helper function now takes `images` data as an argument.
 def _create_img_tag(idx: int, images: np.ndarray | None) -> html.Img | html.Span:
     """Creates a base64 encoded image tag from the IMAGES dataset."""
+    # Gracefully handle missing images array
     if images is None:
         return html.Span()
-    
-    images_np = np.asarray(images)
-    pil = Image.fromarray((images_np[idx] * 16).astype("uint8"), mode="L").resize(
-        (64, 64), Image.NEAREST
-    )
-    buf = io.BytesIO()
-    pil.save(buf, format="PNG")
-    uri = "data:image/png;base64," + base64.b64encode(buf.getvalue()).decode()
-    return html.Img(src=uri, style={"marginRight": "0.5rem", "border": "1px solid #bbb"})
+
+    # Case 1: images are in-memory numpy arrays (e.g. sklearn *digits* dataset)
+    if isinstance(images, (list, np.ndarray)) and isinstance(images[idx], (list, np.ndarray)):
+        images_np = np.asarray(images)
+        pil = (
+            Image.fromarray((images_np[idx] * 16).astype("uint8"), mode="L")
+            .resize((64, 64), Image.NEAREST)
+        )
+        buf = io.BytesIO()
+        pil.save(buf, format="PNG")
+        uri = "data:image/png;base64," + base64.b64encode(buf.getvalue()).decode()
+        return html.Img(
+            src=uri, style={"marginRight": "0.5rem", "border": "1px solid #bbb"}
+        )
+
+    # Case 2: images are file paths on disk (e.g. ImageNet subset)
+    try:
+        img_rel = images[idx]
+        uri = _encode_image(str(img_rel))  # type: ignore[arg-type]
+        return html.Img(
+            src=uri, style={"marginRight": "0.5rem", "border": "1px solid #bbb"}
+        )
+    except Exception:
+        # Fallback: empty span on error (e.g. file missing)
+        return html.Span()
+
 
 # MODIFIED: Helper function now takes `images` data as an argument.
 def _create_interpolated_img_tag(i: int, j: int, t_value: float, images: np.ndarray | None) -> html.Img | html.Span:
@@ -756,6 +806,8 @@ def register_callbacks(app: dash.Dash) -> None:
         Output("feature-names-store", "data"),
         Output("target-names-store", "data"),
         Output("images-store", "data"),
+        Output("meta-store", "data"),
+        Output("points-store", "data"),
         Output("sel", "data", allow_duplicate=True),
         Output("interpolated-point", "data", allow_duplicate=True),
         Output("emb", "data", allow_duplicate=True),
@@ -766,16 +818,77 @@ def register_callbacks(app: dash.Dash) -> None:
         if not dataset_name:
             return dash.no_update
 
-        data, labels, feature_names, target_names, images = _load_dataset(dataset_name)
+        # ------------------------------------------------------------------
+        # Classic sklearn datasets (digits / iris / wine)
+        # ------------------------------------------------------------------
+        if dataset_name in {"digits", "iris", "wine"}:
+            data, labels, feature_names, target_names, images = _load_dataset(dataset_name)
 
-        # Serialize numpy arrays to lists for storing in dcc.Store
-        data_list = data.tolist()
-        labels_list = labels.tolist()
-        target_names_list = target_names.tolist() if target_names is not None else None
-        images_list = images.tolist() if images is not None else None
+            data_list = data.tolist()
+            labels_list = labels.tolist()
+            target_names_list = target_names.tolist() if target_names is not None else None
+            images_list = images.tolist() if images is not None else None
 
-        # Reset selection, interpolation, and embedding when dataset changes
-        return data_list, labels_list, feature_names, target_names_list, images_list, [], None, None
+            return (
+                data_list,
+                labels_list,
+                feature_names,
+                target_names_list,
+                images_list,
+                None,  # meta-store
+                None,  # points-store
+                [],
+                None,
+                None,
+            )
+
+        # ------------------------------------------------------------------
+        # ImageNet subset tree dataset (generated via create_trees.py)
+        # ------------------------------------------------------------------
+        if dataset_name == "imagenet":
+            try:
+                with open("dataset/meta.json", "r", encoding="utf-8") as f_meta:
+                    meta = json.load(f_meta)
+                with open("dataset/points.json", "r", encoding="utf-8") as f_pts:
+                    points = json.load(f_pts)
+            except FileNotFoundError:
+                print("meta.json / points.json not found in ./dataset – did you run create_trees.py?")
+                return dash.no_update
+
+            # ------------------------------------------------------------------
+            # Flatten embeddings into data matrix
+            # ------------------------------------------------------------------
+            embeddings = np.array([pt["embedding"] for pt in points], dtype=np.float32)
+
+            # Map synset_id → integer label (for colouring)
+            synset_ids = [pt["synset_id"] for pt in points]
+            unique_synsets = sorted({sid for sid in synset_ids})
+            syn_to_int = {sid: i for i, sid in enumerate(unique_synsets)}
+            labels = np.array([syn_to_int[s] for s in synset_ids], dtype=int)
+
+            feature_names = [f"dim{i}" for i in range(embeddings.shape[1])]
+            target_names = unique_synsets  # optional mapping to synset ids
+
+            # For images-list we keep relative paths where available else None
+            images_list: list[str | None] = [pt.get("image_path") for pt in points]
+
+            return (
+                embeddings.tolist(),
+                labels.tolist(),
+                feature_names,
+                target_names,
+                images_list,
+                meta,
+                points,
+                [],
+                None,
+                None,
+            )
+
+        # ------------------------------------------------------------------
+        # Unknown dataset
+        # ------------------------------------------------------------------
+        return dash.no_update
 
 
     # MODIFIED: Callback now reads from stores instead of globals.
@@ -923,29 +1036,91 @@ def register_callbacks(app: dash.Dash) -> None:
             interpolated = _interpolate_points(p1, p2, t)
         return interpolated.tolist()
 
-    # MODIFIED: Callback now reads from stores to get data for decoding.
+    # MODIFIED: Callback now reads meta/points stores to build detailed tree view.
     @app.callback(
         [Output("tree-parent", "children"),
          Output("tree-current", "children"),
          Output("tree-child", "children")],
         Input("sel", "data"),
         Input("mode", "data"),
-        State("data-store", "data"),
-        State("labels-store", "data"),
-        State("feature-names-store", "data"),
-        State("target-names-store", "data"),
-        State("images-store", "data"),
+        State("meta-store", "data"),
+        State("points-store", "data"),
     )
-    def _update_tree_view(sel, mode, data, labels, feature_names, target_names, images):
-        if mode != "tree" or not sel or len(sel) != 1 or data is None:
-            no_data_args = (None, None, None, None, None, None)
-            return _decode_point(*no_data_args), _decode_point(*no_data_args), _decode_point(*no_data_args)
-        
+    def _update_tree_view(sel, mode, meta, points):
+        """Render a three-level tree similar to the *create_trees* demo.
+
+        The three nodes are:
+          • Parent   → Word/Name
+          • Current  → Description
+          • Child    → Representative image (or the selected image if kind==image)
+        """
+
+        if mode != "tree" or not sel or len(sel) != 1 or meta is None or points is None:
+            # Nothing to show
+            return html.Span(), html.Span(), html.Span()
+
         idx = sel[0]
-        data_args = (np.asarray(data), np.asarray(labels), feature_names, target_names, images)
-        
-        decoded_point = _decode_point(idx, *data_args, show_features=False)
-        return decoded_point, decoded_point, decoded_point
+
+        try:
+            pt = points[idx]
+        except (IndexError, TypeError):
+            return html.Span(), html.Span(), html.Span()
+
+        synset_id: str = pt.get("synset_id", "?")
+        pt_kind: str = pt.get("kind", "?")
+
+        meta_row = meta.get(synset_id, {}) if isinstance(meta, dict) else {}
+
+        # Parent node: Word/Name
+        parent_div = html.Div(
+            [
+                html.H4(meta_row.get("name", synset_id), style={"margin": "0.25rem 0", "color": "#007bff"}),
+            ],
+            style={
+                "padding": "0.5rem",
+                "backgroundColor": "#eef",
+                "borderRadius": "4px",
+                "marginBottom": "0.5rem",
+            },
+        )
+
+        # Current node: Description
+        current_div = html.Div(
+            [
+                html.P(meta_row.get("description", "(no description)"), style={"margin": 0}),
+            ],
+            style={
+                "padding": "0.5rem",
+                "borderLeft": "3px solid #99c",
+                "marginLeft": "1rem",
+                "marginBottom": "0.5rem",
+            },
+        )
+
+        # Choose image
+        if pt_kind == "image" and pt.get("image_path"):
+            img_rel = pt["image_path"]
+        else:
+            img_rel = meta_row.get("first_image_path")
+
+        img_src = _encode_image(img_rel) if img_rel else ""
+
+        child_div = html.Div(
+            [
+                html.Img(src=img_src, style={"maxWidth": "220px", "border": "1px solid #ccc"}),
+                html.P(
+                    f"Image source: {img_rel}" if img_rel else "",
+                    style={"fontSize": "0.75rem", "color": "#666"},
+                ),
+            ],
+            style={
+                "padding": "0.5rem",
+                "borderLeft": "3px solid #c9c",
+                "marginLeft": "2rem",
+            },
+        )
+
+        return parent_div, current_div, child_div
 
     # MODIFIED: Callback now reads from stores to get data for comparison.
     @app.callback(

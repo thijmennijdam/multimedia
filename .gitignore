@@ -10,3 +10,4 @@ wheels/
 .venv
 .history
 uv.lock
+imagenet-subset/
