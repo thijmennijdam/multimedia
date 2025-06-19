@@ -126,7 +126,8 @@ class Resizer:
             downscale = max(original_width, original_height) > self.image_size
             if not self.resize_only_if_bigger or downscale:
                 interpolation = self.downscale_interpolation if downscale else self.upscale_interpolation
-                img = A.longest_max_size(img, self.image_size, interpolation=interpolation)
+                # img = A.longest_max_size(max_size=self.image_size, interpolation=interpolation)(image=img)['image']  # Original
+                img = A.longest_max_size(img, max_size=self.image_size, interpolation=interpolation)
                 if self.resize_mode == ResizeMode.border:
                     img = A.pad(
                         img,

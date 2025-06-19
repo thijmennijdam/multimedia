@@ -149,7 +149,7 @@ def plot_low_dims(tsne_embeddings, HT_SNE_embeddings, CO_SNE_embedding, colors, 
     plt.scatter(tsne_embeddings[:, 0], tsne_embeddings[:, 1], c=colors, s=30)
     ax.set_aspect('equal')
     plt.axis('off')
-    plt.savefig("./saved_figures/" + "tsne.eps", bbox_inches='tight', dpi=fig.dpi)
+    plt.savefig("./analysis_results/" + "tsne.png", bbox_inches='tight', dpi=fig.dpi)
 
 
 
@@ -162,7 +162,7 @@ def plot_low_dims(tsne_embeddings, HT_SNE_embeddings, CO_SNE_embedding, colors, 
     plt.scatter(HT_SNE_embeddings[:,0], HT_SNE_embeddings[:,1], c=colors, s=30)
     ax.set_aspect('equal')
     plt.axis('off')
-    plt.savefig("./saved_figures/" + "HT-SNE.eps", bbox_inches='tight', dpi=fig.dpi)
+    plt.savefig("./analysis_results/" + "HT-SNE.png", bbox_inches='tight', dpi=fig.dpi)
 
 
 
@@ -176,7 +176,7 @@ def plot_low_dims(tsne_embeddings, HT_SNE_embeddings, CO_SNE_embedding, colors, 
     ax.set_aspect('equal')
     plt.axis('off')
 
-    plt.savefig("./saved_figures/" + "CO-SNE.eps", bbox_inches='tight', dpi=fig.dpi)
+    plt.savefig("./analysis_results/" + "CO-SNE.png", bbox_inches='tight', dpi=fig.dpi)
 
 
 

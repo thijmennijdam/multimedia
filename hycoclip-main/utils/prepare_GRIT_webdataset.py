@@ -119,7 +119,8 @@ class Resizer:
             downscale = max(original_width, original_height) > self.image_size
             if not self.resize_only_if_bigger or downscale:
                 interpolation = self.downscale_interpolation if downscale else self.upscale_interpolation
-                img = A.longest_max_size(img, self.image_size, interpolation=interpolation)
+                # img = A.longest_max_size(max_size=self.image_size, interpolation=interpolation)(image=img)['image'] # Original
+                img = A.longest_max_size(img, max_size=self.image_size, interpolation=interpolation)
                 if self.resize_mode == ResizeMode.border:
                     img = A.pad(
                         img,
@@ -229,7 +230,9 @@ class ImageTextWebDataset(IterableDataset):
 
         # Sort paths; webdataset performs a deterministic shuffle (internally).
         self.tarfiles = sorted(self.tarfiles)
-        logger.info(f"{self.__class__.__name__} found {len(self.tarfiles)} TARs.")
+        # Create logger for this class
+        class_logger = logging.getLogger(self.__class__.__name__)
+        class_logger.info(f"{self.__class__.__name__} found {len(self.tarfiles)} TARs.")
 
     def __iter__(self):
         rng = random.Random(self.seed)
@@ -262,7 +265,7 @@ def shard_process(shard_id, tar_files, args, resizer, save_caption, oom_shard_co
     start_time = time.time()
     sample_writer = WebDatasetSampleWriter(
         shard_id=shard_id,
-        output_folder=args.output_tar_directory,
+        output_folder=args.processed_webdataset_path,
         save_caption=save_caption,
         oom_shard_count=oom_shard_count,
         encode_format=encode_format,
@@ -347,7 +350,7 @@ if __name__ == "__main__":
         max_aspect_ratio=float("inf"),
     )
 
-    grit_tarfiles = [os.path.join(args.original_wd_path, "*.tar")]
+    grit_tarfiles = [os.path.join(args.raw_webdataset_path, "*.tar")]
     all_tarfiles = []
     for _path in grit_tarfiles:
         for _single_glob in _path.split():
@@ -356,8 +359,8 @@ if __name__ == "__main__":
     total_shards = len(all_tarfiles)
     logger.info(f"Total shards: {total_shards}")
 
-    if not os.path.exists(args.output_tar_directory):
-        logger.info(f"Creating output directory: {args.output_tar_directory}")
+    if not os.path.exists(args.processed_webdataset_path):
+        logger.info(f"Creating output directory: {args.processed_webdataset_path}")
         os.makedirs(args.output_tar_directory)
     
     shard_list_split = split_number_to_index_list(total_shards, args.max_num_processes)
