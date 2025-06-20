@@ -6,13 +6,13 @@ This script processes ImageNet and GRIT datasets to create a hierarchical tree s
 
 For ImageNet:
 - Reads synsets.csv and creates tree folders with JSON files containing:
-  - meta_data_tree.json: Tree structure with metadata and file paths
+  - meta_data_trees.json: Tree structure with metadata and file paths
   - embeddings.json: All embeddings indexed by ID
   - data/treeN/: Actual data files organized by tree
 
 For GRIT:
 - Reads TAR files and creates tree folders with JSON files containing:
-  - meta_data_tree.json: Tree structure with metadata and file paths
+  - meta_data_trees.json: Tree structure with metadata and file paths
   - embeddings.json: All embeddings indexed by ID
   - data/treeN/: Actual data files organized by tree
 
@@ -21,7 +21,7 @@ Both datasets create the same folder structure:
 - data/treeN/parent_images/: Contains processed parent images (empty for ImageNet)
 - data/treeN/child_texts/: Contains child text data as txt files
 - data/treeN/parent_texts/: Contains parent text data as txt files
-- meta_data_tree.json: Contains tree structure and file paths
+- meta_data_trees.json: Contains tree structure and file paths
 - embeddings.json: Contains all embeddings indexed by ID
 """
 
@@ -288,7 +288,7 @@ def create_imagenet_tree_structure(base_path, output_dir, synsets, model, prepro
         meta_data["trees"][tree_id] = tree_metadata
         
         # Save JSON and pickle files after each tree (incremental saving)
-        meta_data_path = imagenet_path / "meta_data_tree.json"
+        meta_data_path = imagenet_path / "meta_data_trees.json"
         embeddings_path = imagenet_path / "embeddings.pkl"
         
         # Update total trees count
@@ -509,7 +509,7 @@ def create_grit_tree_structure(grit_path, model, device, output_dir, max_samples
                 meta_data["trees"][tree_id] = tree_metadata
                 
                 # Save JSON and pickle files after each tree (incremental saving)
-                meta_data_path = grit_output_path / "meta_data_tree.json"
+                meta_data_path = grit_output_path / "meta_data_trees.json"
                 embeddings_path = grit_output_path / "embeddings.pkl"
                 
                 # Update total trees count
@@ -538,7 +538,7 @@ def main():
     parser = argparse.ArgumentParser(description='Preprocess ImageNet or GRIT dataset into hierarchical tree structure')
     parser.add_argument('--dataset', choices=['imagenet', 'grit'], required=True,
                         help='Dataset to preprocess')
-    parser.add_argument('--base_path', type=str, default='./', 
+    parser.add_argument('--imagenet_path', type=str, default='./', 
                         help='Base path for ImageNet (containing imagenet folder and synsets.csv)')
     parser.add_argument('--grit_path', type=str, default='/scratch-shared/grit/processed',
                         help='Path to GRIT TAR files')
@@ -560,7 +560,7 @@ def main():
     
     if args.dataset == 'imagenet':
         # Process ImageNet
-        base_path = Path(args.base_path)
+        base_path = Path(args.imagenet_path)
         csv_path = base_path / "synsets.csv"
         
         if not csv_path.exists():
@@ -576,7 +576,7 @@ def main():
             print(f"Limited to first {args.limit} synsets for testing")
         
         # Create ImageNet tree structure
-        create_imagenet_tree_structure(args.base_path, args.output_dir, synsets, model, preprocess, device)
+        create_imagenet_tree_structure(args.imagenet_path, args.output_dir, synsets, model, preprocess, device)
         
     elif args.dataset == 'grit':
         # Process GRIT

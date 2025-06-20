@@ -22,6 +22,7 @@ module purge
 module load 2024
 module load Anaconda3/2024.06-1
 
+source activate hycoclip
 
 ssh -L 5901:tcn679:5901 scur1160@snellius.surf.nl
 
@@ -29,6 +30,16 @@ ssh -L 5901:tcn679:5901 scur1160@snellius.surf.nl
 # generate tree
 python hierchical_datasets/preprocess.py \
     --dataset imagenet \
+    --imagenet_path ./imagenet \
     --output_dir hierchical_datasets/ \
-    --checkpoint_path ./checkpoints/hycoclip_vit_s.pth \
-    --train_config ./hycoclip/configs/train_hycoclip_vit_s.py
+    --checkpoint_path ./checkpoints/hycoclip_vit_b.pth \
+    --train_config ./hycoclip/configs/train_hycoclip_vit_b.py \
+    --limit 200
+
+python hierchical_datasets/preprocess.py \
+    --dataset grit \
+    --grit_path /scratch-shared/grit/processed \
+    --output_dir hierchical_datasets/ \
+    --checkpoint_path ./checkpoints/hycoclip_vit_b.pth \
+    --train_config ./hycoclip/configs/train_hycoclip_vit_b.py \
+    --limit 200
