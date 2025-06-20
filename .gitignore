@@ -12,8 +12,8 @@ wheels/
 uv.lock
 
 archive/
-hierchical_datasets/GRIT/
-hierchical_datasets/ImageNet/
+hierchical_datasets/GRIT/data/
+hierchical_datasets/ImageNet/data/
 imagenet/
 
 ILSVRC2012_img_val.tar

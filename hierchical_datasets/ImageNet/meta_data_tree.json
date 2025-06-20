@@ -1,0 +1,4282 @@
+{
+  "dataset_info": {
+    "name": "ImageNet",
+    "total_trees": 16,
+    "created_at": "2025-06-20T16:09:41.802079",
+    "model": "HyCoCLIP"
+  },
+  "trees": {
+    "tree1": {
+      "tree_id": "tree1",
+      "synset_id": "n01440764",
+      "parent_text": {
+        "id": "pt_tree1",
+        "text": "tench",
+        "path": "hierchical_datasets/ImageNet/data/tree1/parent_texts/parent_text.txt"
+      },
+      "child_text": {
+        "id": "ct_tree1",
+        "text": "freshwater dace-like game fish of Europe and western Asia noted for ability to survive outside water",
+        "path": "hierchical_datasets/ImageNet/data/tree1/child_texts/child_text.txt"
+      },
+      "parent_images": [],
+      "child_images": [
+        {
+          "id": "ci_tree1_001",
+          "name": "tench_001.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree1/child_images/tench_001.JPEG"
+        },
+        {
+          "id": "ci_tree1_002",
+          "name": "tench_002.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree1/child_images/tench_002.JPEG"
+        },
+        {
+          "id": "ci_tree1_003",
+          "name": "tench_003.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree1/child_images/tench_003.JPEG"
+        },
+        {
+          "id": "ci_tree1_004",
+          "name": "tench_004.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree1/child_images/tench_004.JPEG"
+        },
+        {
+          "id": "ci_tree1_005",
+          "name": "tench_005.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree1/child_images/tench_005.JPEG"
+        },
+        {
+          "id": "ci_tree1_006",
+          "name": "tench_006.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree1/child_images/tench_006.JPEG"
+        },
+        {
+          "id": "ci_tree1_007",
+          "name": "tench_007.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree1/child_images/tench_007.JPEG"
+        },
+        {
+          "id": "ci_tree1_008",
+          "name": "tench_008.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree1/child_images/tench_008.JPEG"
+        },
+        {
+          "id": "ci_tree1_009",
+          "name": "tench_009.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree1/child_images/tench_009.JPEG"
+        },
+        {
+          "id": "ci_tree1_010",
+          "name": "tench_010.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree1/child_images/tench_010.JPEG"
+        },
+        {
+          "id": "ci_tree1_011",
+          "name": "tench_011.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree1/child_images/tench_011.JPEG"
+        },
+        {
+          "id": "ci_tree1_012",
+          "name": "tench_012.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree1/child_images/tench_012.JPEG"
+        },
+        {
+          "id": "ci_tree1_013",
+          "name": "tench_013.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree1/child_images/tench_013.JPEG"
+        },
+        {
+          "id": "ci_tree1_014",
+          "name": "tench_014.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree1/child_images/tench_014.JPEG"
+        },
+        {
+          "id": "ci_tree1_015",
+          "name": "tench_015.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree1/child_images/tench_015.JPEG"
+        },
+        {
+          "id": "ci_tree1_016",
+          "name": "tench_016.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree1/child_images/tench_016.JPEG"
+        },
+        {
+          "id": "ci_tree1_017",
+          "name": "tench_017.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree1/child_images/tench_017.JPEG"
+        },
+        {
+          "id": "ci_tree1_018",
+          "name": "tench_018.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree1/child_images/tench_018.JPEG"
+        },
+        {
+          "id": "ci_tree1_019",
+          "name": "tench_019.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree1/child_images/tench_019.JPEG"
+        },
+        {
+          "id": "ci_tree1_020",
+          "name": "tench_020.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree1/child_images/tench_020.JPEG"
+        },
+        {
+          "id": "ci_tree1_021",
+          "name": "tench_021.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree1/child_images/tench_021.JPEG"
+        },
+        {
+          "id": "ci_tree1_022",
+          "name": "tench_022.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree1/child_images/tench_022.JPEG"
+        },
+        {
+          "id": "ci_tree1_023",
+          "name": "tench_023.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree1/child_images/tench_023.JPEG"
+        },
+        {
+          "id": "ci_tree1_024",
+          "name": "tench_024.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree1/child_images/tench_024.JPEG"
+        },
+        {
+          "id": "ci_tree1_025",
+          "name": "tench_025.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree1/child_images/tench_025.JPEG"
+        },
+        {
+          "id": "ci_tree1_026",
+          "name": "tench_026.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree1/child_images/tench_026.JPEG"
+        },
+        {
+          "id": "ci_tree1_027",
+          "name": "tench_027.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree1/child_images/tench_027.JPEG"
+        },
+        {
+          "id": "ci_tree1_028",
+          "name": "tench_028.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree1/child_images/tench_028.JPEG"
+        },
+        {
+          "id": "ci_tree1_029",
+          "name": "tench_029.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree1/child_images/tench_029.JPEG"
+        },
+        {
+          "id": "ci_tree1_030",
+          "name": "tench_030.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree1/child_images/tench_030.JPEG"
+        },
+        {
+          "id": "ci_tree1_031",
+          "name": "tench_031.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree1/child_images/tench_031.JPEG"
+        },
+        {
+          "id": "ci_tree1_032",
+          "name": "tench_032.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree1/child_images/tench_032.JPEG"
+        },
+        {
+          "id": "ci_tree1_033",
+          "name": "tench_033.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree1/child_images/tench_033.JPEG"
+        },
+        {
+          "id": "ci_tree1_034",
+          "name": "tench_034.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree1/child_images/tench_034.JPEG"
+        },
+        {
+          "id": "ci_tree1_035",
+          "name": "tench_035.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree1/child_images/tench_035.JPEG"
+        },
+        {
+          "id": "ci_tree1_036",
+          "name": "tench_036.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree1/child_images/tench_036.JPEG"
+        },
+        {
+          "id": "ci_tree1_037",
+          "name": "tench_037.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree1/child_images/tench_037.JPEG"
+        },
+        {
+          "id": "ci_tree1_038",
+          "name": "tench_038.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree1/child_images/tench_038.JPEG"
+        },
+        {
+          "id": "ci_tree1_039",
+          "name": "tench_039.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree1/child_images/tench_039.JPEG"
+        },
+        {
+          "id": "ci_tree1_040",
+          "name": "tench_040.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree1/child_images/tench_040.JPEG"
+        },
+        {
+          "id": "ci_tree1_041",
+          "name": "tench_041.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree1/child_images/tench_041.JPEG"
+        },
+        {
+          "id": "ci_tree1_042",
+          "name": "tench_042.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree1/child_images/tench_042.JPEG"
+        },
+        {
+          "id": "ci_tree1_043",
+          "name": "tench_043.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree1/child_images/tench_043.JPEG"
+        },
+        {
+          "id": "ci_tree1_044",
+          "name": "tench_044.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree1/child_images/tench_044.JPEG"
+        },
+        {
+          "id": "ci_tree1_045",
+          "name": "tench_045.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree1/child_images/tench_045.JPEG"
+        },
+        {
+          "id": "ci_tree1_046",
+          "name": "tench_046.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree1/child_images/tench_046.JPEG"
+        },
+        {
+          "id": "ci_tree1_047",
+          "name": "tench_047.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree1/child_images/tench_047.JPEG"
+        },
+        {
+          "id": "ci_tree1_048",
+          "name": "tench_048.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree1/child_images/tench_048.JPEG"
+        },
+        {
+          "id": "ci_tree1_049",
+          "name": "tench_049.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree1/child_images/tench_049.JPEG"
+        },
+        {
+          "id": "ci_tree1_050",
+          "name": "tench_050.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree1/child_images/tench_050.JPEG"
+        }
+      ]
+    },
+    "tree2": {
+      "tree_id": "tree2",
+      "synset_id": "n01443537",
+      "parent_text": {
+        "id": "pt_tree2",
+        "text": "goldfish",
+        "path": "hierchical_datasets/ImageNet/data/tree2/parent_texts/parent_text.txt"
+      },
+      "child_text": {
+        "id": "ct_tree2",
+        "text": "small golden or orange-red freshwater fishes of Eurasia used as pond or aquarium fishes",
+        "path": "hierchical_datasets/ImageNet/data/tree2/child_texts/child_text.txt"
+      },
+      "parent_images": [],
+      "child_images": [
+        {
+          "id": "ci_tree2_001",
+          "name": "goldfish_001.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree2/child_images/goldfish_001.JPEG"
+        },
+        {
+          "id": "ci_tree2_002",
+          "name": "goldfish_002.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree2/child_images/goldfish_002.JPEG"
+        },
+        {
+          "id": "ci_tree2_003",
+          "name": "goldfish_003.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree2/child_images/goldfish_003.JPEG"
+        },
+        {
+          "id": "ci_tree2_004",
+          "name": "goldfish_004.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree2/child_images/goldfish_004.JPEG"
+        },
+        {
+          "id": "ci_tree2_005",
+          "name": "goldfish_005.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree2/child_images/goldfish_005.JPEG"
+        },
+        {
+          "id": "ci_tree2_006",
+          "name": "goldfish_006.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree2/child_images/goldfish_006.JPEG"
+        },
+        {
+          "id": "ci_tree2_007",
+          "name": "goldfish_007.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree2/child_images/goldfish_007.JPEG"
+        },
+        {
+          "id": "ci_tree2_008",
+          "name": "goldfish_008.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree2/child_images/goldfish_008.JPEG"
+        },
+        {
+          "id": "ci_tree2_009",
+          "name": "goldfish_009.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree2/child_images/goldfish_009.JPEG"
+        },
+        {
+          "id": "ci_tree2_010",
+          "name": "goldfish_010.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree2/child_images/goldfish_010.JPEG"
+        },
+        {
+          "id": "ci_tree2_011",
+          "name": "goldfish_011.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree2/child_images/goldfish_011.JPEG"
+        },
+        {
+          "id": "ci_tree2_012",
+          "name": "goldfish_012.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree2/child_images/goldfish_012.JPEG"
+        },
+        {
+          "id": "ci_tree2_013",
+          "name": "goldfish_013.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree2/child_images/goldfish_013.JPEG"
+        },
+        {
+          "id": "ci_tree2_014",
+          "name": "goldfish_014.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree2/child_images/goldfish_014.JPEG"
+        },
+        {
+          "id": "ci_tree2_015",
+          "name": "goldfish_015.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree2/child_images/goldfish_015.JPEG"
+        },
+        {
+          "id": "ci_tree2_016",
+          "name": "goldfish_016.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree2/child_images/goldfish_016.JPEG"
+        },
+        {
+          "id": "ci_tree2_017",
+          "name": "goldfish_017.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree2/child_images/goldfish_017.JPEG"
+        },
+        {
+          "id": "ci_tree2_018",
+          "name": "goldfish_018.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree2/child_images/goldfish_018.JPEG"
+        },
+        {
+          "id": "ci_tree2_019",
+          "name": "goldfish_019.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree2/child_images/goldfish_019.JPEG"
+        },
+        {
+          "id": "ci_tree2_020",
+          "name": "goldfish_020.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree2/child_images/goldfish_020.JPEG"
+        },
+        {
+          "id": "ci_tree2_021",
+          "name": "goldfish_021.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree2/child_images/goldfish_021.JPEG"
+        },
+        {
+          "id": "ci_tree2_022",
+          "name": "goldfish_022.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree2/child_images/goldfish_022.JPEG"
+        },
+        {
+          "id": "ci_tree2_023",
+          "name": "goldfish_023.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree2/child_images/goldfish_023.JPEG"
+        },
+        {
+          "id": "ci_tree2_024",
+          "name": "goldfish_024.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree2/child_images/goldfish_024.JPEG"
+        },
+        {
+          "id": "ci_tree2_025",
+          "name": "goldfish_025.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree2/child_images/goldfish_025.JPEG"
+        },
+        {
+          "id": "ci_tree2_026",
+          "name": "goldfish_026.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree2/child_images/goldfish_026.JPEG"
+        },
+        {
+          "id": "ci_tree2_027",
+          "name": "goldfish_027.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree2/child_images/goldfish_027.JPEG"
+        },
+        {
+          "id": "ci_tree2_028",
+          "name": "goldfish_028.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree2/child_images/goldfish_028.JPEG"
+        },
+        {
+          "id": "ci_tree2_029",
+          "name": "goldfish_029.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree2/child_images/goldfish_029.JPEG"
+        },
+        {
+          "id": "ci_tree2_030",
+          "name": "goldfish_030.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree2/child_images/goldfish_030.JPEG"
+        },
+        {
+          "id": "ci_tree2_031",
+          "name": "goldfish_031.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree2/child_images/goldfish_031.JPEG"
+        },
+        {
+          "id": "ci_tree2_032",
+          "name": "goldfish_032.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree2/child_images/goldfish_032.JPEG"
+        },
+        {
+          "id": "ci_tree2_033",
+          "name": "goldfish_033.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree2/child_images/goldfish_033.JPEG"
+        },
+        {
+          "id": "ci_tree2_034",
+          "name": "goldfish_034.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree2/child_images/goldfish_034.JPEG"
+        },
+        {
+          "id": "ci_tree2_035",
+          "name": "goldfish_035.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree2/child_images/goldfish_035.JPEG"
+        },
+        {
+          "id": "ci_tree2_036",
+          "name": "goldfish_036.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree2/child_images/goldfish_036.JPEG"
+        },
+        {
+          "id": "ci_tree2_037",
+          "name": "goldfish_037.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree2/child_images/goldfish_037.JPEG"
+        },
+        {
+          "id": "ci_tree2_038",
+          "name": "goldfish_038.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree2/child_images/goldfish_038.JPEG"
+        },
+        {
+          "id": "ci_tree2_039",
+          "name": "goldfish_039.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree2/child_images/goldfish_039.JPEG"
+        },
+        {
+          "id": "ci_tree2_040",
+          "name": "goldfish_040.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree2/child_images/goldfish_040.JPEG"
+        },
+        {
+          "id": "ci_tree2_041",
+          "name": "goldfish_041.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree2/child_images/goldfish_041.JPEG"
+        },
+        {
+          "id": "ci_tree2_042",
+          "name": "goldfish_042.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree2/child_images/goldfish_042.JPEG"
+        },
+        {
+          "id": "ci_tree2_043",
+          "name": "goldfish_043.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree2/child_images/goldfish_043.JPEG"
+        },
+        {
+          "id": "ci_tree2_044",
+          "name": "goldfish_044.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree2/child_images/goldfish_044.JPEG"
+        },
+        {
+          "id": "ci_tree2_045",
+          "name": "goldfish_045.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree2/child_images/goldfish_045.JPEG"
+        },
+        {
+          "id": "ci_tree2_046",
+          "name": "goldfish_046.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree2/child_images/goldfish_046.JPEG"
+        },
+        {
+          "id": "ci_tree2_047",
+          "name": "goldfish_047.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree2/child_images/goldfish_047.JPEG"
+        },
+        {
+          "id": "ci_tree2_048",
+          "name": "goldfish_048.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree2/child_images/goldfish_048.JPEG"
+        },
+        {
+          "id": "ci_tree2_049",
+          "name": "goldfish_049.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree2/child_images/goldfish_049.JPEG"
+        },
+        {
+          "id": "ci_tree2_050",
+          "name": "goldfish_050.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree2/child_images/goldfish_050.JPEG"
+        }
+      ]
+    },
+    "tree3": {
+      "tree_id": "tree3",
+      "synset_id": "n01484850",
+      "parent_text": {
+        "id": "pt_tree3",
+        "text": "great_white_shark",
+        "path": "hierchical_datasets/ImageNet/data/tree3/parent_texts/parent_text.txt"
+      },
+      "child_text": {
+        "id": "ct_tree3",
+        "text": "large aggressive shark widespread in warm seas; known to attack humans",
+        "path": "hierchical_datasets/ImageNet/data/tree3/child_texts/child_text.txt"
+      },
+      "parent_images": [],
+      "child_images": [
+        {
+          "id": "ci_tree3_001",
+          "name": "great_white_shark_001.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree3/child_images/great_white_shark_001.JPEG"
+        },
+        {
+          "id": "ci_tree3_002",
+          "name": "great_white_shark_002.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree3/child_images/great_white_shark_002.JPEG"
+        },
+        {
+          "id": "ci_tree3_003",
+          "name": "great_white_shark_003.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree3/child_images/great_white_shark_003.JPEG"
+        },
+        {
+          "id": "ci_tree3_004",
+          "name": "great_white_shark_004.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree3/child_images/great_white_shark_004.JPEG"
+        },
+        {
+          "id": "ci_tree3_005",
+          "name": "great_white_shark_005.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree3/child_images/great_white_shark_005.JPEG"
+        },
+        {
+          "id": "ci_tree3_006",
+          "name": "great_white_shark_006.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree3/child_images/great_white_shark_006.JPEG"
+        },
+        {
+          "id": "ci_tree3_007",
+          "name": "great_white_shark_007.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree3/child_images/great_white_shark_007.JPEG"
+        },
+        {
+          "id": "ci_tree3_008",
+          "name": "great_white_shark_008.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree3/child_images/great_white_shark_008.JPEG"
+        },
+        {
+          "id": "ci_tree3_009",
+          "name": "great_white_shark_009.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree3/child_images/great_white_shark_009.JPEG"
+        },
+        {
+          "id": "ci_tree3_010",
+          "name": "great_white_shark_010.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree3/child_images/great_white_shark_010.JPEG"
+        },
+        {
+          "id": "ci_tree3_011",
+          "name": "great_white_shark_011.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree3/child_images/great_white_shark_011.JPEG"
+        },
+        {
+          "id": "ci_tree3_012",
+          "name": "great_white_shark_012.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree3/child_images/great_white_shark_012.JPEG"
+        },
+        {
+          "id": "ci_tree3_013",
+          "name": "great_white_shark_013.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree3/child_images/great_white_shark_013.JPEG"
+        },
+        {
+          "id": "ci_tree3_014",
+          "name": "great_white_shark_014.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree3/child_images/great_white_shark_014.JPEG"
+        },
+        {
+          "id": "ci_tree3_015",
+          "name": "great_white_shark_015.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree3/child_images/great_white_shark_015.JPEG"
+        },
+        {
+          "id": "ci_tree3_016",
+          "name": "great_white_shark_016.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree3/child_images/great_white_shark_016.JPEG"
+        },
+        {
+          "id": "ci_tree3_017",
+          "name": "great_white_shark_017.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree3/child_images/great_white_shark_017.JPEG"
+        },
+        {
+          "id": "ci_tree3_018",
+          "name": "great_white_shark_018.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree3/child_images/great_white_shark_018.JPEG"
+        },
+        {
+          "id": "ci_tree3_019",
+          "name": "great_white_shark_019.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree3/child_images/great_white_shark_019.JPEG"
+        },
+        {
+          "id": "ci_tree3_020",
+          "name": "great_white_shark_020.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree3/child_images/great_white_shark_020.JPEG"
+        },
+        {
+          "id": "ci_tree3_021",
+          "name": "great_white_shark_021.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree3/child_images/great_white_shark_021.JPEG"
+        },
+        {
+          "id": "ci_tree3_022",
+          "name": "great_white_shark_022.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree3/child_images/great_white_shark_022.JPEG"
+        },
+        {
+          "id": "ci_tree3_023",
+          "name": "great_white_shark_023.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree3/child_images/great_white_shark_023.JPEG"
+        },
+        {
+          "id": "ci_tree3_024",
+          "name": "great_white_shark_024.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree3/child_images/great_white_shark_024.JPEG"
+        },
+        {
+          "id": "ci_tree3_025",
+          "name": "great_white_shark_025.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree3/child_images/great_white_shark_025.JPEG"
+        },
+        {
+          "id": "ci_tree3_026",
+          "name": "great_white_shark_026.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree3/child_images/great_white_shark_026.JPEG"
+        },
+        {
+          "id": "ci_tree3_027",
+          "name": "great_white_shark_027.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree3/child_images/great_white_shark_027.JPEG"
+        },
+        {
+          "id": "ci_tree3_028",
+          "name": "great_white_shark_028.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree3/child_images/great_white_shark_028.JPEG"
+        },
+        {
+          "id": "ci_tree3_029",
+          "name": "great_white_shark_029.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree3/child_images/great_white_shark_029.JPEG"
+        },
+        {
+          "id": "ci_tree3_030",
+          "name": "great_white_shark_030.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree3/child_images/great_white_shark_030.JPEG"
+        },
+        {
+          "id": "ci_tree3_031",
+          "name": "great_white_shark_031.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree3/child_images/great_white_shark_031.JPEG"
+        },
+        {
+          "id": "ci_tree3_032",
+          "name": "great_white_shark_032.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree3/child_images/great_white_shark_032.JPEG"
+        },
+        {
+          "id": "ci_tree3_033",
+          "name": "great_white_shark_033.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree3/child_images/great_white_shark_033.JPEG"
+        },
+        {
+          "id": "ci_tree3_034",
+          "name": "great_white_shark_034.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree3/child_images/great_white_shark_034.JPEG"
+        },
+        {
+          "id": "ci_tree3_035",
+          "name": "great_white_shark_035.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree3/child_images/great_white_shark_035.JPEG"
+        },
+        {
+          "id": "ci_tree3_036",
+          "name": "great_white_shark_036.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree3/child_images/great_white_shark_036.JPEG"
+        },
+        {
+          "id": "ci_tree3_037",
+          "name": "great_white_shark_037.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree3/child_images/great_white_shark_037.JPEG"
+        },
+        {
+          "id": "ci_tree3_038",
+          "name": "great_white_shark_038.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree3/child_images/great_white_shark_038.JPEG"
+        },
+        {
+          "id": "ci_tree3_039",
+          "name": "great_white_shark_039.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree3/child_images/great_white_shark_039.JPEG"
+        },
+        {
+          "id": "ci_tree3_040",
+          "name": "great_white_shark_040.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree3/child_images/great_white_shark_040.JPEG"
+        },
+        {
+          "id": "ci_tree3_041",
+          "name": "great_white_shark_041.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree3/child_images/great_white_shark_041.JPEG"
+        },
+        {
+          "id": "ci_tree3_042",
+          "name": "great_white_shark_042.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree3/child_images/great_white_shark_042.JPEG"
+        },
+        {
+          "id": "ci_tree3_043",
+          "name": "great_white_shark_043.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree3/child_images/great_white_shark_043.JPEG"
+        },
+        {
+          "id": "ci_tree3_044",
+          "name": "great_white_shark_044.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree3/child_images/great_white_shark_044.JPEG"
+        },
+        {
+          "id": "ci_tree3_045",
+          "name": "great_white_shark_045.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree3/child_images/great_white_shark_045.JPEG"
+        },
+        {
+          "id": "ci_tree3_046",
+          "name": "great_white_shark_046.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree3/child_images/great_white_shark_046.JPEG"
+        },
+        {
+          "id": "ci_tree3_047",
+          "name": "great_white_shark_047.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree3/child_images/great_white_shark_047.JPEG"
+        },
+        {
+          "id": "ci_tree3_048",
+          "name": "great_white_shark_048.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree3/child_images/great_white_shark_048.JPEG"
+        },
+        {
+          "id": "ci_tree3_049",
+          "name": "great_white_shark_049.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree3/child_images/great_white_shark_049.JPEG"
+        },
+        {
+          "id": "ci_tree3_050",
+          "name": "great_white_shark_050.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree3/child_images/great_white_shark_050.JPEG"
+        }
+      ]
+    },
+    "tree4": {
+      "tree_id": "tree4",
+      "synset_id": "n01491361",
+      "parent_text": {
+        "id": "pt_tree4",
+        "text": "tiger_shark",
+        "path": "hierchical_datasets/ImageNet/data/tree4/parent_texts/parent_text.txt"
+      },
+      "child_text": {
+        "id": "ct_tree4",
+        "text": "large dangerous warm-water shark with striped or spotted body",
+        "path": "hierchical_datasets/ImageNet/data/tree4/child_texts/child_text.txt"
+      },
+      "parent_images": [],
+      "child_images": [
+        {
+          "id": "ci_tree4_001",
+          "name": "tiger_shark_001.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree4/child_images/tiger_shark_001.JPEG"
+        },
+        {
+          "id": "ci_tree4_002",
+          "name": "tiger_shark_002.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree4/child_images/tiger_shark_002.JPEG"
+        },
+        {
+          "id": "ci_tree4_003",
+          "name": "tiger_shark_003.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree4/child_images/tiger_shark_003.JPEG"
+        },
+        {
+          "id": "ci_tree4_004",
+          "name": "tiger_shark_004.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree4/child_images/tiger_shark_004.JPEG"
+        },
+        {
+          "id": "ci_tree4_005",
+          "name": "tiger_shark_005.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree4/child_images/tiger_shark_005.JPEG"
+        },
+        {
+          "id": "ci_tree4_006",
+          "name": "tiger_shark_006.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree4/child_images/tiger_shark_006.JPEG"
+        },
+        {
+          "id": "ci_tree4_007",
+          "name": "tiger_shark_007.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree4/child_images/tiger_shark_007.JPEG"
+        },
+        {
+          "id": "ci_tree4_008",
+          "name": "tiger_shark_008.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree4/child_images/tiger_shark_008.JPEG"
+        },
+        {
+          "id": "ci_tree4_009",
+          "name": "tiger_shark_009.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree4/child_images/tiger_shark_009.JPEG"
+        },
+        {
+          "id": "ci_tree4_010",
+          "name": "tiger_shark_010.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree4/child_images/tiger_shark_010.JPEG"
+        },
+        {
+          "id": "ci_tree4_011",
+          "name": "tiger_shark_011.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree4/child_images/tiger_shark_011.JPEG"
+        },
+        {
+          "id": "ci_tree4_012",
+          "name": "tiger_shark_012.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree4/child_images/tiger_shark_012.JPEG"
+        },
+        {
+          "id": "ci_tree4_013",
+          "name": "tiger_shark_013.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree4/child_images/tiger_shark_013.JPEG"
+        },
+        {
+          "id": "ci_tree4_014",
+          "name": "tiger_shark_014.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree4/child_images/tiger_shark_014.JPEG"
+        },
+        {
+          "id": "ci_tree4_015",
+          "name": "tiger_shark_015.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree4/child_images/tiger_shark_015.JPEG"
+        },
+        {
+          "id": "ci_tree4_016",
+          "name": "tiger_shark_016.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree4/child_images/tiger_shark_016.JPEG"
+        },
+        {
+          "id": "ci_tree4_017",
+          "name": "tiger_shark_017.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree4/child_images/tiger_shark_017.JPEG"
+        },
+        {
+          "id": "ci_tree4_018",
+          "name": "tiger_shark_018.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree4/child_images/tiger_shark_018.JPEG"
+        },
+        {
+          "id": "ci_tree4_019",
+          "name": "tiger_shark_019.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree4/child_images/tiger_shark_019.JPEG"
+        },
+        {
+          "id": "ci_tree4_020",
+          "name": "tiger_shark_020.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree4/child_images/tiger_shark_020.JPEG"
+        },
+        {
+          "id": "ci_tree4_021",
+          "name": "tiger_shark_021.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree4/child_images/tiger_shark_021.JPEG"
+        },
+        {
+          "id": "ci_tree4_022",
+          "name": "tiger_shark_022.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree4/child_images/tiger_shark_022.JPEG"
+        },
+        {
+          "id": "ci_tree4_023",
+          "name": "tiger_shark_023.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree4/child_images/tiger_shark_023.JPEG"
+        },
+        {
+          "id": "ci_tree4_024",
+          "name": "tiger_shark_024.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree4/child_images/tiger_shark_024.JPEG"
+        },
+        {
+          "id": "ci_tree4_025",
+          "name": "tiger_shark_025.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree4/child_images/tiger_shark_025.JPEG"
+        },
+        {
+          "id": "ci_tree4_026",
+          "name": "tiger_shark_026.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree4/child_images/tiger_shark_026.JPEG"
+        },
+        {
+          "id": "ci_tree4_027",
+          "name": "tiger_shark_027.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree4/child_images/tiger_shark_027.JPEG"
+        },
+        {
+          "id": "ci_tree4_028",
+          "name": "tiger_shark_028.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree4/child_images/tiger_shark_028.JPEG"
+        },
+        {
+          "id": "ci_tree4_029",
+          "name": "tiger_shark_029.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree4/child_images/tiger_shark_029.JPEG"
+        },
+        {
+          "id": "ci_tree4_030",
+          "name": "tiger_shark_030.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree4/child_images/tiger_shark_030.JPEG"
+        },
+        {
+          "id": "ci_tree4_031",
+          "name": "tiger_shark_031.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree4/child_images/tiger_shark_031.JPEG"
+        },
+        {
+          "id": "ci_tree4_032",
+          "name": "tiger_shark_032.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree4/child_images/tiger_shark_032.JPEG"
+        },
+        {
+          "id": "ci_tree4_033",
+          "name": "tiger_shark_033.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree4/child_images/tiger_shark_033.JPEG"
+        },
+        {
+          "id": "ci_tree4_034",
+          "name": "tiger_shark_034.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree4/child_images/tiger_shark_034.JPEG"
+        },
+        {
+          "id": "ci_tree4_035",
+          "name": "tiger_shark_035.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree4/child_images/tiger_shark_035.JPEG"
+        },
+        {
+          "id": "ci_tree4_036",
+          "name": "tiger_shark_036.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree4/child_images/tiger_shark_036.JPEG"
+        },
+        {
+          "id": "ci_tree4_037",
+          "name": "tiger_shark_037.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree4/child_images/tiger_shark_037.JPEG"
+        },
+        {
+          "id": "ci_tree4_038",
+          "name": "tiger_shark_038.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree4/child_images/tiger_shark_038.JPEG"
+        },
+        {
+          "id": "ci_tree4_039",
+          "name": "tiger_shark_039.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree4/child_images/tiger_shark_039.JPEG"
+        },
+        {
+          "id": "ci_tree4_040",
+          "name": "tiger_shark_040.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree4/child_images/tiger_shark_040.JPEG"
+        },
+        {
+          "id": "ci_tree4_041",
+          "name": "tiger_shark_041.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree4/child_images/tiger_shark_041.JPEG"
+        },
+        {
+          "id": "ci_tree4_042",
+          "name": "tiger_shark_042.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree4/child_images/tiger_shark_042.JPEG"
+        },
+        {
+          "id": "ci_tree4_043",
+          "name": "tiger_shark_043.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree4/child_images/tiger_shark_043.JPEG"
+        },
+        {
+          "id": "ci_tree4_044",
+          "name": "tiger_shark_044.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree4/child_images/tiger_shark_044.JPEG"
+        },
+        {
+          "id": "ci_tree4_045",
+          "name": "tiger_shark_045.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree4/child_images/tiger_shark_045.JPEG"
+        },
+        {
+          "id": "ci_tree4_046",
+          "name": "tiger_shark_046.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree4/child_images/tiger_shark_046.JPEG"
+        },
+        {
+          "id": "ci_tree4_047",
+          "name": "tiger_shark_047.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree4/child_images/tiger_shark_047.JPEG"
+        },
+        {
+          "id": "ci_tree4_048",
+          "name": "tiger_shark_048.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree4/child_images/tiger_shark_048.JPEG"
+        },
+        {
+          "id": "ci_tree4_049",
+          "name": "tiger_shark_049.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree4/child_images/tiger_shark_049.JPEG"
+        },
+        {
+          "id": "ci_tree4_050",
+          "name": "tiger_shark_050.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree4/child_images/tiger_shark_050.JPEG"
+        }
+      ]
+    },
+    "tree5": {
+      "tree_id": "tree5",
+      "synset_id": "n01494475",
+      "parent_text": {
+        "id": "pt_tree5",
+        "text": "hammerhead",
+        "path": "hierchical_datasets/ImageNet/data/tree5/parent_texts/parent_text.txt"
+      },
+      "child_text": {
+        "id": "ct_tree5",
+        "text": "medium-sized live-bearing shark with eyes at either end of a flattened hammer-shaped head; worldwide in warm waters; can be dangerous",
+        "path": "hierchical_datasets/ImageNet/data/tree5/child_texts/child_text.txt"
+      },
+      "parent_images": [],
+      "child_images": [
+        {
+          "id": "ci_tree5_001",
+          "name": "hammerhead_001.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree5/child_images/hammerhead_001.JPEG"
+        },
+        {
+          "id": "ci_tree5_002",
+          "name": "hammerhead_002.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree5/child_images/hammerhead_002.JPEG"
+        },
+        {
+          "id": "ci_tree5_003",
+          "name": "hammerhead_003.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree5/child_images/hammerhead_003.JPEG"
+        },
+        {
+          "id": "ci_tree5_004",
+          "name": "hammerhead_004.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree5/child_images/hammerhead_004.JPEG"
+        },
+        {
+          "id": "ci_tree5_005",
+          "name": "hammerhead_005.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree5/child_images/hammerhead_005.JPEG"
+        },
+        {
+          "id": "ci_tree5_006",
+          "name": "hammerhead_006.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree5/child_images/hammerhead_006.JPEG"
+        },
+        {
+          "id": "ci_tree5_007",
+          "name": "hammerhead_007.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree5/child_images/hammerhead_007.JPEG"
+        },
+        {
+          "id": "ci_tree5_008",
+          "name": "hammerhead_008.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree5/child_images/hammerhead_008.JPEG"
+        },
+        {
+          "id": "ci_tree5_009",
+          "name": "hammerhead_009.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree5/child_images/hammerhead_009.JPEG"
+        },
+        {
+          "id": "ci_tree5_010",
+          "name": "hammerhead_010.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree5/child_images/hammerhead_010.JPEG"
+        },
+        {
+          "id": "ci_tree5_011",
+          "name": "hammerhead_011.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree5/child_images/hammerhead_011.JPEG"
+        },
+        {
+          "id": "ci_tree5_012",
+          "name": "hammerhead_012.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree5/child_images/hammerhead_012.JPEG"
+        },
+        {
+          "id": "ci_tree5_013",
+          "name": "hammerhead_013.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree5/child_images/hammerhead_013.JPEG"
+        },
+        {
+          "id": "ci_tree5_014",
+          "name": "hammerhead_014.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree5/child_images/hammerhead_014.JPEG"
+        },
+        {
+          "id": "ci_tree5_015",
+          "name": "hammerhead_015.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree5/child_images/hammerhead_015.JPEG"
+        },
+        {
+          "id": "ci_tree5_016",
+          "name": "hammerhead_016.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree5/child_images/hammerhead_016.JPEG"
+        },
+        {
+          "id": "ci_tree5_017",
+          "name": "hammerhead_017.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree5/child_images/hammerhead_017.JPEG"
+        },
+        {
+          "id": "ci_tree5_018",
+          "name": "hammerhead_018.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree5/child_images/hammerhead_018.JPEG"
+        },
+        {
+          "id": "ci_tree5_019",
+          "name": "hammerhead_019.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree5/child_images/hammerhead_019.JPEG"
+        },
+        {
+          "id": "ci_tree5_020",
+          "name": "hammerhead_020.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree5/child_images/hammerhead_020.JPEG"
+        },
+        {
+          "id": "ci_tree5_021",
+          "name": "hammerhead_021.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree5/child_images/hammerhead_021.JPEG"
+        },
+        {
+          "id": "ci_tree5_022",
+          "name": "hammerhead_022.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree5/child_images/hammerhead_022.JPEG"
+        },
+        {
+          "id": "ci_tree5_023",
+          "name": "hammerhead_023.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree5/child_images/hammerhead_023.JPEG"
+        },
+        {
+          "id": "ci_tree5_024",
+          "name": "hammerhead_024.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree5/child_images/hammerhead_024.JPEG"
+        },
+        {
+          "id": "ci_tree5_025",
+          "name": "hammerhead_025.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree5/child_images/hammerhead_025.JPEG"
+        },
+        {
+          "id": "ci_tree5_026",
+          "name": "hammerhead_026.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree5/child_images/hammerhead_026.JPEG"
+        },
+        {
+          "id": "ci_tree5_027",
+          "name": "hammerhead_027.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree5/child_images/hammerhead_027.JPEG"
+        },
+        {
+          "id": "ci_tree5_028",
+          "name": "hammerhead_028.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree5/child_images/hammerhead_028.JPEG"
+        },
+        {
+          "id": "ci_tree5_029",
+          "name": "hammerhead_029.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree5/child_images/hammerhead_029.JPEG"
+        },
+        {
+          "id": "ci_tree5_030",
+          "name": "hammerhead_030.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree5/child_images/hammerhead_030.JPEG"
+        },
+        {
+          "id": "ci_tree5_031",
+          "name": "hammerhead_031.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree5/child_images/hammerhead_031.JPEG"
+        },
+        {
+          "id": "ci_tree5_032",
+          "name": "hammerhead_032.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree5/child_images/hammerhead_032.JPEG"
+        },
+        {
+          "id": "ci_tree5_033",
+          "name": "hammerhead_033.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree5/child_images/hammerhead_033.JPEG"
+        },
+        {
+          "id": "ci_tree5_034",
+          "name": "hammerhead_034.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree5/child_images/hammerhead_034.JPEG"
+        },
+        {
+          "id": "ci_tree5_035",
+          "name": "hammerhead_035.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree5/child_images/hammerhead_035.JPEG"
+        },
+        {
+          "id": "ci_tree5_036",
+          "name": "hammerhead_036.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree5/child_images/hammerhead_036.JPEG"
+        },
+        {
+          "id": "ci_tree5_037",
+          "name": "hammerhead_037.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree5/child_images/hammerhead_037.JPEG"
+        },
+        {
+          "id": "ci_tree5_038",
+          "name": "hammerhead_038.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree5/child_images/hammerhead_038.JPEG"
+        },
+        {
+          "id": "ci_tree5_039",
+          "name": "hammerhead_039.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree5/child_images/hammerhead_039.JPEG"
+        },
+        {
+          "id": "ci_tree5_040",
+          "name": "hammerhead_040.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree5/child_images/hammerhead_040.JPEG"
+        },
+        {
+          "id": "ci_tree5_041",
+          "name": "hammerhead_041.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree5/child_images/hammerhead_041.JPEG"
+        },
+        {
+          "id": "ci_tree5_042",
+          "name": "hammerhead_042.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree5/child_images/hammerhead_042.JPEG"
+        },
+        {
+          "id": "ci_tree5_043",
+          "name": "hammerhead_043.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree5/child_images/hammerhead_043.JPEG"
+        },
+        {
+          "id": "ci_tree5_044",
+          "name": "hammerhead_044.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree5/child_images/hammerhead_044.JPEG"
+        },
+        {
+          "id": "ci_tree5_045",
+          "name": "hammerhead_045.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree5/child_images/hammerhead_045.JPEG"
+        },
+        {
+          "id": "ci_tree5_046",
+          "name": "hammerhead_046.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree5/child_images/hammerhead_046.JPEG"
+        },
+        {
+          "id": "ci_tree5_047",
+          "name": "hammerhead_047.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree5/child_images/hammerhead_047.JPEG"
+        },
+        {
+          "id": "ci_tree5_048",
+          "name": "hammerhead_048.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree5/child_images/hammerhead_048.JPEG"
+        },
+        {
+          "id": "ci_tree5_049",
+          "name": "hammerhead_049.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree5/child_images/hammerhead_049.JPEG"
+        },
+        {
+          "id": "ci_tree5_050",
+          "name": "hammerhead_050.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree5/child_images/hammerhead_050.JPEG"
+        }
+      ]
+    },
+    "tree6": {
+      "tree_id": "tree6",
+      "synset_id": "n01496331",
+      "parent_text": {
+        "id": "pt_tree6",
+        "text": "electric_ray",
+        "path": "hierchical_datasets/ImageNet/data/tree6/parent_texts/parent_text.txt"
+      },
+      "child_text": {
+        "id": "ct_tree6",
+        "text": "any sluggish bottom-dwelling ray of the order Torpediniformes having a rounded body and electric organs on each side of the head capable of emitting strong electric discharges",
+        "path": "hierchical_datasets/ImageNet/data/tree6/child_texts/child_text.txt"
+      },
+      "parent_images": [],
+      "child_images": [
+        {
+          "id": "ci_tree6_001",
+          "name": "electric_ray_001.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree6/child_images/electric_ray_001.JPEG"
+        },
+        {
+          "id": "ci_tree6_002",
+          "name": "electric_ray_002.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree6/child_images/electric_ray_002.JPEG"
+        },
+        {
+          "id": "ci_tree6_003",
+          "name": "electric_ray_003.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree6/child_images/electric_ray_003.JPEG"
+        },
+        {
+          "id": "ci_tree6_004",
+          "name": "electric_ray_004.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree6/child_images/electric_ray_004.JPEG"
+        },
+        {
+          "id": "ci_tree6_005",
+          "name": "electric_ray_005.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree6/child_images/electric_ray_005.JPEG"
+        },
+        {
+          "id": "ci_tree6_006",
+          "name": "electric_ray_006.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree6/child_images/electric_ray_006.JPEG"
+        },
+        {
+          "id": "ci_tree6_007",
+          "name": "electric_ray_007.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree6/child_images/electric_ray_007.JPEG"
+        },
+        {
+          "id": "ci_tree6_008",
+          "name": "electric_ray_008.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree6/child_images/electric_ray_008.JPEG"
+        },
+        {
+          "id": "ci_tree6_009",
+          "name": "electric_ray_009.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree6/child_images/electric_ray_009.JPEG"
+        },
+        {
+          "id": "ci_tree6_010",
+          "name": "electric_ray_010.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree6/child_images/electric_ray_010.JPEG"
+        },
+        {
+          "id": "ci_tree6_011",
+          "name": "electric_ray_011.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree6/child_images/electric_ray_011.JPEG"
+        },
+        {
+          "id": "ci_tree6_012",
+          "name": "electric_ray_012.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree6/child_images/electric_ray_012.JPEG"
+        },
+        {
+          "id": "ci_tree6_013",
+          "name": "electric_ray_013.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree6/child_images/electric_ray_013.JPEG"
+        },
+        {
+          "id": "ci_tree6_014",
+          "name": "electric_ray_014.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree6/child_images/electric_ray_014.JPEG"
+        },
+        {
+          "id": "ci_tree6_015",
+          "name": "electric_ray_015.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree6/child_images/electric_ray_015.JPEG"
+        },
+        {
+          "id": "ci_tree6_016",
+          "name": "electric_ray_016.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree6/child_images/electric_ray_016.JPEG"
+        },
+        {
+          "id": "ci_tree6_017",
+          "name": "electric_ray_017.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree6/child_images/electric_ray_017.JPEG"
+        },
+        {
+          "id": "ci_tree6_018",
+          "name": "electric_ray_018.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree6/child_images/electric_ray_018.JPEG"
+        },
+        {
+          "id": "ci_tree6_019",
+          "name": "electric_ray_019.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree6/child_images/electric_ray_019.JPEG"
+        },
+        {
+          "id": "ci_tree6_020",
+          "name": "electric_ray_020.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree6/child_images/electric_ray_020.JPEG"
+        },
+        {
+          "id": "ci_tree6_021",
+          "name": "electric_ray_021.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree6/child_images/electric_ray_021.JPEG"
+        },
+        {
+          "id": "ci_tree6_022",
+          "name": "electric_ray_022.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree6/child_images/electric_ray_022.JPEG"
+        },
+        {
+          "id": "ci_tree6_023",
+          "name": "electric_ray_023.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree6/child_images/electric_ray_023.JPEG"
+        },
+        {
+          "id": "ci_tree6_024",
+          "name": "electric_ray_024.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree6/child_images/electric_ray_024.JPEG"
+        },
+        {
+          "id": "ci_tree6_025",
+          "name": "electric_ray_025.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree6/child_images/electric_ray_025.JPEG"
+        },
+        {
+          "id": "ci_tree6_026",
+          "name": "electric_ray_026.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree6/child_images/electric_ray_026.JPEG"
+        },
+        {
+          "id": "ci_tree6_027",
+          "name": "electric_ray_027.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree6/child_images/electric_ray_027.JPEG"
+        },
+        {
+          "id": "ci_tree6_028",
+          "name": "electric_ray_028.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree6/child_images/electric_ray_028.JPEG"
+        },
+        {
+          "id": "ci_tree6_029",
+          "name": "electric_ray_029.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree6/child_images/electric_ray_029.JPEG"
+        },
+        {
+          "id": "ci_tree6_030",
+          "name": "electric_ray_030.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree6/child_images/electric_ray_030.JPEG"
+        },
+        {
+          "id": "ci_tree6_031",
+          "name": "electric_ray_031.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree6/child_images/electric_ray_031.JPEG"
+        },
+        {
+          "id": "ci_tree6_032",
+          "name": "electric_ray_032.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree6/child_images/electric_ray_032.JPEG"
+        },
+        {
+          "id": "ci_tree6_033",
+          "name": "electric_ray_033.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree6/child_images/electric_ray_033.JPEG"
+        },
+        {
+          "id": "ci_tree6_034",
+          "name": "electric_ray_034.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree6/child_images/electric_ray_034.JPEG"
+        },
+        {
+          "id": "ci_tree6_035",
+          "name": "electric_ray_035.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree6/child_images/electric_ray_035.JPEG"
+        },
+        {
+          "id": "ci_tree6_036",
+          "name": "electric_ray_036.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree6/child_images/electric_ray_036.JPEG"
+        },
+        {
+          "id": "ci_tree6_037",
+          "name": "electric_ray_037.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree6/child_images/electric_ray_037.JPEG"
+        },
+        {
+          "id": "ci_tree6_038",
+          "name": "electric_ray_038.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree6/child_images/electric_ray_038.JPEG"
+        },
+        {
+          "id": "ci_tree6_039",
+          "name": "electric_ray_039.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree6/child_images/electric_ray_039.JPEG"
+        },
+        {
+          "id": "ci_tree6_040",
+          "name": "electric_ray_040.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree6/child_images/electric_ray_040.JPEG"
+        },
+        {
+          "id": "ci_tree6_041",
+          "name": "electric_ray_041.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree6/child_images/electric_ray_041.JPEG"
+        },
+        {
+          "id": "ci_tree6_042",
+          "name": "electric_ray_042.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree6/child_images/electric_ray_042.JPEG"
+        },
+        {
+          "id": "ci_tree6_043",
+          "name": "electric_ray_043.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree6/child_images/electric_ray_043.JPEG"
+        },
+        {
+          "id": "ci_tree6_044",
+          "name": "electric_ray_044.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree6/child_images/electric_ray_044.JPEG"
+        },
+        {
+          "id": "ci_tree6_045",
+          "name": "electric_ray_045.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree6/child_images/electric_ray_045.JPEG"
+        },
+        {
+          "id": "ci_tree6_046",
+          "name": "electric_ray_046.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree6/child_images/electric_ray_046.JPEG"
+        },
+        {
+          "id": "ci_tree6_047",
+          "name": "electric_ray_047.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree6/child_images/electric_ray_047.JPEG"
+        },
+        {
+          "id": "ci_tree6_048",
+          "name": "electric_ray_048.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree6/child_images/electric_ray_048.JPEG"
+        },
+        {
+          "id": "ci_tree6_049",
+          "name": "electric_ray_049.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree6/child_images/electric_ray_049.JPEG"
+        },
+        {
+          "id": "ci_tree6_050",
+          "name": "electric_ray_050.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree6/child_images/electric_ray_050.JPEG"
+        }
+      ]
+    },
+    "tree7": {
+      "tree_id": "tree7",
+      "synset_id": "n01498041",
+      "parent_text": {
+        "id": "pt_tree7",
+        "text": "stingray",
+        "path": "hierchical_datasets/ImageNet/data/tree7/parent_texts/parent_text.txt"
+      },
+      "child_text": {
+        "id": "ct_tree7",
+        "text": "large venomous ray with large barbed spines near the base of a thin whiplike tail capable of inflicting severe wounds",
+        "path": "hierchical_datasets/ImageNet/data/tree7/child_texts/child_text.txt"
+      },
+      "parent_images": [],
+      "child_images": [
+        {
+          "id": "ci_tree7_001",
+          "name": "stingray_001.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree7/child_images/stingray_001.JPEG"
+        },
+        {
+          "id": "ci_tree7_002",
+          "name": "stingray_002.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree7/child_images/stingray_002.JPEG"
+        },
+        {
+          "id": "ci_tree7_003",
+          "name": "stingray_003.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree7/child_images/stingray_003.JPEG"
+        },
+        {
+          "id": "ci_tree7_004",
+          "name": "stingray_004.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree7/child_images/stingray_004.JPEG"
+        },
+        {
+          "id": "ci_tree7_005",
+          "name": "stingray_005.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree7/child_images/stingray_005.JPEG"
+        },
+        {
+          "id": "ci_tree7_006",
+          "name": "stingray_006.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree7/child_images/stingray_006.JPEG"
+        },
+        {
+          "id": "ci_tree7_007",
+          "name": "stingray_007.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree7/child_images/stingray_007.JPEG"
+        },
+        {
+          "id": "ci_tree7_008",
+          "name": "stingray_008.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree7/child_images/stingray_008.JPEG"
+        },
+        {
+          "id": "ci_tree7_009",
+          "name": "stingray_009.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree7/child_images/stingray_009.JPEG"
+        },
+        {
+          "id": "ci_tree7_010",
+          "name": "stingray_010.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree7/child_images/stingray_010.JPEG"
+        },
+        {
+          "id": "ci_tree7_011",
+          "name": "stingray_011.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree7/child_images/stingray_011.JPEG"
+        },
+        {
+          "id": "ci_tree7_012",
+          "name": "stingray_012.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree7/child_images/stingray_012.JPEG"
+        },
+        {
+          "id": "ci_tree7_013",
+          "name": "stingray_013.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree7/child_images/stingray_013.JPEG"
+        },
+        {
+          "id": "ci_tree7_014",
+          "name": "stingray_014.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree7/child_images/stingray_014.JPEG"
+        },
+        {
+          "id": "ci_tree7_015",
+          "name": "stingray_015.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree7/child_images/stingray_015.JPEG"
+        },
+        {
+          "id": "ci_tree7_016",
+          "name": "stingray_016.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree7/child_images/stingray_016.JPEG"
+        },
+        {
+          "id": "ci_tree7_017",
+          "name": "stingray_017.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree7/child_images/stingray_017.JPEG"
+        },
+        {
+          "id": "ci_tree7_018",
+          "name": "stingray_018.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree7/child_images/stingray_018.JPEG"
+        },
+        {
+          "id": "ci_tree7_019",
+          "name": "stingray_019.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree7/child_images/stingray_019.JPEG"
+        },
+        {
+          "id": "ci_tree7_020",
+          "name": "stingray_020.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree7/child_images/stingray_020.JPEG"
+        },
+        {
+          "id": "ci_tree7_021",
+          "name": "stingray_021.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree7/child_images/stingray_021.JPEG"
+        },
+        {
+          "id": "ci_tree7_022",
+          "name": "stingray_022.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree7/child_images/stingray_022.JPEG"
+        },
+        {
+          "id": "ci_tree7_023",
+          "name": "stingray_023.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree7/child_images/stingray_023.JPEG"
+        },
+        {
+          "id": "ci_tree7_024",
+          "name": "stingray_024.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree7/child_images/stingray_024.JPEG"
+        },
+        {
+          "id": "ci_tree7_025",
+          "name": "stingray_025.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree7/child_images/stingray_025.JPEG"
+        },
+        {
+          "id": "ci_tree7_026",
+          "name": "stingray_026.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree7/child_images/stingray_026.JPEG"
+        },
+        {
+          "id": "ci_tree7_027",
+          "name": "stingray_027.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree7/child_images/stingray_027.JPEG"
+        },
+        {
+          "id": "ci_tree7_028",
+          "name": "stingray_028.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree7/child_images/stingray_028.JPEG"
+        },
+        {
+          "id": "ci_tree7_029",
+          "name": "stingray_029.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree7/child_images/stingray_029.JPEG"
+        },
+        {
+          "id": "ci_tree7_030",
+          "name": "stingray_030.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree7/child_images/stingray_030.JPEG"
+        },
+        {
+          "id": "ci_tree7_031",
+          "name": "stingray_031.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree7/child_images/stingray_031.JPEG"
+        },
+        {
+          "id": "ci_tree7_032",
+          "name": "stingray_032.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree7/child_images/stingray_032.JPEG"
+        },
+        {
+          "id": "ci_tree7_033",
+          "name": "stingray_033.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree7/child_images/stingray_033.JPEG"
+        },
+        {
+          "id": "ci_tree7_034",
+          "name": "stingray_034.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree7/child_images/stingray_034.JPEG"
+        },
+        {
+          "id": "ci_tree7_035",
+          "name": "stingray_035.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree7/child_images/stingray_035.JPEG"
+        },
+        {
+          "id": "ci_tree7_036",
+          "name": "stingray_036.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree7/child_images/stingray_036.JPEG"
+        },
+        {
+          "id": "ci_tree7_037",
+          "name": "stingray_037.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree7/child_images/stingray_037.JPEG"
+        },
+        {
+          "id": "ci_tree7_038",
+          "name": "stingray_038.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree7/child_images/stingray_038.JPEG"
+        },
+        {
+          "id": "ci_tree7_039",
+          "name": "stingray_039.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree7/child_images/stingray_039.JPEG"
+        },
+        {
+          "id": "ci_tree7_040",
+          "name": "stingray_040.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree7/child_images/stingray_040.JPEG"
+        },
+        {
+          "id": "ci_tree7_041",
+          "name": "stingray_041.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree7/child_images/stingray_041.JPEG"
+        },
+        {
+          "id": "ci_tree7_042",
+          "name": "stingray_042.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree7/child_images/stingray_042.JPEG"
+        },
+        {
+          "id": "ci_tree7_043",
+          "name": "stingray_043.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree7/child_images/stingray_043.JPEG"
+        },
+        {
+          "id": "ci_tree7_044",
+          "name": "stingray_044.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree7/child_images/stingray_044.JPEG"
+        },
+        {
+          "id": "ci_tree7_045",
+          "name": "stingray_045.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree7/child_images/stingray_045.JPEG"
+        },
+        {
+          "id": "ci_tree7_046",
+          "name": "stingray_046.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree7/child_images/stingray_046.JPEG"
+        },
+        {
+          "id": "ci_tree7_047",
+          "name": "stingray_047.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree7/child_images/stingray_047.JPEG"
+        },
+        {
+          "id": "ci_tree7_048",
+          "name": "stingray_048.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree7/child_images/stingray_048.JPEG"
+        },
+        {
+          "id": "ci_tree7_049",
+          "name": "stingray_049.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree7/child_images/stingray_049.JPEG"
+        },
+        {
+          "id": "ci_tree7_050",
+          "name": "stingray_050.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree7/child_images/stingray_050.JPEG"
+        }
+      ]
+    },
+    "tree8": {
+      "tree_id": "tree8",
+      "synset_id": "n01514668",
+      "parent_text": {
+        "id": "pt_tree8",
+        "text": "cock",
+        "path": "hierchical_datasets/ImageNet/data/tree8/parent_texts/parent_text.txt"
+      },
+      "child_text": {
+        "id": "ct_tree8",
+        "text": "adult male bird",
+        "path": "hierchical_datasets/ImageNet/data/tree8/child_texts/child_text.txt"
+      },
+      "parent_images": [],
+      "child_images": [
+        {
+          "id": "ci_tree8_001",
+          "name": "cock_001.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree8/child_images/cock_001.JPEG"
+        },
+        {
+          "id": "ci_tree8_002",
+          "name": "cock_002.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree8/child_images/cock_002.JPEG"
+        },
+        {
+          "id": "ci_tree8_003",
+          "name": "cock_003.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree8/child_images/cock_003.JPEG"
+        },
+        {
+          "id": "ci_tree8_004",
+          "name": "cock_004.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree8/child_images/cock_004.JPEG"
+        },
+        {
+          "id": "ci_tree8_005",
+          "name": "cock_005.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree8/child_images/cock_005.JPEG"
+        },
+        {
+          "id": "ci_tree8_006",
+          "name": "cock_006.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree8/child_images/cock_006.JPEG"
+        },
+        {
+          "id": "ci_tree8_007",
+          "name": "cock_007.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree8/child_images/cock_007.JPEG"
+        },
+        {
+          "id": "ci_tree8_008",
+          "name": "cock_008.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree8/child_images/cock_008.JPEG"
+        },
+        {
+          "id": "ci_tree8_009",
+          "name": "cock_009.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree8/child_images/cock_009.JPEG"
+        },
+        {
+          "id": "ci_tree8_010",
+          "name": "cock_010.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree8/child_images/cock_010.JPEG"
+        },
+        {
+          "id": "ci_tree8_011",
+          "name": "cock_011.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree8/child_images/cock_011.JPEG"
+        },
+        {
+          "id": "ci_tree8_012",
+          "name": "cock_012.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree8/child_images/cock_012.JPEG"
+        },
+        {
+          "id": "ci_tree8_013",
+          "name": "cock_013.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree8/child_images/cock_013.JPEG"
+        },
+        {
+          "id": "ci_tree8_014",
+          "name": "cock_014.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree8/child_images/cock_014.JPEG"
+        },
+        {
+          "id": "ci_tree8_015",
+          "name": "cock_015.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree8/child_images/cock_015.JPEG"
+        },
+        {
+          "id": "ci_tree8_016",
+          "name": "cock_016.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree8/child_images/cock_016.JPEG"
+        },
+        {
+          "id": "ci_tree8_017",
+          "name": "cock_017.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree8/child_images/cock_017.JPEG"
+        },
+        {
+          "id": "ci_tree8_018",
+          "name": "cock_018.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree8/child_images/cock_018.JPEG"
+        },
+        {
+          "id": "ci_tree8_019",
+          "name": "cock_019.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree8/child_images/cock_019.JPEG"
+        },
+        {
+          "id": "ci_tree8_020",
+          "name": "cock_020.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree8/child_images/cock_020.JPEG"
+        },
+        {
+          "id": "ci_tree8_021",
+          "name": "cock_021.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree8/child_images/cock_021.JPEG"
+        },
+        {
+          "id": "ci_tree8_022",
+          "name": "cock_022.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree8/child_images/cock_022.JPEG"
+        },
+        {
+          "id": "ci_tree8_023",
+          "name": "cock_023.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree8/child_images/cock_023.JPEG"
+        },
+        {
+          "id": "ci_tree8_024",
+          "name": "cock_024.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree8/child_images/cock_024.JPEG"
+        },
+        {
+          "id": "ci_tree8_025",
+          "name": "cock_025.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree8/child_images/cock_025.JPEG"
+        },
+        {
+          "id": "ci_tree8_026",
+          "name": "cock_026.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree8/child_images/cock_026.JPEG"
+        },
+        {
+          "id": "ci_tree8_027",
+          "name": "cock_027.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree8/child_images/cock_027.JPEG"
+        },
+        {
+          "id": "ci_tree8_028",
+          "name": "cock_028.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree8/child_images/cock_028.JPEG"
+        },
+        {
+          "id": "ci_tree8_029",
+          "name": "cock_029.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree8/child_images/cock_029.JPEG"
+        },
+        {
+          "id": "ci_tree8_030",
+          "name": "cock_030.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree8/child_images/cock_030.JPEG"
+        },
+        {
+          "id": "ci_tree8_031",
+          "name": "cock_031.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree8/child_images/cock_031.JPEG"
+        },
+        {
+          "id": "ci_tree8_032",
+          "name": "cock_032.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree8/child_images/cock_032.JPEG"
+        },
+        {
+          "id": "ci_tree8_033",
+          "name": "cock_033.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree8/child_images/cock_033.JPEG"
+        },
+        {
+          "id": "ci_tree8_034",
+          "name": "cock_034.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree8/child_images/cock_034.JPEG"
+        },
+        {
+          "id": "ci_tree8_035",
+          "name": "cock_035.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree8/child_images/cock_035.JPEG"
+        },
+        {
+          "id": "ci_tree8_036",
+          "name": "cock_036.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree8/child_images/cock_036.JPEG"
+        },
+        {
+          "id": "ci_tree8_037",
+          "name": "cock_037.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree8/child_images/cock_037.JPEG"
+        },
+        {
+          "id": "ci_tree8_038",
+          "name": "cock_038.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree8/child_images/cock_038.JPEG"
+        },
+        {
+          "id": "ci_tree8_039",
+          "name": "cock_039.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree8/child_images/cock_039.JPEG"
+        },
+        {
+          "id": "ci_tree8_040",
+          "name": "cock_040.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree8/child_images/cock_040.JPEG"
+        },
+        {
+          "id": "ci_tree8_041",
+          "name": "cock_041.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree8/child_images/cock_041.JPEG"
+        },
+        {
+          "id": "ci_tree8_042",
+          "name": "cock_042.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree8/child_images/cock_042.JPEG"
+        },
+        {
+          "id": "ci_tree8_043",
+          "name": "cock_043.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree8/child_images/cock_043.JPEG"
+        },
+        {
+          "id": "ci_tree8_044",
+          "name": "cock_044.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree8/child_images/cock_044.JPEG"
+        },
+        {
+          "id": "ci_tree8_045",
+          "name": "cock_045.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree8/child_images/cock_045.JPEG"
+        },
+        {
+          "id": "ci_tree8_046",
+          "name": "cock_046.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree8/child_images/cock_046.JPEG"
+        },
+        {
+          "id": "ci_tree8_047",
+          "name": "cock_047.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree8/child_images/cock_047.JPEG"
+        },
+        {
+          "id": "ci_tree8_048",
+          "name": "cock_048.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree8/child_images/cock_048.JPEG"
+        },
+        {
+          "id": "ci_tree8_049",
+          "name": "cock_049.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree8/child_images/cock_049.JPEG"
+        },
+        {
+          "id": "ci_tree8_050",
+          "name": "cock_050.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree8/child_images/cock_050.JPEG"
+        }
+      ]
+    },
+    "tree9": {
+      "tree_id": "tree9",
+      "synset_id": "n01514859",
+      "parent_text": {
+        "id": "pt_tree9",
+        "text": "hen",
+        "path": "hierchical_datasets/ImageNet/data/tree9/parent_texts/parent_text.txt"
+      },
+      "child_text": {
+        "id": "ct_tree9",
+        "text": "adult female bird",
+        "path": "hierchical_datasets/ImageNet/data/tree9/child_texts/child_text.txt"
+      },
+      "parent_images": [],
+      "child_images": [
+        {
+          "id": "ci_tree9_001",
+          "name": "hen_001.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree9/child_images/hen_001.JPEG"
+        },
+        {
+          "id": "ci_tree9_002",
+          "name": "hen_002.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree9/child_images/hen_002.JPEG"
+        },
+        {
+          "id": "ci_tree9_003",
+          "name": "hen_003.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree9/child_images/hen_003.JPEG"
+        },
+        {
+          "id": "ci_tree9_004",
+          "name": "hen_004.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree9/child_images/hen_004.JPEG"
+        },
+        {
+          "id": "ci_tree9_005",
+          "name": "hen_005.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree9/child_images/hen_005.JPEG"
+        },
+        {
+          "id": "ci_tree9_006",
+          "name": "hen_006.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree9/child_images/hen_006.JPEG"
+        },
+        {
+          "id": "ci_tree9_007",
+          "name": "hen_007.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree9/child_images/hen_007.JPEG"
+        },
+        {
+          "id": "ci_tree9_008",
+          "name": "hen_008.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree9/child_images/hen_008.JPEG"
+        },
+        {
+          "id": "ci_tree9_009",
+          "name": "hen_009.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree9/child_images/hen_009.JPEG"
+        },
+        {
+          "id": "ci_tree9_010",
+          "name": "hen_010.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree9/child_images/hen_010.JPEG"
+        },
+        {
+          "id": "ci_tree9_011",
+          "name": "hen_011.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree9/child_images/hen_011.JPEG"
+        },
+        {
+          "id": "ci_tree9_012",
+          "name": "hen_012.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree9/child_images/hen_012.JPEG"
+        },
+        {
+          "id": "ci_tree9_013",
+          "name": "hen_013.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree9/child_images/hen_013.JPEG"
+        },
+        {
+          "id": "ci_tree9_014",
+          "name": "hen_014.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree9/child_images/hen_014.JPEG"
+        },
+        {
+          "id": "ci_tree9_015",
+          "name": "hen_015.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree9/child_images/hen_015.JPEG"
+        },
+        {
+          "id": "ci_tree9_016",
+          "name": "hen_016.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree9/child_images/hen_016.JPEG"
+        },
+        {
+          "id": "ci_tree9_017",
+          "name": "hen_017.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree9/child_images/hen_017.JPEG"
+        },
+        {
+          "id": "ci_tree9_018",
+          "name": "hen_018.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree9/child_images/hen_018.JPEG"
+        },
+        {
+          "id": "ci_tree9_019",
+          "name": "hen_019.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree9/child_images/hen_019.JPEG"
+        },
+        {
+          "id": "ci_tree9_020",
+          "name": "hen_020.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree9/child_images/hen_020.JPEG"
+        },
+        {
+          "id": "ci_tree9_021",
+          "name": "hen_021.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree9/child_images/hen_021.JPEG"
+        },
+        {
+          "id": "ci_tree9_022",
+          "name": "hen_022.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree9/child_images/hen_022.JPEG"
+        },
+        {
+          "id": "ci_tree9_023",
+          "name": "hen_023.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree9/child_images/hen_023.JPEG"
+        },
+        {
+          "id": "ci_tree9_024",
+          "name": "hen_024.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree9/child_images/hen_024.JPEG"
+        },
+        {
+          "id": "ci_tree9_025",
+          "name": "hen_025.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree9/child_images/hen_025.JPEG"
+        },
+        {
+          "id": "ci_tree9_026",
+          "name": "hen_026.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree9/child_images/hen_026.JPEG"
+        },
+        {
+          "id": "ci_tree9_027",
+          "name": "hen_027.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree9/child_images/hen_027.JPEG"
+        },
+        {
+          "id": "ci_tree9_028",
+          "name": "hen_028.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree9/child_images/hen_028.JPEG"
+        },
+        {
+          "id": "ci_tree9_029",
+          "name": "hen_029.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree9/child_images/hen_029.JPEG"
+        },
+        {
+          "id": "ci_tree9_030",
+          "name": "hen_030.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree9/child_images/hen_030.JPEG"
+        },
+        {
+          "id": "ci_tree9_031",
+          "name": "hen_031.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree9/child_images/hen_031.JPEG"
+        },
+        {
+          "id": "ci_tree9_032",
+          "name": "hen_032.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree9/child_images/hen_032.JPEG"
+        },
+        {
+          "id": "ci_tree9_033",
+          "name": "hen_033.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree9/child_images/hen_033.JPEG"
+        },
+        {
+          "id": "ci_tree9_034",
+          "name": "hen_034.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree9/child_images/hen_034.JPEG"
+        },
+        {
+          "id": "ci_tree9_035",
+          "name": "hen_035.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree9/child_images/hen_035.JPEG"
+        },
+        {
+          "id": "ci_tree9_036",
+          "name": "hen_036.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree9/child_images/hen_036.JPEG"
+        },
+        {
+          "id": "ci_tree9_037",
+          "name": "hen_037.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree9/child_images/hen_037.JPEG"
+        },
+        {
+          "id": "ci_tree9_038",
+          "name": "hen_038.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree9/child_images/hen_038.JPEG"
+        },
+        {
+          "id": "ci_tree9_039",
+          "name": "hen_039.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree9/child_images/hen_039.JPEG"
+        },
+        {
+          "id": "ci_tree9_040",
+          "name": "hen_040.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree9/child_images/hen_040.JPEG"
+        },
+        {
+          "id": "ci_tree9_041",
+          "name": "hen_041.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree9/child_images/hen_041.JPEG"
+        },
+        {
+          "id": "ci_tree9_042",
+          "name": "hen_042.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree9/child_images/hen_042.JPEG"
+        },
+        {
+          "id": "ci_tree9_043",
+          "name": "hen_043.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree9/child_images/hen_043.JPEG"
+        },
+        {
+          "id": "ci_tree9_044",
+          "name": "hen_044.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree9/child_images/hen_044.JPEG"
+        },
+        {
+          "id": "ci_tree9_045",
+          "name": "hen_045.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree9/child_images/hen_045.JPEG"
+        },
+        {
+          "id": "ci_tree9_046",
+          "name": "hen_046.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree9/child_images/hen_046.JPEG"
+        },
+        {
+          "id": "ci_tree9_047",
+          "name": "hen_047.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree9/child_images/hen_047.JPEG"
+        },
+        {
+          "id": "ci_tree9_048",
+          "name": "hen_048.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree9/child_images/hen_048.JPEG"
+        },
+        {
+          "id": "ci_tree9_049",
+          "name": "hen_049.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree9/child_images/hen_049.JPEG"
+        },
+        {
+          "id": "ci_tree9_050",
+          "name": "hen_050.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree9/child_images/hen_050.JPEG"
+        }
+      ]
+    },
+    "tree10": {
+      "tree_id": "tree10",
+      "synset_id": "n01518878",
+      "parent_text": {
+        "id": "pt_tree10",
+        "text": "ostrich",
+        "path": "hierchical_datasets/ImageNet/data/tree10/parent_texts/parent_text.txt"
+      },
+      "child_text": {
+        "id": "ct_tree10",
+        "text": "fast-running African flightless bird with two-toed feet; largest living bird",
+        "path": "hierchical_datasets/ImageNet/data/tree10/child_texts/child_text.txt"
+      },
+      "parent_images": [],
+      "child_images": [
+        {
+          "id": "ci_tree10_001",
+          "name": "ostrich_001.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree10/child_images/ostrich_001.JPEG"
+        },
+        {
+          "id": "ci_tree10_002",
+          "name": "ostrich_002.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree10/child_images/ostrich_002.JPEG"
+        },
+        {
+          "id": "ci_tree10_003",
+          "name": "ostrich_003.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree10/child_images/ostrich_003.JPEG"
+        },
+        {
+          "id": "ci_tree10_004",
+          "name": "ostrich_004.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree10/child_images/ostrich_004.JPEG"
+        },
+        {
+          "id": "ci_tree10_005",
+          "name": "ostrich_005.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree10/child_images/ostrich_005.JPEG"
+        },
+        {
+          "id": "ci_tree10_006",
+          "name": "ostrich_006.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree10/child_images/ostrich_006.JPEG"
+        },
+        {
+          "id": "ci_tree10_007",
+          "name": "ostrich_007.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree10/child_images/ostrich_007.JPEG"
+        },
+        {
+          "id": "ci_tree10_008",
+          "name": "ostrich_008.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree10/child_images/ostrich_008.JPEG"
+        },
+        {
+          "id": "ci_tree10_009",
+          "name": "ostrich_009.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree10/child_images/ostrich_009.JPEG"
+        },
+        {
+          "id": "ci_tree10_010",
+          "name": "ostrich_010.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree10/child_images/ostrich_010.JPEG"
+        },
+        {
+          "id": "ci_tree10_011",
+          "name": "ostrich_011.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree10/child_images/ostrich_011.JPEG"
+        },
+        {
+          "id": "ci_tree10_012",
+          "name": "ostrich_012.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree10/child_images/ostrich_012.JPEG"
+        },
+        {
+          "id": "ci_tree10_013",
+          "name": "ostrich_013.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree10/child_images/ostrich_013.JPEG"
+        },
+        {
+          "id": "ci_tree10_014",
+          "name": "ostrich_014.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree10/child_images/ostrich_014.JPEG"
+        },
+        {
+          "id": "ci_tree10_015",
+          "name": "ostrich_015.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree10/child_images/ostrich_015.JPEG"
+        },
+        {
+          "id": "ci_tree10_016",
+          "name": "ostrich_016.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree10/child_images/ostrich_016.JPEG"
+        },
+        {
+          "id": "ci_tree10_017",
+          "name": "ostrich_017.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree10/child_images/ostrich_017.JPEG"
+        },
+        {
+          "id": "ci_tree10_018",
+          "name": "ostrich_018.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree10/child_images/ostrich_018.JPEG"
+        },
+        {
+          "id": "ci_tree10_019",
+          "name": "ostrich_019.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree10/child_images/ostrich_019.JPEG"
+        },
+        {
+          "id": "ci_tree10_020",
+          "name": "ostrich_020.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree10/child_images/ostrich_020.JPEG"
+        },
+        {
+          "id": "ci_tree10_021",
+          "name": "ostrich_021.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree10/child_images/ostrich_021.JPEG"
+        },
+        {
+          "id": "ci_tree10_022",
+          "name": "ostrich_022.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree10/child_images/ostrich_022.JPEG"
+        },
+        {
+          "id": "ci_tree10_023",
+          "name": "ostrich_023.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree10/child_images/ostrich_023.JPEG"
+        },
+        {
+          "id": "ci_tree10_024",
+          "name": "ostrich_024.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree10/child_images/ostrich_024.JPEG"
+        },
+        {
+          "id": "ci_tree10_025",
+          "name": "ostrich_025.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree10/child_images/ostrich_025.JPEG"
+        },
+        {
+          "id": "ci_tree10_026",
+          "name": "ostrich_026.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree10/child_images/ostrich_026.JPEG"
+        },
+        {
+          "id": "ci_tree10_027",
+          "name": "ostrich_027.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree10/child_images/ostrich_027.JPEG"
+        },
+        {
+          "id": "ci_tree10_028",
+          "name": "ostrich_028.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree10/child_images/ostrich_028.JPEG"
+        },
+        {
+          "id": "ci_tree10_029",
+          "name": "ostrich_029.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree10/child_images/ostrich_029.JPEG"
+        },
+        {
+          "id": "ci_tree10_030",
+          "name": "ostrich_030.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree10/child_images/ostrich_030.JPEG"
+        },
+        {
+          "id": "ci_tree10_031",
+          "name": "ostrich_031.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree10/child_images/ostrich_031.JPEG"
+        },
+        {
+          "id": "ci_tree10_032",
+          "name": "ostrich_032.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree10/child_images/ostrich_032.JPEG"
+        },
+        {
+          "id": "ci_tree10_033",
+          "name": "ostrich_033.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree10/child_images/ostrich_033.JPEG"
+        },
+        {
+          "id": "ci_tree10_034",
+          "name": "ostrich_034.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree10/child_images/ostrich_034.JPEG"
+        },
+        {
+          "id": "ci_tree10_035",
+          "name": "ostrich_035.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree10/child_images/ostrich_035.JPEG"
+        },
+        {
+          "id": "ci_tree10_036",
+          "name": "ostrich_036.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree10/child_images/ostrich_036.JPEG"
+        },
+        {
+          "id": "ci_tree10_037",
+          "name": "ostrich_037.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree10/child_images/ostrich_037.JPEG"
+        },
+        {
+          "id": "ci_tree10_038",
+          "name": "ostrich_038.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree10/child_images/ostrich_038.JPEG"
+        },
+        {
+          "id": "ci_tree10_039",
+          "name": "ostrich_039.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree10/child_images/ostrich_039.JPEG"
+        },
+        {
+          "id": "ci_tree10_040",
+          "name": "ostrich_040.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree10/child_images/ostrich_040.JPEG"
+        },
+        {
+          "id": "ci_tree10_041",
+          "name": "ostrich_041.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree10/child_images/ostrich_041.JPEG"
+        },
+        {
+          "id": "ci_tree10_042",
+          "name": "ostrich_042.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree10/child_images/ostrich_042.JPEG"
+        },
+        {
+          "id": "ci_tree10_043",
+          "name": "ostrich_043.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree10/child_images/ostrich_043.JPEG"
+        },
+        {
+          "id": "ci_tree10_044",
+          "name": "ostrich_044.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree10/child_images/ostrich_044.JPEG"
+        },
+        {
+          "id": "ci_tree10_045",
+          "name": "ostrich_045.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree10/child_images/ostrich_045.JPEG"
+        },
+        {
+          "id": "ci_tree10_046",
+          "name": "ostrich_046.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree10/child_images/ostrich_046.JPEG"
+        },
+        {
+          "id": "ci_tree10_047",
+          "name": "ostrich_047.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree10/child_images/ostrich_047.JPEG"
+        },
+        {
+          "id": "ci_tree10_048",
+          "name": "ostrich_048.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree10/child_images/ostrich_048.JPEG"
+        },
+        {
+          "id": "ci_tree10_049",
+          "name": "ostrich_049.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree10/child_images/ostrich_049.JPEG"
+        },
+        {
+          "id": "ci_tree10_050",
+          "name": "ostrich_050.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree10/child_images/ostrich_050.JPEG"
+        }
+      ]
+    },
+    "tree11": {
+      "tree_id": "tree11",
+      "synset_id": "n01530575",
+      "parent_text": {
+        "id": "pt_tree11",
+        "text": "brambling",
+        "path": "hierchical_datasets/ImageNet/data/tree11/parent_texts/parent_text.txt"
+      },
+      "child_text": {
+        "id": "ct_tree11",
+        "text": "Eurasian finch",
+        "path": "hierchical_datasets/ImageNet/data/tree11/child_texts/child_text.txt"
+      },
+      "parent_images": [],
+      "child_images": [
+        {
+          "id": "ci_tree11_001",
+          "name": "brambling_001.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree11/child_images/brambling_001.JPEG"
+        },
+        {
+          "id": "ci_tree11_002",
+          "name": "brambling_002.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree11/child_images/brambling_002.JPEG"
+        },
+        {
+          "id": "ci_tree11_003",
+          "name": "brambling_003.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree11/child_images/brambling_003.JPEG"
+        },
+        {
+          "id": "ci_tree11_004",
+          "name": "brambling_004.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree11/child_images/brambling_004.JPEG"
+        },
+        {
+          "id": "ci_tree11_005",
+          "name": "brambling_005.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree11/child_images/brambling_005.JPEG"
+        },
+        {
+          "id": "ci_tree11_006",
+          "name": "brambling_006.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree11/child_images/brambling_006.JPEG"
+        },
+        {
+          "id": "ci_tree11_007",
+          "name": "brambling_007.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree11/child_images/brambling_007.JPEG"
+        },
+        {
+          "id": "ci_tree11_008",
+          "name": "brambling_008.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree11/child_images/brambling_008.JPEG"
+        },
+        {
+          "id": "ci_tree11_009",
+          "name": "brambling_009.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree11/child_images/brambling_009.JPEG"
+        },
+        {
+          "id": "ci_tree11_010",
+          "name": "brambling_010.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree11/child_images/brambling_010.JPEG"
+        },
+        {
+          "id": "ci_tree11_011",
+          "name": "brambling_011.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree11/child_images/brambling_011.JPEG"
+        },
+        {
+          "id": "ci_tree11_012",
+          "name": "brambling_012.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree11/child_images/brambling_012.JPEG"
+        },
+        {
+          "id": "ci_tree11_013",
+          "name": "brambling_013.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree11/child_images/brambling_013.JPEG"
+        },
+        {
+          "id": "ci_tree11_014",
+          "name": "brambling_014.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree11/child_images/brambling_014.JPEG"
+        },
+        {
+          "id": "ci_tree11_015",
+          "name": "brambling_015.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree11/child_images/brambling_015.JPEG"
+        },
+        {
+          "id": "ci_tree11_016",
+          "name": "brambling_016.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree11/child_images/brambling_016.JPEG"
+        },
+        {
+          "id": "ci_tree11_017",
+          "name": "brambling_017.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree11/child_images/brambling_017.JPEG"
+        },
+        {
+          "id": "ci_tree11_018",
+          "name": "brambling_018.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree11/child_images/brambling_018.JPEG"
+        },
+        {
+          "id": "ci_tree11_019",
+          "name": "brambling_019.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree11/child_images/brambling_019.JPEG"
+        },
+        {
+          "id": "ci_tree11_020",
+          "name": "brambling_020.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree11/child_images/brambling_020.JPEG"
+        },
+        {
+          "id": "ci_tree11_021",
+          "name": "brambling_021.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree11/child_images/brambling_021.JPEG"
+        },
+        {
+          "id": "ci_tree11_022",
+          "name": "brambling_022.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree11/child_images/brambling_022.JPEG"
+        },
+        {
+          "id": "ci_tree11_023",
+          "name": "brambling_023.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree11/child_images/brambling_023.JPEG"
+        },
+        {
+          "id": "ci_tree11_024",
+          "name": "brambling_024.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree11/child_images/brambling_024.JPEG"
+        },
+        {
+          "id": "ci_tree11_025",
+          "name": "brambling_025.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree11/child_images/brambling_025.JPEG"
+        },
+        {
+          "id": "ci_tree11_026",
+          "name": "brambling_026.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree11/child_images/brambling_026.JPEG"
+        },
+        {
+          "id": "ci_tree11_027",
+          "name": "brambling_027.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree11/child_images/brambling_027.JPEG"
+        },
+        {
+          "id": "ci_tree11_028",
+          "name": "brambling_028.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree11/child_images/brambling_028.JPEG"
+        },
+        {
+          "id": "ci_tree11_029",
+          "name": "brambling_029.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree11/child_images/brambling_029.JPEG"
+        },
+        {
+          "id": "ci_tree11_030",
+          "name": "brambling_030.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree11/child_images/brambling_030.JPEG"
+        },
+        {
+          "id": "ci_tree11_031",
+          "name": "brambling_031.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree11/child_images/brambling_031.JPEG"
+        },
+        {
+          "id": "ci_tree11_032",
+          "name": "brambling_032.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree11/child_images/brambling_032.JPEG"
+        },
+        {
+          "id": "ci_tree11_033",
+          "name": "brambling_033.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree11/child_images/brambling_033.JPEG"
+        },
+        {
+          "id": "ci_tree11_034",
+          "name": "brambling_034.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree11/child_images/brambling_034.JPEG"
+        },
+        {
+          "id": "ci_tree11_035",
+          "name": "brambling_035.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree11/child_images/brambling_035.JPEG"
+        },
+        {
+          "id": "ci_tree11_036",
+          "name": "brambling_036.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree11/child_images/brambling_036.JPEG"
+        },
+        {
+          "id": "ci_tree11_037",
+          "name": "brambling_037.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree11/child_images/brambling_037.JPEG"
+        },
+        {
+          "id": "ci_tree11_038",
+          "name": "brambling_038.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree11/child_images/brambling_038.JPEG"
+        },
+        {
+          "id": "ci_tree11_039",
+          "name": "brambling_039.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree11/child_images/brambling_039.JPEG"
+        },
+        {
+          "id": "ci_tree11_040",
+          "name": "brambling_040.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree11/child_images/brambling_040.JPEG"
+        },
+        {
+          "id": "ci_tree11_041",
+          "name": "brambling_041.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree11/child_images/brambling_041.JPEG"
+        },
+        {
+          "id": "ci_tree11_042",
+          "name": "brambling_042.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree11/child_images/brambling_042.JPEG"
+        },
+        {
+          "id": "ci_tree11_043",
+          "name": "brambling_043.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree11/child_images/brambling_043.JPEG"
+        },
+        {
+          "id": "ci_tree11_044",
+          "name": "brambling_044.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree11/child_images/brambling_044.JPEG"
+        },
+        {
+          "id": "ci_tree11_045",
+          "name": "brambling_045.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree11/child_images/brambling_045.JPEG"
+        },
+        {
+          "id": "ci_tree11_046",
+          "name": "brambling_046.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree11/child_images/brambling_046.JPEG"
+        },
+        {
+          "id": "ci_tree11_047",
+          "name": "brambling_047.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree11/child_images/brambling_047.JPEG"
+        },
+        {
+          "id": "ci_tree11_048",
+          "name": "brambling_048.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree11/child_images/brambling_048.JPEG"
+        },
+        {
+          "id": "ci_tree11_049",
+          "name": "brambling_049.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree11/child_images/brambling_049.JPEG"
+        },
+        {
+          "id": "ci_tree11_050",
+          "name": "brambling_050.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree11/child_images/brambling_050.JPEG"
+        }
+      ]
+    },
+    "tree12": {
+      "tree_id": "tree12",
+      "synset_id": "n01531178",
+      "parent_text": {
+        "id": "pt_tree12",
+        "text": "goldfinch",
+        "path": "hierchical_datasets/ImageNet/data/tree12/parent_texts/parent_text.txt"
+      },
+      "child_text": {
+        "id": "ct_tree12",
+        "text": "small European finch having a crimson face and yellow-and-black wings",
+        "path": "hierchical_datasets/ImageNet/data/tree12/child_texts/child_text.txt"
+      },
+      "parent_images": [],
+      "child_images": [
+        {
+          "id": "ci_tree12_001",
+          "name": "goldfinch_001.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree12/child_images/goldfinch_001.JPEG"
+        },
+        {
+          "id": "ci_tree12_002",
+          "name": "goldfinch_002.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree12/child_images/goldfinch_002.JPEG"
+        },
+        {
+          "id": "ci_tree12_003",
+          "name": "goldfinch_003.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree12/child_images/goldfinch_003.JPEG"
+        },
+        {
+          "id": "ci_tree12_004",
+          "name": "goldfinch_004.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree12/child_images/goldfinch_004.JPEG"
+        },
+        {
+          "id": "ci_tree12_005",
+          "name": "goldfinch_005.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree12/child_images/goldfinch_005.JPEG"
+        },
+        {
+          "id": "ci_tree12_006",
+          "name": "goldfinch_006.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree12/child_images/goldfinch_006.JPEG"
+        },
+        {
+          "id": "ci_tree12_007",
+          "name": "goldfinch_007.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree12/child_images/goldfinch_007.JPEG"
+        },
+        {
+          "id": "ci_tree12_008",
+          "name": "goldfinch_008.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree12/child_images/goldfinch_008.JPEG"
+        },
+        {
+          "id": "ci_tree12_009",
+          "name": "goldfinch_009.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree12/child_images/goldfinch_009.JPEG"
+        },
+        {
+          "id": "ci_tree12_010",
+          "name": "goldfinch_010.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree12/child_images/goldfinch_010.JPEG"
+        },
+        {
+          "id": "ci_tree12_011",
+          "name": "goldfinch_011.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree12/child_images/goldfinch_011.JPEG"
+        },
+        {
+          "id": "ci_tree12_012",
+          "name": "goldfinch_012.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree12/child_images/goldfinch_012.JPEG"
+        },
+        {
+          "id": "ci_tree12_013",
+          "name": "goldfinch_013.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree12/child_images/goldfinch_013.JPEG"
+        },
+        {
+          "id": "ci_tree12_014",
+          "name": "goldfinch_014.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree12/child_images/goldfinch_014.JPEG"
+        },
+        {
+          "id": "ci_tree12_015",
+          "name": "goldfinch_015.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree12/child_images/goldfinch_015.JPEG"
+        },
+        {
+          "id": "ci_tree12_016",
+          "name": "goldfinch_016.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree12/child_images/goldfinch_016.JPEG"
+        },
+        {
+          "id": "ci_tree12_017",
+          "name": "goldfinch_017.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree12/child_images/goldfinch_017.JPEG"
+        },
+        {
+          "id": "ci_tree12_018",
+          "name": "goldfinch_018.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree12/child_images/goldfinch_018.JPEG"
+        },
+        {
+          "id": "ci_tree12_019",
+          "name": "goldfinch_019.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree12/child_images/goldfinch_019.JPEG"
+        },
+        {
+          "id": "ci_tree12_020",
+          "name": "goldfinch_020.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree12/child_images/goldfinch_020.JPEG"
+        },
+        {
+          "id": "ci_tree12_021",
+          "name": "goldfinch_021.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree12/child_images/goldfinch_021.JPEG"
+        },
+        {
+          "id": "ci_tree12_022",
+          "name": "goldfinch_022.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree12/child_images/goldfinch_022.JPEG"
+        },
+        {
+          "id": "ci_tree12_023",
+          "name": "goldfinch_023.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree12/child_images/goldfinch_023.JPEG"
+        },
+        {
+          "id": "ci_tree12_024",
+          "name": "goldfinch_024.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree12/child_images/goldfinch_024.JPEG"
+        },
+        {
+          "id": "ci_tree12_025",
+          "name": "goldfinch_025.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree12/child_images/goldfinch_025.JPEG"
+        },
+        {
+          "id": "ci_tree12_026",
+          "name": "goldfinch_026.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree12/child_images/goldfinch_026.JPEG"
+        },
+        {
+          "id": "ci_tree12_027",
+          "name": "goldfinch_027.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree12/child_images/goldfinch_027.JPEG"
+        },
+        {
+          "id": "ci_tree12_028",
+          "name": "goldfinch_028.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree12/child_images/goldfinch_028.JPEG"
+        },
+        {
+          "id": "ci_tree12_029",
+          "name": "goldfinch_029.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree12/child_images/goldfinch_029.JPEG"
+        },
+        {
+          "id": "ci_tree12_030",
+          "name": "goldfinch_030.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree12/child_images/goldfinch_030.JPEG"
+        },
+        {
+          "id": "ci_tree12_031",
+          "name": "goldfinch_031.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree12/child_images/goldfinch_031.JPEG"
+        },
+        {
+          "id": "ci_tree12_032",
+          "name": "goldfinch_032.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree12/child_images/goldfinch_032.JPEG"
+        },
+        {
+          "id": "ci_tree12_033",
+          "name": "goldfinch_033.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree12/child_images/goldfinch_033.JPEG"
+        },
+        {
+          "id": "ci_tree12_034",
+          "name": "goldfinch_034.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree12/child_images/goldfinch_034.JPEG"
+        },
+        {
+          "id": "ci_tree12_035",
+          "name": "goldfinch_035.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree12/child_images/goldfinch_035.JPEG"
+        },
+        {
+          "id": "ci_tree12_036",
+          "name": "goldfinch_036.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree12/child_images/goldfinch_036.JPEG"
+        },
+        {
+          "id": "ci_tree12_037",
+          "name": "goldfinch_037.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree12/child_images/goldfinch_037.JPEG"
+        },
+        {
+          "id": "ci_tree12_038",
+          "name": "goldfinch_038.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree12/child_images/goldfinch_038.JPEG"
+        },
+        {
+          "id": "ci_tree12_039",
+          "name": "goldfinch_039.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree12/child_images/goldfinch_039.JPEG"
+        },
+        {
+          "id": "ci_tree12_040",
+          "name": "goldfinch_040.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree12/child_images/goldfinch_040.JPEG"
+        },
+        {
+          "id": "ci_tree12_041",
+          "name": "goldfinch_041.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree12/child_images/goldfinch_041.JPEG"
+        },
+        {
+          "id": "ci_tree12_042",
+          "name": "goldfinch_042.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree12/child_images/goldfinch_042.JPEG"
+        },
+        {
+          "id": "ci_tree12_043",
+          "name": "goldfinch_043.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree12/child_images/goldfinch_043.JPEG"
+        },
+        {
+          "id": "ci_tree12_044",
+          "name": "goldfinch_044.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree12/child_images/goldfinch_044.JPEG"
+        },
+        {
+          "id": "ci_tree12_045",
+          "name": "goldfinch_045.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree12/child_images/goldfinch_045.JPEG"
+        },
+        {
+          "id": "ci_tree12_046",
+          "name": "goldfinch_046.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree12/child_images/goldfinch_046.JPEG"
+        },
+        {
+          "id": "ci_tree12_047",
+          "name": "goldfinch_047.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree12/child_images/goldfinch_047.JPEG"
+        },
+        {
+          "id": "ci_tree12_048",
+          "name": "goldfinch_048.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree12/child_images/goldfinch_048.JPEG"
+        },
+        {
+          "id": "ci_tree12_049",
+          "name": "goldfinch_049.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree12/child_images/goldfinch_049.JPEG"
+        },
+        {
+          "id": "ci_tree12_050",
+          "name": "goldfinch_050.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree12/child_images/goldfinch_050.JPEG"
+        }
+      ]
+    },
+    "tree13": {
+      "tree_id": "tree13",
+      "synset_id": "n01532829",
+      "parent_text": {
+        "id": "pt_tree13",
+        "text": "house_finch",
+        "path": "hierchical_datasets/ImageNet/data/tree13/parent_texts/parent_text.txt"
+      },
+      "child_text": {
+        "id": "ct_tree13",
+        "text": "small finch originally of the western United States and Mexico",
+        "path": "hierchical_datasets/ImageNet/data/tree13/child_texts/child_text.txt"
+      },
+      "parent_images": [],
+      "child_images": [
+        {
+          "id": "ci_tree13_001",
+          "name": "house_finch_001.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree13/child_images/house_finch_001.JPEG"
+        },
+        {
+          "id": "ci_tree13_002",
+          "name": "house_finch_002.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree13/child_images/house_finch_002.JPEG"
+        },
+        {
+          "id": "ci_tree13_003",
+          "name": "house_finch_003.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree13/child_images/house_finch_003.JPEG"
+        },
+        {
+          "id": "ci_tree13_004",
+          "name": "house_finch_004.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree13/child_images/house_finch_004.JPEG"
+        },
+        {
+          "id": "ci_tree13_005",
+          "name": "house_finch_005.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree13/child_images/house_finch_005.JPEG"
+        },
+        {
+          "id": "ci_tree13_006",
+          "name": "house_finch_006.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree13/child_images/house_finch_006.JPEG"
+        },
+        {
+          "id": "ci_tree13_007",
+          "name": "house_finch_007.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree13/child_images/house_finch_007.JPEG"
+        },
+        {
+          "id": "ci_tree13_008",
+          "name": "house_finch_008.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree13/child_images/house_finch_008.JPEG"
+        },
+        {
+          "id": "ci_tree13_009",
+          "name": "house_finch_009.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree13/child_images/house_finch_009.JPEG"
+        },
+        {
+          "id": "ci_tree13_010",
+          "name": "house_finch_010.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree13/child_images/house_finch_010.JPEG"
+        },
+        {
+          "id": "ci_tree13_011",
+          "name": "house_finch_011.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree13/child_images/house_finch_011.JPEG"
+        },
+        {
+          "id": "ci_tree13_012",
+          "name": "house_finch_012.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree13/child_images/house_finch_012.JPEG"
+        },
+        {
+          "id": "ci_tree13_013",
+          "name": "house_finch_013.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree13/child_images/house_finch_013.JPEG"
+        },
+        {
+          "id": "ci_tree13_014",
+          "name": "house_finch_014.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree13/child_images/house_finch_014.JPEG"
+        },
+        {
+          "id": "ci_tree13_015",
+          "name": "house_finch_015.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree13/child_images/house_finch_015.JPEG"
+        },
+        {
+          "id": "ci_tree13_016",
+          "name": "house_finch_016.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree13/child_images/house_finch_016.JPEG"
+        },
+        {
+          "id": "ci_tree13_017",
+          "name": "house_finch_017.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree13/child_images/house_finch_017.JPEG"
+        },
+        {
+          "id": "ci_tree13_018",
+          "name": "house_finch_018.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree13/child_images/house_finch_018.JPEG"
+        },
+        {
+          "id": "ci_tree13_019",
+          "name": "house_finch_019.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree13/child_images/house_finch_019.JPEG"
+        },
+        {
+          "id": "ci_tree13_020",
+          "name": "house_finch_020.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree13/child_images/house_finch_020.JPEG"
+        },
+        {
+          "id": "ci_tree13_021",
+          "name": "house_finch_021.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree13/child_images/house_finch_021.JPEG"
+        },
+        {
+          "id": "ci_tree13_022",
+          "name": "house_finch_022.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree13/child_images/house_finch_022.JPEG"
+        },
+        {
+          "id": "ci_tree13_023",
+          "name": "house_finch_023.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree13/child_images/house_finch_023.JPEG"
+        },
+        {
+          "id": "ci_tree13_024",
+          "name": "house_finch_024.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree13/child_images/house_finch_024.JPEG"
+        },
+        {
+          "id": "ci_tree13_025",
+          "name": "house_finch_025.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree13/child_images/house_finch_025.JPEG"
+        },
+        {
+          "id": "ci_tree13_026",
+          "name": "house_finch_026.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree13/child_images/house_finch_026.JPEG"
+        },
+        {
+          "id": "ci_tree13_027",
+          "name": "house_finch_027.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree13/child_images/house_finch_027.JPEG"
+        },
+        {
+          "id": "ci_tree13_028",
+          "name": "house_finch_028.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree13/child_images/house_finch_028.JPEG"
+        },
+        {
+          "id": "ci_tree13_029",
+          "name": "house_finch_029.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree13/child_images/house_finch_029.JPEG"
+        },
+        {
+          "id": "ci_tree13_030",
+          "name": "house_finch_030.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree13/child_images/house_finch_030.JPEG"
+        },
+        {
+          "id": "ci_tree13_031",
+          "name": "house_finch_031.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree13/child_images/house_finch_031.JPEG"
+        },
+        {
+          "id": "ci_tree13_032",
+          "name": "house_finch_032.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree13/child_images/house_finch_032.JPEG"
+        },
+        {
+          "id": "ci_tree13_033",
+          "name": "house_finch_033.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree13/child_images/house_finch_033.JPEG"
+        },
+        {
+          "id": "ci_tree13_034",
+          "name": "house_finch_034.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree13/child_images/house_finch_034.JPEG"
+        },
+        {
+          "id": "ci_tree13_035",
+          "name": "house_finch_035.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree13/child_images/house_finch_035.JPEG"
+        },
+        {
+          "id": "ci_tree13_036",
+          "name": "house_finch_036.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree13/child_images/house_finch_036.JPEG"
+        },
+        {
+          "id": "ci_tree13_037",
+          "name": "house_finch_037.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree13/child_images/house_finch_037.JPEG"
+        },
+        {
+          "id": "ci_tree13_038",
+          "name": "house_finch_038.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree13/child_images/house_finch_038.JPEG"
+        },
+        {
+          "id": "ci_tree13_039",
+          "name": "house_finch_039.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree13/child_images/house_finch_039.JPEG"
+        },
+        {
+          "id": "ci_tree13_040",
+          "name": "house_finch_040.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree13/child_images/house_finch_040.JPEG"
+        },
+        {
+          "id": "ci_tree13_041",
+          "name": "house_finch_041.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree13/child_images/house_finch_041.JPEG"
+        },
+        {
+          "id": "ci_tree13_042",
+          "name": "house_finch_042.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree13/child_images/house_finch_042.JPEG"
+        },
+        {
+          "id": "ci_tree13_043",
+          "name": "house_finch_043.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree13/child_images/house_finch_043.JPEG"
+        },
+        {
+          "id": "ci_tree13_044",
+          "name": "house_finch_044.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree13/child_images/house_finch_044.JPEG"
+        },
+        {
+          "id": "ci_tree13_045",
+          "name": "house_finch_045.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree13/child_images/house_finch_045.JPEG"
+        },
+        {
+          "id": "ci_tree13_046",
+          "name": "house_finch_046.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree13/child_images/house_finch_046.JPEG"
+        },
+        {
+          "id": "ci_tree13_047",
+          "name": "house_finch_047.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree13/child_images/house_finch_047.JPEG"
+        },
+        {
+          "id": "ci_tree13_048",
+          "name": "house_finch_048.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree13/child_images/house_finch_048.JPEG"
+        },
+        {
+          "id": "ci_tree13_049",
+          "name": "house_finch_049.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree13/child_images/house_finch_049.JPEG"
+        },
+        {
+          "id": "ci_tree13_050",
+          "name": "house_finch_050.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree13/child_images/house_finch_050.JPEG"
+        }
+      ]
+    },
+    "tree14": {
+      "tree_id": "tree14",
+      "synset_id": "n01534433",
+      "parent_text": {
+        "id": "pt_tree14",
+        "text": "junco",
+        "path": "hierchical_datasets/ImageNet/data/tree14/parent_texts/parent_text.txt"
+      },
+      "child_text": {
+        "id": "ct_tree14",
+        "text": "small North American finch seen chiefly in winter",
+        "path": "hierchical_datasets/ImageNet/data/tree14/child_texts/child_text.txt"
+      },
+      "parent_images": [],
+      "child_images": [
+        {
+          "id": "ci_tree14_001",
+          "name": "junco_001.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree14/child_images/junco_001.JPEG"
+        },
+        {
+          "id": "ci_tree14_002",
+          "name": "junco_002.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree14/child_images/junco_002.JPEG"
+        },
+        {
+          "id": "ci_tree14_003",
+          "name": "junco_003.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree14/child_images/junco_003.JPEG"
+        },
+        {
+          "id": "ci_tree14_004",
+          "name": "junco_004.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree14/child_images/junco_004.JPEG"
+        },
+        {
+          "id": "ci_tree14_005",
+          "name": "junco_005.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree14/child_images/junco_005.JPEG"
+        },
+        {
+          "id": "ci_tree14_006",
+          "name": "junco_006.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree14/child_images/junco_006.JPEG"
+        },
+        {
+          "id": "ci_tree14_007",
+          "name": "junco_007.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree14/child_images/junco_007.JPEG"
+        },
+        {
+          "id": "ci_tree14_008",
+          "name": "junco_008.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree14/child_images/junco_008.JPEG"
+        },
+        {
+          "id": "ci_tree14_009",
+          "name": "junco_009.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree14/child_images/junco_009.JPEG"
+        },
+        {
+          "id": "ci_tree14_010",
+          "name": "junco_010.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree14/child_images/junco_010.JPEG"
+        },
+        {
+          "id": "ci_tree14_011",
+          "name": "junco_011.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree14/child_images/junco_011.JPEG"
+        },
+        {
+          "id": "ci_tree14_012",
+          "name": "junco_012.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree14/child_images/junco_012.JPEG"
+        },
+        {
+          "id": "ci_tree14_013",
+          "name": "junco_013.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree14/child_images/junco_013.JPEG"
+        },
+        {
+          "id": "ci_tree14_014",
+          "name": "junco_014.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree14/child_images/junco_014.JPEG"
+        },
+        {
+          "id": "ci_tree14_015",
+          "name": "junco_015.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree14/child_images/junco_015.JPEG"
+        },
+        {
+          "id": "ci_tree14_016",
+          "name": "junco_016.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree14/child_images/junco_016.JPEG"
+        },
+        {
+          "id": "ci_tree14_017",
+          "name": "junco_017.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree14/child_images/junco_017.JPEG"
+        },
+        {
+          "id": "ci_tree14_018",
+          "name": "junco_018.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree14/child_images/junco_018.JPEG"
+        },
+        {
+          "id": "ci_tree14_019",
+          "name": "junco_019.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree14/child_images/junco_019.JPEG"
+        },
+        {
+          "id": "ci_tree14_020",
+          "name": "junco_020.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree14/child_images/junco_020.JPEG"
+        },
+        {
+          "id": "ci_tree14_021",
+          "name": "junco_021.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree14/child_images/junco_021.JPEG"
+        },
+        {
+          "id": "ci_tree14_022",
+          "name": "junco_022.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree14/child_images/junco_022.JPEG"
+        },
+        {
+          "id": "ci_tree14_023",
+          "name": "junco_023.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree14/child_images/junco_023.JPEG"
+        },
+        {
+          "id": "ci_tree14_024",
+          "name": "junco_024.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree14/child_images/junco_024.JPEG"
+        },
+        {
+          "id": "ci_tree14_025",
+          "name": "junco_025.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree14/child_images/junco_025.JPEG"
+        },
+        {
+          "id": "ci_tree14_026",
+          "name": "junco_026.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree14/child_images/junco_026.JPEG"
+        },
+        {
+          "id": "ci_tree14_027",
+          "name": "junco_027.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree14/child_images/junco_027.JPEG"
+        },
+        {
+          "id": "ci_tree14_028",
+          "name": "junco_028.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree14/child_images/junco_028.JPEG"
+        },
+        {
+          "id": "ci_tree14_029",
+          "name": "junco_029.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree14/child_images/junco_029.JPEG"
+        },
+        {
+          "id": "ci_tree14_030",
+          "name": "junco_030.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree14/child_images/junco_030.JPEG"
+        },
+        {
+          "id": "ci_tree14_031",
+          "name": "junco_031.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree14/child_images/junco_031.JPEG"
+        },
+        {
+          "id": "ci_tree14_032",
+          "name": "junco_032.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree14/child_images/junco_032.JPEG"
+        },
+        {
+          "id": "ci_tree14_033",
+          "name": "junco_033.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree14/child_images/junco_033.JPEG"
+        },
+        {
+          "id": "ci_tree14_034",
+          "name": "junco_034.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree14/child_images/junco_034.JPEG"
+        },
+        {
+          "id": "ci_tree14_035",
+          "name": "junco_035.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree14/child_images/junco_035.JPEG"
+        },
+        {
+          "id": "ci_tree14_036",
+          "name": "junco_036.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree14/child_images/junco_036.JPEG"
+        },
+        {
+          "id": "ci_tree14_037",
+          "name": "junco_037.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree14/child_images/junco_037.JPEG"
+        },
+        {
+          "id": "ci_tree14_038",
+          "name": "junco_038.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree14/child_images/junco_038.JPEG"
+        },
+        {
+          "id": "ci_tree14_039",
+          "name": "junco_039.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree14/child_images/junco_039.JPEG"
+        },
+        {
+          "id": "ci_tree14_040",
+          "name": "junco_040.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree14/child_images/junco_040.JPEG"
+        },
+        {
+          "id": "ci_tree14_041",
+          "name": "junco_041.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree14/child_images/junco_041.JPEG"
+        },
+        {
+          "id": "ci_tree14_042",
+          "name": "junco_042.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree14/child_images/junco_042.JPEG"
+        },
+        {
+          "id": "ci_tree14_043",
+          "name": "junco_043.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree14/child_images/junco_043.JPEG"
+        },
+        {
+          "id": "ci_tree14_044",
+          "name": "junco_044.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree14/child_images/junco_044.JPEG"
+        },
+        {
+          "id": "ci_tree14_045",
+          "name": "junco_045.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree14/child_images/junco_045.JPEG"
+        },
+        {
+          "id": "ci_tree14_046",
+          "name": "junco_046.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree14/child_images/junco_046.JPEG"
+        },
+        {
+          "id": "ci_tree14_047",
+          "name": "junco_047.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree14/child_images/junco_047.JPEG"
+        },
+        {
+          "id": "ci_tree14_048",
+          "name": "junco_048.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree14/child_images/junco_048.JPEG"
+        },
+        {
+          "id": "ci_tree14_049",
+          "name": "junco_049.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree14/child_images/junco_049.JPEG"
+        },
+        {
+          "id": "ci_tree14_050",
+          "name": "junco_050.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree14/child_images/junco_050.JPEG"
+        }
+      ]
+    },
+    "tree15": {
+      "tree_id": "tree15",
+      "synset_id": "n01537544",
+      "parent_text": {
+        "id": "pt_tree15",
+        "text": "indigo_bunting",
+        "path": "hierchical_datasets/ImageNet/data/tree15/parent_texts/parent_text.txt"
+      },
+      "child_text": {
+        "id": "ct_tree15",
+        "text": "small deep blue North American bunting",
+        "path": "hierchical_datasets/ImageNet/data/tree15/child_texts/child_text.txt"
+      },
+      "parent_images": [],
+      "child_images": [
+        {
+          "id": "ci_tree15_001",
+          "name": "indigo_bunting_001.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree15/child_images/indigo_bunting_001.JPEG"
+        },
+        {
+          "id": "ci_tree15_002",
+          "name": "indigo_bunting_002.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree15/child_images/indigo_bunting_002.JPEG"
+        },
+        {
+          "id": "ci_tree15_003",
+          "name": "indigo_bunting_003.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree15/child_images/indigo_bunting_003.JPEG"
+        },
+        {
+          "id": "ci_tree15_004",
+          "name": "indigo_bunting_004.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree15/child_images/indigo_bunting_004.JPEG"
+        },
+        {
+          "id": "ci_tree15_005",
+          "name": "indigo_bunting_005.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree15/child_images/indigo_bunting_005.JPEG"
+        },
+        {
+          "id": "ci_tree15_006",
+          "name": "indigo_bunting_006.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree15/child_images/indigo_bunting_006.JPEG"
+        },
+        {
+          "id": "ci_tree15_007",
+          "name": "indigo_bunting_007.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree15/child_images/indigo_bunting_007.JPEG"
+        },
+        {
+          "id": "ci_tree15_008",
+          "name": "indigo_bunting_008.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree15/child_images/indigo_bunting_008.JPEG"
+        },
+        {
+          "id": "ci_tree15_009",
+          "name": "indigo_bunting_009.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree15/child_images/indigo_bunting_009.JPEG"
+        },
+        {
+          "id": "ci_tree15_010",
+          "name": "indigo_bunting_010.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree15/child_images/indigo_bunting_010.JPEG"
+        },
+        {
+          "id": "ci_tree15_011",
+          "name": "indigo_bunting_011.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree15/child_images/indigo_bunting_011.JPEG"
+        },
+        {
+          "id": "ci_tree15_012",
+          "name": "indigo_bunting_012.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree15/child_images/indigo_bunting_012.JPEG"
+        },
+        {
+          "id": "ci_tree15_013",
+          "name": "indigo_bunting_013.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree15/child_images/indigo_bunting_013.JPEG"
+        },
+        {
+          "id": "ci_tree15_014",
+          "name": "indigo_bunting_014.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree15/child_images/indigo_bunting_014.JPEG"
+        },
+        {
+          "id": "ci_tree15_015",
+          "name": "indigo_bunting_015.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree15/child_images/indigo_bunting_015.JPEG"
+        },
+        {
+          "id": "ci_tree15_016",
+          "name": "indigo_bunting_016.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree15/child_images/indigo_bunting_016.JPEG"
+        },
+        {
+          "id": "ci_tree15_017",
+          "name": "indigo_bunting_017.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree15/child_images/indigo_bunting_017.JPEG"
+        },
+        {
+          "id": "ci_tree15_018",
+          "name": "indigo_bunting_018.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree15/child_images/indigo_bunting_018.JPEG"
+        },
+        {
+          "id": "ci_tree15_019",
+          "name": "indigo_bunting_019.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree15/child_images/indigo_bunting_019.JPEG"
+        },
+        {
+          "id": "ci_tree15_020",
+          "name": "indigo_bunting_020.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree15/child_images/indigo_bunting_020.JPEG"
+        },
+        {
+          "id": "ci_tree15_021",
+          "name": "indigo_bunting_021.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree15/child_images/indigo_bunting_021.JPEG"
+        },
+        {
+          "id": "ci_tree15_022",
+          "name": "indigo_bunting_022.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree15/child_images/indigo_bunting_022.JPEG"
+        },
+        {
+          "id": "ci_tree15_023",
+          "name": "indigo_bunting_023.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree15/child_images/indigo_bunting_023.JPEG"
+        },
+        {
+          "id": "ci_tree15_024",
+          "name": "indigo_bunting_024.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree15/child_images/indigo_bunting_024.JPEG"
+        },
+        {
+          "id": "ci_tree15_025",
+          "name": "indigo_bunting_025.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree15/child_images/indigo_bunting_025.JPEG"
+        },
+        {
+          "id": "ci_tree15_026",
+          "name": "indigo_bunting_026.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree15/child_images/indigo_bunting_026.JPEG"
+        },
+        {
+          "id": "ci_tree15_027",
+          "name": "indigo_bunting_027.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree15/child_images/indigo_bunting_027.JPEG"
+        },
+        {
+          "id": "ci_tree15_028",
+          "name": "indigo_bunting_028.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree15/child_images/indigo_bunting_028.JPEG"
+        },
+        {
+          "id": "ci_tree15_029",
+          "name": "indigo_bunting_029.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree15/child_images/indigo_bunting_029.JPEG"
+        },
+        {
+          "id": "ci_tree15_030",
+          "name": "indigo_bunting_030.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree15/child_images/indigo_bunting_030.JPEG"
+        },
+        {
+          "id": "ci_tree15_031",
+          "name": "indigo_bunting_031.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree15/child_images/indigo_bunting_031.JPEG"
+        },
+        {
+          "id": "ci_tree15_032",
+          "name": "indigo_bunting_032.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree15/child_images/indigo_bunting_032.JPEG"
+        },
+        {
+          "id": "ci_tree15_033",
+          "name": "indigo_bunting_033.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree15/child_images/indigo_bunting_033.JPEG"
+        },
+        {
+          "id": "ci_tree15_034",
+          "name": "indigo_bunting_034.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree15/child_images/indigo_bunting_034.JPEG"
+        },
+        {
+          "id": "ci_tree15_035",
+          "name": "indigo_bunting_035.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree15/child_images/indigo_bunting_035.JPEG"
+        },
+        {
+          "id": "ci_tree15_036",
+          "name": "indigo_bunting_036.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree15/child_images/indigo_bunting_036.JPEG"
+        },
+        {
+          "id": "ci_tree15_037",
+          "name": "indigo_bunting_037.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree15/child_images/indigo_bunting_037.JPEG"
+        },
+        {
+          "id": "ci_tree15_038",
+          "name": "indigo_bunting_038.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree15/child_images/indigo_bunting_038.JPEG"
+        },
+        {
+          "id": "ci_tree15_039",
+          "name": "indigo_bunting_039.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree15/child_images/indigo_bunting_039.JPEG"
+        },
+        {
+          "id": "ci_tree15_040",
+          "name": "indigo_bunting_040.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree15/child_images/indigo_bunting_040.JPEG"
+        },
+        {
+          "id": "ci_tree15_041",
+          "name": "indigo_bunting_041.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree15/child_images/indigo_bunting_041.JPEG"
+        },
+        {
+          "id": "ci_tree15_042",
+          "name": "indigo_bunting_042.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree15/child_images/indigo_bunting_042.JPEG"
+        },
+        {
+          "id": "ci_tree15_043",
+          "name": "indigo_bunting_043.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree15/child_images/indigo_bunting_043.JPEG"
+        },
+        {
+          "id": "ci_tree15_044",
+          "name": "indigo_bunting_044.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree15/child_images/indigo_bunting_044.JPEG"
+        },
+        {
+          "id": "ci_tree15_045",
+          "name": "indigo_bunting_045.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree15/child_images/indigo_bunting_045.JPEG"
+        },
+        {
+          "id": "ci_tree15_046",
+          "name": "indigo_bunting_046.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree15/child_images/indigo_bunting_046.JPEG"
+        },
+        {
+          "id": "ci_tree15_047",
+          "name": "indigo_bunting_047.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree15/child_images/indigo_bunting_047.JPEG"
+        },
+        {
+          "id": "ci_tree15_048",
+          "name": "indigo_bunting_048.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree15/child_images/indigo_bunting_048.JPEG"
+        },
+        {
+          "id": "ci_tree15_049",
+          "name": "indigo_bunting_049.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree15/child_images/indigo_bunting_049.JPEG"
+        },
+        {
+          "id": "ci_tree15_050",
+          "name": "indigo_bunting_050.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree15/child_images/indigo_bunting_050.JPEG"
+        }
+      ]
+    },
+    "tree16": {
+      "tree_id": "tree16",
+      "synset_id": "n01558993",
+      "parent_text": {
+        "id": "pt_tree16",
+        "text": "robin",
+        "path": "hierchical_datasets/ImageNet/data/tree16/parent_texts/parent_text.txt"
+      },
+      "child_text": {
+        "id": "ct_tree16",
+        "text": "large American thrush having a rust-red breast and abdomen",
+        "path": "hierchical_datasets/ImageNet/data/tree16/child_texts/child_text.txt"
+      },
+      "parent_images": [],
+      "child_images": [
+        {
+          "id": "ci_tree16_001",
+          "name": "robin_001.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree16/child_images/robin_001.JPEG"
+        },
+        {
+          "id": "ci_tree16_002",
+          "name": "robin_002.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree16/child_images/robin_002.JPEG"
+        },
+        {
+          "id": "ci_tree16_003",
+          "name": "robin_003.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree16/child_images/robin_003.JPEG"
+        },
+        {
+          "id": "ci_tree16_004",
+          "name": "robin_004.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree16/child_images/robin_004.JPEG"
+        },
+        {
+          "id": "ci_tree16_005",
+          "name": "robin_005.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree16/child_images/robin_005.JPEG"
+        },
+        {
+          "id": "ci_tree16_006",
+          "name": "robin_006.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree16/child_images/robin_006.JPEG"
+        },
+        {
+          "id": "ci_tree16_007",
+          "name": "robin_007.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree16/child_images/robin_007.JPEG"
+        },
+        {
+          "id": "ci_tree16_008",
+          "name": "robin_008.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree16/child_images/robin_008.JPEG"
+        },
+        {
+          "id": "ci_tree16_009",
+          "name": "robin_009.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree16/child_images/robin_009.JPEG"
+        },
+        {
+          "id": "ci_tree16_010",
+          "name": "robin_010.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree16/child_images/robin_010.JPEG"
+        },
+        {
+          "id": "ci_tree16_011",
+          "name": "robin_011.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree16/child_images/robin_011.JPEG"
+        },
+        {
+          "id": "ci_tree16_012",
+          "name": "robin_012.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree16/child_images/robin_012.JPEG"
+        },
+        {
+          "id": "ci_tree16_013",
+          "name": "robin_013.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree16/child_images/robin_013.JPEG"
+        },
+        {
+          "id": "ci_tree16_014",
+          "name": "robin_014.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree16/child_images/robin_014.JPEG"
+        },
+        {
+          "id": "ci_tree16_015",
+          "name": "robin_015.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree16/child_images/robin_015.JPEG"
+        },
+        {
+          "id": "ci_tree16_016",
+          "name": "robin_016.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree16/child_images/robin_016.JPEG"
+        },
+        {
+          "id": "ci_tree16_017",
+          "name": "robin_017.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree16/child_images/robin_017.JPEG"
+        },
+        {
+          "id": "ci_tree16_018",
+          "name": "robin_018.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree16/child_images/robin_018.JPEG"
+        },
+        {
+          "id": "ci_tree16_019",
+          "name": "robin_019.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree16/child_images/robin_019.JPEG"
+        },
+        {
+          "id": "ci_tree16_020",
+          "name": "robin_020.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree16/child_images/robin_020.JPEG"
+        },
+        {
+          "id": "ci_tree16_021",
+          "name": "robin_021.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree16/child_images/robin_021.JPEG"
+        },
+        {
+          "id": "ci_tree16_022",
+          "name": "robin_022.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree16/child_images/robin_022.JPEG"
+        },
+        {
+          "id": "ci_tree16_023",
+          "name": "robin_023.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree16/child_images/robin_023.JPEG"
+        },
+        {
+          "id": "ci_tree16_024",
+          "name": "robin_024.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree16/child_images/robin_024.JPEG"
+        },
+        {
+          "id": "ci_tree16_025",
+          "name": "robin_025.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree16/child_images/robin_025.JPEG"
+        },
+        {
+          "id": "ci_tree16_026",
+          "name": "robin_026.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree16/child_images/robin_026.JPEG"
+        },
+        {
+          "id": "ci_tree16_027",
+          "name": "robin_027.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree16/child_images/robin_027.JPEG"
+        },
+        {
+          "id": "ci_tree16_028",
+          "name": "robin_028.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree16/child_images/robin_028.JPEG"
+        },
+        {
+          "id": "ci_tree16_029",
+          "name": "robin_029.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree16/child_images/robin_029.JPEG"
+        },
+        {
+          "id": "ci_tree16_030",
+          "name": "robin_030.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree16/child_images/robin_030.JPEG"
+        },
+        {
+          "id": "ci_tree16_031",
+          "name": "robin_031.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree16/child_images/robin_031.JPEG"
+        },
+        {
+          "id": "ci_tree16_032",
+          "name": "robin_032.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree16/child_images/robin_032.JPEG"
+        },
+        {
+          "id": "ci_tree16_033",
+          "name": "robin_033.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree16/child_images/robin_033.JPEG"
+        },
+        {
+          "id": "ci_tree16_034",
+          "name": "robin_034.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree16/child_images/robin_034.JPEG"
+        },
+        {
+          "id": "ci_tree16_035",
+          "name": "robin_035.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree16/child_images/robin_035.JPEG"
+        },
+        {
+          "id": "ci_tree16_036",
+          "name": "robin_036.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree16/child_images/robin_036.JPEG"
+        },
+        {
+          "id": "ci_tree16_037",
+          "name": "robin_037.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree16/child_images/robin_037.JPEG"
+        },
+        {
+          "id": "ci_tree16_038",
+          "name": "robin_038.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree16/child_images/robin_038.JPEG"
+        },
+        {
+          "id": "ci_tree16_039",
+          "name": "robin_039.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree16/child_images/robin_039.JPEG"
+        },
+        {
+          "id": "ci_tree16_040",
+          "name": "robin_040.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree16/child_images/robin_040.JPEG"
+        },
+        {
+          "id": "ci_tree16_041",
+          "name": "robin_041.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree16/child_images/robin_041.JPEG"
+        },
+        {
+          "id": "ci_tree16_042",
+          "name": "robin_042.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree16/child_images/robin_042.JPEG"
+        },
+        {
+          "id": "ci_tree16_043",
+          "name": "robin_043.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree16/child_images/robin_043.JPEG"
+        },
+        {
+          "id": "ci_tree16_044",
+          "name": "robin_044.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree16/child_images/robin_044.JPEG"
+        },
+        {
+          "id": "ci_tree16_045",
+          "name": "robin_045.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree16/child_images/robin_045.JPEG"
+        },
+        {
+          "id": "ci_tree16_046",
+          "name": "robin_046.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree16/child_images/robin_046.JPEG"
+        },
+        {
+          "id": "ci_tree16_047",
+          "name": "robin_047.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree16/child_images/robin_047.JPEG"
+        },
+        {
+          "id": "ci_tree16_048",
+          "name": "robin_048.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree16/child_images/robin_048.JPEG"
+        },
+        {
+          "id": "ci_tree16_049",
+          "name": "robin_049.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree16/child_images/robin_049.JPEG"
+        },
+        {
+          "id": "ci_tree16_050",
+          "name": "robin_050.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree16/child_images/robin_050.JPEG"
+        }
+      ]
+    }
+  }
+}
