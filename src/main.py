@@ -5,6 +5,7 @@ import base64
 import io
 import json
 from pathlib import Path
+from typing import Callable
 
 import numpy as np
 import dash
@@ -59,7 +60,7 @@ def _umap_hyperbolic(x: np.ndarray) -> np.ndarray:  # noqa: ANN001
     return np.column_stack((xh, yh, zh))
 
 
-PROJECTIONS: dict[str, callable[[np.ndarray], np.ndarray]] = {
+PROJECTIONS: dict[str, Callable[[np.ndarray], np.ndarray]] = {
     "UMAP (Euclidean)": _umap_euclidean,
     "UMAP (Hyperbolic)": _umap_hyperbolic,
 }
@@ -497,7 +498,6 @@ def _cmp_panel() -> html.Div:
                                     _tree_node("Child Node", html.Div(id="tree-child")),
                                 ],
                                 id="tree-traversal",
-                                style={"display": "none"},  # Hidden by default
                             ),
                         ],
                     ),
@@ -746,8 +746,8 @@ def _fig3d(
     sel: list[int],
     labels: np.ndarray,
     target_names: list[str] | None,
-    interpolated_point: np.ndarray = None,
-    neighbor_indices: list[int] = None,
+    interpolated_point: np.ndarray | None = None,
+    neighbor_indices: list[int] | None = None,
 ) -> go.Figure:
     labels_txt = [
         f"{i}: {target_names[labels[i]] if target_names is not None else labels[i]}"
@@ -819,8 +819,8 @@ def _fig_disk(
     sel: list[int],
     labels: np.ndarray,
     target_names: list[str] | None,
-    interpolated_point: np.ndarray = None,
-    neighbor_indices: list[int] = None,
+    interpolated_point: np.ndarray | None = None,
+    neighbor_indices: list[int] | None = None,
 ) -> go.Figure:
     base = go.Scatter(
         x=x,
@@ -1145,7 +1145,8 @@ def register_callbacks(app: dash.Dash) -> None:
 
     # MODIFIED: Callback now reads meta/points stores to build detailed tree view.
     @app.callback(
-        Output("cmp-header", "children"),
+        [Output("tree-parent", "children"), Output("tree-current", "children"), Output("tree-child", "children")],
+        Input("sel", "data"),
         Input("mode", "data"),
         State("meta-store", "data"),
         State("points-store", "data"),
@@ -1227,38 +1228,6 @@ def register_callbacks(app: dash.Dash) -> None:
         return parent_div, current_div, child_div
 
     # MODIFIED: Callback now reads from stores to get data for comparison.
-    @app.callback(
-        Output("cmp", "children"),
-        Input("sel", "data"),
-        Input("interpolated-point", "data"),
-        Input("interpolation-slider", "value"),
-        Input("mode", "data"),
-        State("labels-store", "data"),
-        State("target-names-store", "data"),
-        State("images-store", "data"),
-    )
-    def _compare(sel, interpolated_point, t_value, mode, labels_data, target_names, images):
-        if labels_data is None:
-            return html.P("Select a dataset to begin.")
-
-        labels = np.asarray(labels_data)
-        sel = sel or []
-
-        if mode == "tree":
-            return None
-    
-    def _cmp_header_and_instructions(mode):
-        if mode == "compare":
-            return html.H4("Point comparison")
-        elif mode == "interpolate":
-            return html.H4("Interpolation")
-        elif mode == "tree":
-            return html.H4("Tree Traversal")
-        elif mode == "neighbors":
-            return html.H4("Neighbors")
-        else:
-            return html.H4("Point comparison")
-
     @app.callback(
         Output("mode", "data"),
         Output("compare-btn", "style"),
@@ -1446,6 +1415,22 @@ def register_callbacks(app: dash.Dash) -> None:
             return html.Div(components), instructions
         
         return html.Div(), instructions
+
+    @app.callback(
+        Output("cmp-header", "children"),
+        Input("mode", "data"),
+    )
+    def _cmp_header(mode):
+        if mode == "compare":
+            return html.H4("Point comparison")
+        elif mode == "interpolate":
+            return html.H4("Interpolation")
+        elif mode == "tree":
+            return html.H4("Tree Traversal")
+        elif mode == "neighbors":
+            return html.H4("Neighbors")
+        else:
+            return html.H4("Point comparison")
 
 
 # ---------------------------------------------------------------------------
