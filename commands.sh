@@ -46,14 +46,14 @@ python hierchical_datasets/preprocess.py \
 
 
 # generate projections afterwards
-python projection_methods/projection_methods_analysis.py \
-    --checkpoint-path checkpoints/hycoclip_vit_b.pth --train-config hycoclip/configs/train_hycoclip_vit_b.py \
-    --methods cosne \
-    --n-embed 1000 \
-    --n-project 1000
-
-python projection_methods/projection_methods_analysis.py \
-    --checkpoint-path checkpoints/hycoclip_vit_b.pth --train-config configs/train_hycoclip_vit_b.py \
+python projection_methods/create_projections.py \
+    --dataset-path hierchical_datasets/GRIT \
     --methods horopca \
-    --n-embed 1000 \
-    --n-project 1000
+    --n-project 200 \
+    --plot 
+
+python projection_methods/create_projections.py \
+    --dataset-path hierchical_datasets/ImageNet \
+    --methods horopca \
+    --n-project 200 \
+    --plot 

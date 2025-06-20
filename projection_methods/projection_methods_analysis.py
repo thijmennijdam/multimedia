@@ -92,7 +92,7 @@ def parse_arguments():
     # Model and data args
     parser.add_argument("--checkpoint-path", required=True, help="Path to checkpoint")
     parser.add_argument("--train-config", required=True, help="Path to train config")
-    parser.add_argument("--output-dir", default="projection_analysis", help="Output directory")
+    parser.add_argument("--output-dir", default="projection_methods", help="Output directory")
     parser.add_argument("--embedding-file", default="grit_5k_embeddings.pkl", help="Embedding file name")
     
     # Data generation args
