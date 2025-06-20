@@ -23,15 +23,15 @@ from PIL import Image
 import glob
 
 # Add path imports
-sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'hycoclip', 'CO-SNE'))
-sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'hycoclip', 'HoroPCA'))
-sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'utils'))
+sys.path.append(os.path.join(os.path.dirname(__file__), 'CO-SNE'))
+sys.path.append(os.path.join(os.path.dirname(__file__), 'HoroPCA'))
+sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'hycoclip'))
 
 # Import required modules
 from hycoclip.config import LazyConfig, LazyFactory
 from hycoclip.utils.checkpointing import CheckpointManager
 from hycoclip.tokenizer import Tokenizer
-from prepare_GRIT_webdataset import ImageTextWebDataset
+from hycoclip.utils.prepare_GRIT_webdataset import ImageTextWebDataset
 
 # HoroPCA imports
 from learning.frechet import Frechet
