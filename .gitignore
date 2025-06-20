@@ -11,6 +11,6 @@ wheels/
 .history
 uv.lock
 
-ILSVRC2012_img_val.tar
-ImageNet/
 imagenet/
+archive/
+hierchical_datasets/

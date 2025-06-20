@@ -100,8 +100,9 @@ python scripts/projection_methods_analysis.py \
 
 
 # preprocess imagenet
-python preprocess_imagenet.py \
+python scripts/preprocess_datasets.py \
+    --dataset imagenet \
     --base_path ./ \
     --checkpoint_path ./checkpoints/hycoclip_vit_b.pth \
     --train_config ./configs/train_hycoclip_vit_b.py \
-    --limit 10
+    --limit 5
