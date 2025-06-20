@@ -28,6 +28,7 @@ Both datasets create the same folder structure:
 import os
 import csv
 import json
+import pickle
 import shutil
 import glob
 from pathlib import Path
@@ -286,9 +287,9 @@ def create_imagenet_tree_structure(base_path, output_dir, synsets, model, prepro
         
         meta_data["trees"][tree_id] = tree_metadata
         
-        # Save JSON files after each tree (incremental saving)
+        # Save JSON and pickle files after each tree (incremental saving)
         meta_data_path = imagenet_path / "meta_data_tree.json"
-        embeddings_path = imagenet_path / "embeddings.json"
+        embeddings_path = imagenet_path / "embeddings.pkl"
         
         # Update total trees count
         meta_data["dataset_info"]["total_trees"] = i + 1
@@ -296,8 +297,8 @@ def create_imagenet_tree_structure(base_path, output_dir, synsets, model, prepro
         with open(meta_data_path, 'w', encoding='utf-8') as f:
             json.dump(meta_data, f, indent=2, ensure_ascii=False)
         
-        with open(embeddings_path, 'w', encoding='utf-8') as f:
-            json.dump(embeddings_data, f, indent=2, cls=NumpyEncoder)
+        with open(embeddings_path, 'wb') as f:
+            pickle.dump(embeddings_data, f)
         
         print(f"Created {tree_folder} with {len(child_images_list)} images")
     
@@ -507,9 +508,9 @@ def create_grit_tree_structure(grit_path, model, device, output_dir, max_samples
                 
                 meta_data["trees"][tree_id] = tree_metadata
                 
-                # Save JSON files after each tree (incremental saving)
+                # Save JSON and pickle files after each tree (incremental saving)
                 meta_data_path = grit_output_path / "meta_data_tree.json"
-                embeddings_path = grit_output_path / "embeddings.json"
+                embeddings_path = grit_output_path / "embeddings.pkl"
                 
                 # Update total trees count
                 meta_data["dataset_info"]["total_trees"] = tree_count
@@ -517,8 +518,8 @@ def create_grit_tree_structure(grit_path, model, device, output_dir, max_samples
                 with open(meta_data_path, 'w', encoding='utf-8') as f:
                     json.dump(meta_data, f, indent=2, ensure_ascii=False)
                 
-                with open(embeddings_path, 'w', encoding='utf-8') as f:
-                    json.dump(embeddings_data, f, indent=2, cls=NumpyEncoder)
+                with open(embeddings_path, 'wb') as f:
+                    pickle.dump(embeddings_data, f)
                 
                 sample_count += 1
                 

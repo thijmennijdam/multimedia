@@ -1,8 +1,8 @@
 {
   "dataset_info": {
     "name": "ImageNet",
-    "total_trees": 16,
-    "created_at": "2025-06-20T16:09:41.802079",
+    "total_trees": 17,
+    "created_at": "2025-06-20T16:15:09.120936",
     "model": "HyCoCLIP"
   },
   "trees": {
@@ -4275,6 +4275,273 @@
           "id": "ci_tree16_050",
           "name": "robin_050.JPEG",
           "path": "hierchical_datasets/ImageNet/data/tree16/child_images/robin_050.JPEG"
+        }
+      ]
+    },
+    "tree17": {
+      "tree_id": "tree17",
+      "synset_id": "n01560419",
+      "parent_text": {
+        "id": "pt_tree17",
+        "text": "bulbul",
+        "path": "hierchical_datasets/ImageNet/data/tree17/parent_texts/parent_text.txt"
+      },
+      "child_text": {
+        "id": "ct_tree17",
+        "text": "nightingale spoken of in Persian poetry",
+        "path": "hierchical_datasets/ImageNet/data/tree17/child_texts/child_text.txt"
+      },
+      "parent_images": [],
+      "child_images": [
+        {
+          "id": "ci_tree17_001",
+          "name": "bulbul_001.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree17/child_images/bulbul_001.JPEG"
+        },
+        {
+          "id": "ci_tree17_002",
+          "name": "bulbul_002.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree17/child_images/bulbul_002.JPEG"
+        },
+        {
+          "id": "ci_tree17_003",
+          "name": "bulbul_003.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree17/child_images/bulbul_003.JPEG"
+        },
+        {
+          "id": "ci_tree17_004",
+          "name": "bulbul_004.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree17/child_images/bulbul_004.JPEG"
+        },
+        {
+          "id": "ci_tree17_005",
+          "name": "bulbul_005.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree17/child_images/bulbul_005.JPEG"
+        },
+        {
+          "id": "ci_tree17_006",
+          "name": "bulbul_006.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree17/child_images/bulbul_006.JPEG"
+        },
+        {
+          "id": "ci_tree17_007",
+          "name": "bulbul_007.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree17/child_images/bulbul_007.JPEG"
+        },
+        {
+          "id": "ci_tree17_008",
+          "name": "bulbul_008.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree17/child_images/bulbul_008.JPEG"
+        },
+        {
+          "id": "ci_tree17_009",
+          "name": "bulbul_009.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree17/child_images/bulbul_009.JPEG"
+        },
+        {
+          "id": "ci_tree17_010",
+          "name": "bulbul_010.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree17/child_images/bulbul_010.JPEG"
+        },
+        {
+          "id": "ci_tree17_011",
+          "name": "bulbul_011.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree17/child_images/bulbul_011.JPEG"
+        },
+        {
+          "id": "ci_tree17_012",
+          "name": "bulbul_012.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree17/child_images/bulbul_012.JPEG"
+        },
+        {
+          "id": "ci_tree17_013",
+          "name": "bulbul_013.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree17/child_images/bulbul_013.JPEG"
+        },
+        {
+          "id": "ci_tree17_014",
+          "name": "bulbul_014.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree17/child_images/bulbul_014.JPEG"
+        },
+        {
+          "id": "ci_tree17_015",
+          "name": "bulbul_015.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree17/child_images/bulbul_015.JPEG"
+        },
+        {
+          "id": "ci_tree17_016",
+          "name": "bulbul_016.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree17/child_images/bulbul_016.JPEG"
+        },
+        {
+          "id": "ci_tree17_017",
+          "name": "bulbul_017.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree17/child_images/bulbul_017.JPEG"
+        },
+        {
+          "id": "ci_tree17_018",
+          "name": "bulbul_018.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree17/child_images/bulbul_018.JPEG"
+        },
+        {
+          "id": "ci_tree17_019",
+          "name": "bulbul_019.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree17/child_images/bulbul_019.JPEG"
+        },
+        {
+          "id": "ci_tree17_020",
+          "name": "bulbul_020.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree17/child_images/bulbul_020.JPEG"
+        },
+        {
+          "id": "ci_tree17_021",
+          "name": "bulbul_021.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree17/child_images/bulbul_021.JPEG"
+        },
+        {
+          "id": "ci_tree17_022",
+          "name": "bulbul_022.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree17/child_images/bulbul_022.JPEG"
+        },
+        {
+          "id": "ci_tree17_023",
+          "name": "bulbul_023.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree17/child_images/bulbul_023.JPEG"
+        },
+        {
+          "id": "ci_tree17_024",
+          "name": "bulbul_024.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree17/child_images/bulbul_024.JPEG"
+        },
+        {
+          "id": "ci_tree17_025",
+          "name": "bulbul_025.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree17/child_images/bulbul_025.JPEG"
+        },
+        {
+          "id": "ci_tree17_026",
+          "name": "bulbul_026.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree17/child_images/bulbul_026.JPEG"
+        },
+        {
+          "id": "ci_tree17_027",
+          "name": "bulbul_027.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree17/child_images/bulbul_027.JPEG"
+        },
+        {
+          "id": "ci_tree17_028",
+          "name": "bulbul_028.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree17/child_images/bulbul_028.JPEG"
+        },
+        {
+          "id": "ci_tree17_029",
+          "name": "bulbul_029.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree17/child_images/bulbul_029.JPEG"
+        },
+        {
+          "id": "ci_tree17_030",
+          "name": "bulbul_030.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree17/child_images/bulbul_030.JPEG"
+        },
+        {
+          "id": "ci_tree17_031",
+          "name": "bulbul_031.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree17/child_images/bulbul_031.JPEG"
+        },
+        {
+          "id": "ci_tree17_032",
+          "name": "bulbul_032.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree17/child_images/bulbul_032.JPEG"
+        },
+        {
+          "id": "ci_tree17_033",
+          "name": "bulbul_033.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree17/child_images/bulbul_033.JPEG"
+        },
+        {
+          "id": "ci_tree17_034",
+          "name": "bulbul_034.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree17/child_images/bulbul_034.JPEG"
+        },
+        {
+          "id": "ci_tree17_035",
+          "name": "bulbul_035.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree17/child_images/bulbul_035.JPEG"
+        },
+        {
+          "id": "ci_tree17_036",
+          "name": "bulbul_036.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree17/child_images/bulbul_036.JPEG"
+        },
+        {
+          "id": "ci_tree17_037",
+          "name": "bulbul_037.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree17/child_images/bulbul_037.JPEG"
+        },
+        {
+          "id": "ci_tree17_038",
+          "name": "bulbul_038.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree17/child_images/bulbul_038.JPEG"
+        },
+        {
+          "id": "ci_tree17_039",
+          "name": "bulbul_039.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree17/child_images/bulbul_039.JPEG"
+        },
+        {
+          "id": "ci_tree17_040",
+          "name": "bulbul_040.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree17/child_images/bulbul_040.JPEG"
+        },
+        {
+          "id": "ci_tree17_041",
+          "name": "bulbul_041.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree17/child_images/bulbul_041.JPEG"
+        },
+        {
+          "id": "ci_tree17_042",
+          "name": "bulbul_042.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree17/child_images/bulbul_042.JPEG"
+        },
+        {
+          "id": "ci_tree17_043",
+          "name": "bulbul_043.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree17/child_images/bulbul_043.JPEG"
+        },
+        {
+          "id": "ci_tree17_044",
+          "name": "bulbul_044.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree17/child_images/bulbul_044.JPEG"
+        },
+        {
+          "id": "ci_tree17_045",
+          "name": "bulbul_045.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree17/child_images/bulbul_045.JPEG"
+        },
+        {
+          "id": "ci_tree17_046",
+          "name": "bulbul_046.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree17/child_images/bulbul_046.JPEG"
+        },
+        {
+          "id": "ci_tree17_047",
+          "name": "bulbul_047.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree17/child_images/bulbul_047.JPEG"
+        },
+        {
+          "id": "ci_tree17_048",
+          "name": "bulbul_048.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree17/child_images/bulbul_048.JPEG"
+        },
+        {
+          "id": "ci_tree17_049",
+          "name": "bulbul_049.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree17/child_images/bulbul_049.JPEG"
+        },
+        {
+          "id": "ci_tree17_050",
+          "name": "bulbul_050.JPEG",
+          "path": "hierchical_datasets/ImageNet/data/tree17/child_images/bulbul_050.JPEG"
         }
       ]
     }
