@@ -12,3 +12,4 @@ wheels/
 uv.lock
 
 ILSVRC2012_img_val.tar
+imagenet-subset/
