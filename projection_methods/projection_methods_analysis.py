@@ -22,16 +22,7 @@ import time
 from PIL import Image
 import glob
 
-# Add path imports
-sys.path.append(os.path.join(os.path.dirname(__file__), 'CO-SNE'))
 sys.path.append(os.path.join(os.path.dirname(__file__), 'HoroPCA'))
-sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'hycoclip'))
-
-# Import required modules
-from hycoclip.config import LazyConfig, LazyFactory
-from hycoclip.utils.checkpointing import CheckpointManager
-from hycoclip.tokenizer import Tokenizer
-from hycoclip.utils.prepare_GRIT_webdataset import ImageTextWebDataset
 
 # HoroPCA imports
 from learning.frechet import Frechet
@@ -39,9 +30,20 @@ from learning.pca import HoroPCA
 import geom.hyperboloid as hyperboloid
 import geom.poincare as poincare
 
+sys.path.append(os.path.join(os.path.dirname(__file__), 'CO-SNE'))
+
 # CO-SNE imports
 import hyptorch.pmath as pmath
 from htsne_impl import TSNE as hTSNE
+
+# Add path imports
+sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'hycoclip'))
+
+# Import required modules
+from hycoclip.config import LazyConfig, LazyFactory
+from hycoclip.utils.checkpointing import CheckpointManager
+from hycoclip.tokenizer import Tokenizer
+from hycoclip_utils.prepare_GRIT_webdataset import ImageTextWebDataset
 
 # UMAP import
 import umap

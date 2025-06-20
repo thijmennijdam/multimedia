@@ -27,7 +27,7 @@ source activate hycoclip
 ssh -L 5901:tcn679:5901 scur1160@snellius.surf.nl
 
 
-# generate tree
+# generate trees
 python hierchical_datasets/preprocess.py \
     --dataset imagenet \
     --imagenet_path ./imagenet \
@@ -43,3 +43,17 @@ python hierchical_datasets/preprocess.py \
     --checkpoint_path ./checkpoints/hycoclip_vit_b.pth \
     --train_config ./hycoclip/configs/train_hycoclip_vit_b.py \
     --limit 200
+
+
+# generate projections afterwards
+python projection_methods/projection_methods_analysis.py \
+    --checkpoint-path checkpoints/hycoclip_vit_b.pth --train-config hycoclip/configs/train_hycoclip_vit_b.py \
+    --methods cosne \
+    --n-embed 1000 \
+    --n-project 1000
+
+python projection_methods/projection_methods_analysis.py \
+    --checkpoint-path checkpoints/hycoclip_vit_b.pth --train-config configs/train_hycoclip_vit_b.py \
+    --methods horopca \
+    --n-embed 1000 \
+    --n-project 1000

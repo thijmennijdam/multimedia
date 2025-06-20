@@ -44,9 +44,9 @@ from datetime import datetime
 import sys
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'hycoclip'))
 from hycoclip.config import LazyConfig, LazyFactory
-from hycoclip.utils.checkpointing import CheckpointManager
+from hycoclip.hycoclip_utils.checkpointing import CheckpointManager
 from hycoclip.tokenizer import Tokenizer
-from utils.prepare_GRIT_webdataset import ImageTextWebDataset
+from hycoclip_utils.prepare_GRIT_webdataset import ImageTextWebDataset
 
 class NumpyEncoder(json.JSONEncoder):
     """Custom JSON encoder for numpy arrays"""
