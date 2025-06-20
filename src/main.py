@@ -12,6 +12,7 @@ from dash import dcc, html, Input, Output, State, callback_context
 import plotly.graph_objs as go
 from sklearn.datasets import load_digits, load_iris, load_wine
 from PIL import Image
+from sklearn.metrics import pairwise_distances
 
 import umap
 
@@ -157,17 +158,22 @@ def _config_panel() -> html.Div:
             html.Label("Mode"),
             html.Div(
                 [
+                    html.Div([
                     html.Button(
                         "Compare",
                         id="compare-btn",
-                        style={  # Default selected style
+                            style={
                             "backgroundColor": "green",
                             "color": "white",
                             "border": "none",
                             "padding": "0.5rem 1rem",
                             "borderRadius": "6px",
                             "cursor": "pointer",
-                            "width": "33.3%",
+                                "width": "100%",
+                                "minWidth": "0",
+                                "flex": "1 1 0",
+                                "boxSizing": "border-box",
+                                "transition": "background-color 0.2s",
                         },
                     ),
                     html.Button(
@@ -180,9 +186,15 @@ def _config_panel() -> html.Div:
                             "padding": "0.5rem 1rem",
                             "borderRadius": "6px",
                             "cursor": "pointer",
-                            "width": "33.3%",
-                        },
-                    ),
+                                "width": "100%",
+                                "minWidth": "0",
+                                "flex": "1 1 0",
+                                "boxSizing": "border-box",
+                                "transition": "background-color 0.2s",
+                            },
+                        ),
+                    ], style={"display": "flex", "gap": "0.5rem", "marginBottom": "0.5rem"}),
+                    html.Div([
                     html.Button(
                         "Tree",
                         id="tree-mode-btn",
@@ -193,11 +205,33 @@ def _config_panel() -> html.Div:
                             "padding": "0.5rem 1rem",
                             "borderRadius": "6px",
                             "cursor": "pointer",
-                            "width": "33.3%",
+                                "width": "100%",
+                                "minWidth": "0",
+                                "flex": "1 1 0",
+                                "boxSizing": "border-box",
+                                "transition": "background-color 0.2s",
                         },
                     ),
+                    html.Button(
+                        "Neighbors",
+                        id="neighbors-mode-btn",
+                        style={
+                            "backgroundColor": "#007bff",
+                            "color": "white",
+                            "border": "none",
+                            "padding": "0.5rem 1rem",
+                            "borderRadius": "6px",
+                            "cursor": "pointer",
+                                "width": "100%",
+                                "minWidth": "0",
+                                "flex": "1 1 0",
+                                "boxSizing": "border-box",
+                                "transition": "background-color 0.2s",
+                            },
+                        ),
+                    ], style={"display": "flex", "gap": "0.5rem"}),
                 ],
-                style={"display": "flex", "gap": "0.5rem", "marginBottom": "1rem"},
+                style={"display": "flex", "flexDirection": "column", "gap": "0.5rem", "marginBottom": "1rem"},
             ),
             html.P(id="mode-instructions", children="Select up to 5 points."),
             html.Div(
@@ -233,6 +267,22 @@ def _config_panel() -> html.Div:
                             ),
                         ],
                         style={"marginTop": "1rem"},
+                    ),
+                ],
+            ),
+            html.Div(
+                id="neighbors-controls",
+                style={"display": "none"},
+                children=[
+                    html.Label("Number of neighbors (k):"),
+                    dcc.Slider(
+                        id="neighbors-slider",
+                        min=1,
+                        max=10,
+                        step=1,
+                        value=3,
+                        marks={i: str(i) for i in range(1, 11)},
+                        tooltip={"placement": "bottom", "always_visible": True},
                     ),
                 ],
             ),
@@ -399,8 +449,9 @@ def _tree_node(title: str, content: html.Div, is_current: bool = False) -> html.
 def _cmp_panel() -> html.Div:
     return html.Div(
         [
-            html.H4("Point comparison"),
-            # Tree traversal section (hidden by default)
+            html.Div(id="cmp-header"),
+            html.Div(id="cmp-instructions"),
+            # Tree traversal section (conditionally rendered)
             html.Div(
                 [
                     html.H5(
@@ -451,9 +502,11 @@ def _cmp_panel() -> html.Div:
                         ],
                     ),
                 ],
+                id="tree-traversal-section",
+                style={"display": "none"},
             ),
-            # Regular comparison view
-            html.Div(id="cmp"),
+            # Results panel is always present
+            html.Div(id="cmp")
         ],
         style={
             "width": "320px",
@@ -586,6 +639,15 @@ def _encode_image(rel_path: str) -> str:
         return ""
 
     return f"data:image/{mime};base64,{enc}"
+def _find_neighbors(emb: np.ndarray, idx: int, k: int) -> list[int]:
+    """Find k nearest neighbors of a point in the embedding."""
+    if emb is None or idx is None or k < 1:
+        return []
+    dists = pairwise_distances(emb, emb[idx][None, :]).flatten()
+    # Exclude the point itself
+    neighbor_indices = np.argsort(dists)
+    neighbor_indices = neighbor_indices[neighbor_indices != idx][:k]
+    return neighbor_indices.tolist()
 
 
 # MODIFIED: Helper function now takes `images` data as an argument.
@@ -619,6 +681,7 @@ def _create_img_tag(idx: int, images: np.ndarray | None) -> html.Img | html.Span
     except Exception:
         # Fallback: empty span on error (e.g. file missing)
         return html.Span()
+
 
 
 # MODIFIED: Helper function now takes `images` data as an argument.
@@ -677,13 +740,14 @@ def _create_close_button(idx: int) -> html.Button:
 # Drawing helpers
 # ---------------------------------------------------------------------------
 
-# MODIFIED: Helper function now takes `labels` and `target_names` as arguments.
+# MODIFIED: Helper function now takes selected and neighbor indices separately for coloring.
 def _fig3d(
     emb: np.ndarray,
     sel: list[int],
     labels: np.ndarray,
     target_names: list[str] | None,
     interpolated_point: np.ndarray = None,
+    neighbor_indices: list[int] = None,
 ) -> go.Figure:
     labels_txt = [
         f"{i}: {target_names[labels[i]] if target_names is not None else labels[i]}"
@@ -701,6 +765,19 @@ def _fig3d(
     )
     traces = [base]
 
+    # Neighbors (blue)
+    if neighbor_indices:
+        traces.append(
+            go.Scatter3d(
+                x=emb[neighbor_indices, 0],
+                y=emb[neighbor_indices, 1],
+                z=emb[neighbor_indices, 2],
+                mode="markers",
+                marker=dict(size=10, color="blue"),
+                name="Neighbors",
+            )
+        )
+    # Selected point (red)
     if sel:
         traces.append(
             go.Scatter3d(
@@ -708,8 +785,8 @@ def _fig3d(
                 y=emb[sel, 1],
                 z=emb[sel, 2],
                 mode="markers",
-                marker=dict(size=10, color="red"),
-                name="Selected points",
+                marker=dict(size=12, color="red"),
+                name="Selected point",
             )
         )
 
@@ -735,7 +812,7 @@ def _fig3d(
     )
     return fig
 
-# MODIFIED: Helper function now takes `labels` and `target_names` as arguments.
+# MODIFIED: Helper function now takes selected and neighbor indices separately for coloring.
 def _fig_disk(
     x: np.ndarray,
     y: np.ndarray,
@@ -743,6 +820,7 @@ def _fig_disk(
     labels: np.ndarray,
     target_names: list[str] | None,
     interpolated_point: np.ndarray = None,
+    neighbor_indices: list[int] = None,
 ) -> go.Figure:
     base = go.Scatter(
         x=x,
@@ -758,14 +836,26 @@ def _fig_disk(
     )
     traces = [base]
 
+    # Neighbors (blue)
+    if neighbor_indices:
+        traces.append(
+            go.Scatter(
+                x=x[neighbor_indices],
+                y=y[neighbor_indices],
+                mode="markers",
+                marker=dict(size=10, color="blue"),
+                name="Neighbors",
+            )
+        )
+    # Selected point (red)
     if sel:
         traces.append(
             go.Scatter(
                 x=x[sel],
                 y=y[sel],
                 mode="markers",
-                marker=dict(size=10, color="red"),
-                name="Selected points",
+                marker=dict(size=12, color="red"),
+                name="Selected point",
             )
         )
 
@@ -900,8 +990,11 @@ def register_callbacks(app: dash.Dash) -> None:
         Input("interpolated-point", "data"),
         State("labels-store", "data"),
         State("target-names-store", "data"),
+        Input("mode", "data"),
+        Input("neighbors-slider", "value"),
+        State("data-store", "data"),  # <-- Add original data as State
     )
-    def _scatter(edata, sel, proj, interpolated_point, labels_data, target_names):
+    def _scatter(edata, sel, proj, interpolated_point, labels_data, target_names, mode, k_neighbors, data_store):
         if edata is None or labels_data is None:
             return _empty_fig3d(), _empty_fig3d()
         
@@ -914,7 +1007,25 @@ def register_callbacks(app: dash.Dash) -> None:
             else None
         )
 
-        fig_3d = _fig3d(emb, sel, labels, target_names, interp_point)
+        # Default: highlight all selected points
+        highlight = sel
+        neighbor_indices = []
+        selected_idx = sel
+
+        # Special handling for neighbors mode
+        if mode == "neighbors" and sel and len(sel) == 1:
+            selected_idx = sel[:1]
+            if data_store is not None:
+                data_np = np.asarray(data_store, dtype=np.float32)
+                neighbor_indices = _find_neighbors(data_np, sel[0], k_neighbors)
+            else:
+                neighbor_indices = []
+        else:
+            neighbor_indices = []
+
+        # For neighbors mode, only show the selected point and its neighbors distinctly
+        # For other modes, show all selected points
+        fig_3d = _fig3d(emb, selected_idx if mode == "neighbors" else highlight, labels, target_names, interp_point, neighbor_indices)
 
         if "Hyperbolic" in proj:
             xh, yh, zh = emb[:, 0], emb[:, 1], emb[:, 2]
@@ -928,11 +1039,10 @@ def register_callbacks(app: dash.Dash) -> None:
             dx, dy = emb[:, 0], emb[:, 1]
             interp_transformed = interp_point[:2] if interp_point is not None else None
         
-        fig_disk = _fig_disk(dx, dy, sel, labels, target_names, interp_transformed)
+        fig_disk = _fig_disk(dx, dy, selected_idx if mode == "neighbors" else highlight, labels, target_names, interp_transformed, neighbor_indices)
         
         return fig_3d, fig_disk
 
-    # MODIFIED: Callback now triggers on data change and reads from store.
     @app.callback(
         Output("emb", "data"),
         Output("proj-loading", "parent_style"),
@@ -983,11 +1093,10 @@ def register_callbacks(app: dash.Dash) -> None:
                 new_sel = [i for i in current_sel if i != idx]
             else:
                 new_sel = current_sel + [idx]
-                
                 max_points = 1
                 if mode == "compare": max_points = 5
                 elif mode == "interpolate": max_points = 2
-                
+                elif mode == "neighbors": max_points = 1
                 if len(new_sel) > max_points:
                     new_sel = new_sel[-max_points:]
             return new_sel
@@ -995,12 +1104,10 @@ def register_callbacks(app: dash.Dash) -> None:
         elif isinstance(triggered_id, dict) and triggered_id.get("type") == "close-button":
             if not ctx.triggered[0]['value']:
                 return dash.no_update
-            
             idx_to_remove = triggered_id.get("index")
             if idx_to_remove in current_sel:
                 new_sel = [i for i in current_sel if i != idx_to_remove]
                 return new_sel
-
         return dash.no_update
 
     @app.callback(
@@ -1038,10 +1145,7 @@ def register_callbacks(app: dash.Dash) -> None:
 
     # MODIFIED: Callback now reads meta/points stores to build detailed tree view.
     @app.callback(
-        [Output("tree-parent", "children"),
-         Output("tree-current", "children"),
-         Output("tree-child", "children")],
-        Input("sel", "data"),
+        Output("cmp-header", "children"),
         Input("mode", "data"),
         State("meta-store", "data"),
         State("points-store", "data"),
@@ -1142,79 +1246,62 @@ def register_callbacks(app: dash.Dash) -> None:
 
         if mode == "tree":
             return None
-            
+    
+    def _cmp_header_and_instructions(mode):
         if mode == "compare":
-            if not sel: return html.P("Select up to 5 points to compare.")
-            components = []
-            for idx in sel:
-                label = target_names[labels[idx]] if target_names is not None else labels[idx]
-                components.append(
-                    html.Div([
-                        _create_close_button(idx),
-                        _create_img_tag(idx, images), 
-                        html.P(f"Point {idx} label: {label}")
-                    ], style={"display": "flex", "alignItems": "center", "padding": "0.5rem", "borderRadius": "4px", "position": "relative", "backgroundColor": "#f8f9fa", "marginBottom": "0.5rem"})
-                )
-            return html.Div(components)
-
-        if mode == "interpolate":
-            if len(sel) < 2: return html.P("Select two distinct points to interpolate.")
-            i, j = sel[:2]
-            li = target_names[labels[i]] if target_names is not None else labels[i]
-            lj = target_names[labels[j]] if target_names is not None else labels[j]
-
-            components = [
-                html.Div([
-                    _create_close_button(i),
-                    _create_img_tag(i, images), 
-                    html.P(f"Point {i} label: {li}")
-                ], style={"display": "flex", "alignItems": "center", "padding": "0.5rem", "borderRadius": "4px", "position": "relative", "backgroundColor": "#f8f9fa", "marginBottom": "0.5rem"}),
-                html.Div([
-                    _create_close_button(j),
-                    _create_img_tag(j, images), 
-                    html.P(f"Point {j} label: {lj}")
-                ], style={"display": "flex", "alignItems": "center", "padding": "0.5rem", "borderRadius": "4px", "position": "relative", "backgroundColor": "#f8f9fa", "marginBottom": "0.5rem"}),
-            ]
-
-            if interpolated_point is not None:
-                interpolated_img = _create_interpolated_img_tag(i, j, t_value, images)
-                components.append(
-                    html.Div([
-                        interpolated_img,
-                        html.P(f"Interpolated point (t={t_value:.1f})"),
-                    ], style={"display": "flex", "alignItems": "center", "marginTop": "0.5rem"})
-                )
-            return html.Div(components)
-        
-        return html.Div()
+            return html.H4("Point comparison")
+        elif mode == "interpolate":
+            return html.H4("Interpolation")
+        elif mode == "tree":
+            return html.H4("Tree Traversal")
+        elif mode == "neighbors":
+            return html.H4("Neighbors")
+        else:
+            return html.H4("Point comparison")
 
     @app.callback(
         Output("mode", "data"),
         Output("compare-btn", "style"),
         Output("interpolate-mode-btn", "style"),
         Output("tree-mode-btn", "style"),
+        Output("neighbors-mode-btn", "style"),
         Output("interpolate-controls", "style"),
-        Output("tree-traversal", "style"),
+        Output("neighbors-controls", "style"),
+        Output("tree-traversal-section", "style"),
         Output("mode-instructions", "children"),
         Output("sel", "data", allow_duplicate=True),
         Output("interpolated-point", "data", allow_duplicate=True),
         Input("compare-btn", "n_clicks"),
         Input("interpolate-mode-btn", "n_clicks"),
         Input("tree-mode-btn", "n_clicks"),
+        Input("neighbors-mode-btn", "n_clicks"),
         prevent_initial_call=True,
     )
-    def _update_mode(compare_clicks, interpolate_clicks, tree_clicks):
+    def _update_mode(compare_clicks, interpolate_clicks, tree_clicks, neighbors_clicks):
         ctx = callback_context
         triggered_id = ctx.triggered[0]["prop_id"].split(".")[0]
 
-        base_style = {"color": "white", "border": "none", "padding": "0.5rem 1rem", "borderRadius": "6px", "cursor": "pointer", "width": "33.3%"}
+        base_style = {
+            "color": "white",
+            "border": "none",
+            "padding": "0.5rem 1rem",
+            "borderRadius": "6px",
+            "cursor": "pointer",
+            "width": "100%",
+            "minWidth": "0",
+            "flex": "1 1 0",
+            "boxSizing": "border-box",
+            "transition": "background-color 0.2s",
+        }
         compare_style = {**base_style, "backgroundColor": "#007bff"}
         interpolate_style = {**base_style, "backgroundColor": "#007bff"}
         tree_style = {**base_style, "backgroundColor": "#007bff"}
+        neighbors_style = {**base_style, "backgroundColor": "#007bff"}
         selected_style = {**base_style, "backgroundColor": "green"}
 
         mode = "compare"
         interpolate_controls_style = {"display": "none"}
+        neighbors_controls_style = {"display": "none"}
         tree_traversal_style = {"display": "none"}
         instructions = "Select up to 5 points to compare."
 
@@ -1228,10 +1315,137 @@ def register_callbacks(app: dash.Dash) -> None:
             tree_style = selected_style
             tree_traversal_style = {"display": "block"}
             instructions = "Select 1 point to view its lineage."
+        elif triggered_id == "neighbors-mode-btn":
+            mode = "neighbors"
+            neighbors_style = selected_style
+            neighbors_controls_style = {"display": "block"}
+            instructions = "Select 1 point to view its neighbors."
         else:
             compare_style = selected_style
 
-        return (mode, compare_style, interpolate_style, tree_style, interpolate_controls_style, tree_traversal_style, instructions, [], None)
+        return (
+            mode, compare_style, interpolate_style, tree_style, neighbors_style,
+            interpolate_controls_style, neighbors_controls_style, tree_traversal_style, instructions, [], None
+        )
+
+    @app.callback(
+        Output("cmp", "children"),
+        Output("cmp-instructions", "children"),
+        Input("sel", "data"),
+        Input("interpolated-point", "data"),
+        Input("interpolation-slider", "value"),
+        Input("mode", "data"),
+        State("labels-store", "data"),
+        State("target-names-store", "data"),
+        State("images-store", "data"),
+        State("emb", "data"),
+        Input("neighbors-slider", "value"),
+    )
+    def _compare(sel, interpolated_point, t_value, mode, labels_data, target_names, images, emb_data, k_neighbors):
+        if labels_data is None:
+            return html.Div(), html.P("Select a dataset to begin.")
+
+        labels = np.asarray(labels_data)
+        sel = sel or []
+        
+        instructions = None
+        components = []
+
+        if mode == "tree":
+            instructions = html.P("Select 1 point to view its lineage.")
+            if sel:
+                # In the future, tree components might be built here.
+                # For now, just confirm selection.
+                pass
+            return html.Div(components), instructions
+            
+        if mode == "compare":
+            instructions = html.P("Select up to 5 points to compare.")
+            for idx in sel:
+                label = target_names[labels[idx]] if target_names is not None else labels[idx]
+                components.append(
+                    html.Div([
+                        _create_close_button(idx),
+                        _create_img_tag(idx, images), 
+                        html.P(f"Point {idx} label: {label}")
+                    ], style={"display": "flex", "alignItems": "center", "padding": "0.5rem", "borderRadius": "4px", "position": "relative", "backgroundColor": "#f8f9fa", "marginBottom": "0.5rem"})
+                )
+            return html.Div(components), instructions
+
+        if mode == "interpolate":
+            instructions = html.P("Select two distinct points to interpolate.")
+            
+            if sel:
+                i, j = (sel[0], sel[1]) if len(sel) > 1 else (sel[0], None)
+                li = target_names[labels[i]] if target_names is not None else labels[i]
+                
+                components.append(
+                    html.Div([
+                        _create_close_button(i),
+                        _create_img_tag(i, images), 
+                        html.P(f"Point {i} label: {li}")
+                    ], style={"display": "flex", "alignItems": "center", "padding": "0.5rem", "borderRadius": "4px", "position": "relative", "backgroundColor": "#f8f9fa", "marginBottom": "0.5rem"})
+                )
+                if j is not None:
+                    lj = target_names[labels[j]] if target_names is not None else labels[j]
+                    components.append(
+                        html.Div([
+                            _create_close_button(j),
+                            _create_img_tag(j, images), 
+                            html.P(f"Point {j} label: {lj}")
+                        ], style={"display": "flex", "alignItems": "center", "padding": "0.5rem", "borderRadius": "4px", "position": "relative", "backgroundColor": "#f8f9fa", "marginBottom": "0.5rem"})
+                    )
+            
+            if interpolated_point is not None and len(sel) == 2:
+                interpolated_img = _create_interpolated_img_tag(sel[0], sel[1], t_value, images)
+                components.append(
+                    html.Div([
+                        interpolated_img,
+                        html.P(f"Interpolated point (t={t_value:.1f})"),
+                    ], style={"display": "flex", "alignItems": "center", "marginTop": "0.5rem"})
+                )
+            return html.Div(components), instructions
+
+        if mode == "neighbors":
+            instructions = html.P("Select one point to view its neighbors.")
+            
+            if not sel or len(sel) != 1:
+                return html.Div(), instructions
+
+            if emb_data is None:
+                components.append(html.P("Embedding not available."))
+                return html.Div(components), instructions
+
+            emb = np.asarray(emb_data, dtype=np.float32)
+            neighbors = _find_neighbors(emb, sel[0], k_neighbors)
+            
+            # Selected point
+            label = target_names[labels[sel[0]]] if target_names is not None else labels[sel[0]]
+            components.append(
+                html.Div([
+                    _create_close_button(sel[0]),
+                    _create_img_tag(sel[0], images),
+                    html.P(f"Selected point {sel[0]} label: {label}")
+                ], style={"display": "flex", "alignItems": "center", "padding": "0.5rem", "borderRadius": "4px", "position": "relative", "backgroundColor": "#e0f7fa", "marginBottom": "0.5rem"})
+            )
+            
+            # Neighbors
+            if neighbors:
+                components.append(html.H6("Neighbors:", style={"margin": "1rem 0 0.5rem 0", "color": "#666"}))
+                for nidx in neighbors:
+                    nlabel = target_names[labels[nidx]] if target_names is not None else labels[nidx]
+                    components.append(
+                        html.Div([
+                            _create_img_tag(nidx, images),
+                            html.P(f"Neighbor {nidx} label: {nlabel}")
+                        ], style={"display": "flex", "alignItems": "center", "padding": "0.5rem", "borderRadius": "4px", "backgroundColor": "#f8f9fa", "marginBottom": "0.5rem"})
+                    )
+            else:
+                components.append(html.P("No neighbors found.", style={"color": "#666", "fontStyle": "italic"}))
+            
+            return html.Div(components), instructions
+        
+        return html.Div(), instructions
 
 
 # ---------------------------------------------------------------------------
