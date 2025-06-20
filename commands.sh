@@ -53,7 +53,19 @@ python projection_methods/create_projections.py \
     --plot 
 
 python projection_methods/create_projections.py \
+    --dataset-path hierchical_datasets/GRIT \
+    --methods cosne \
+    --n-project 200 \
+    --plot 
+
+python projection_methods/create_projections.py \
     --dataset-path hierchical_datasets/ImageNet \
     --methods horopca \
+    --n-project 200 \
+    --plot 
+
+python projection_methods/create_projections.py \
+    --dataset-path hierchical_datasets/ImageNet \
+    --methods cosne \
     --n-project 200 \
     --plot 
