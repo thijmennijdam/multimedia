@@ -97,3 +97,11 @@ python scripts/projection_methods_analysis.py \
     --n-embed 1000 \
     --n-project 1000 \
     --umap-components
+
+
+# preprocess imagenet
+python preprocess_imagenet.py \
+    --base_path ./ \
+    --checkpoint_path ./checkpoints/hycoclip_vit_b.pth \
+    --train_config ./configs/train_hycoclip_vit_b.py \
+    --limit 10
