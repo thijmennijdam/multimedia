@@ -97,3 +97,5 @@ python scripts/projection_methods_analysis.py \
     --n-embed 1000 \
     --n-project 1000 \
     --umap-components
+
+

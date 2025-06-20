@@ -24,3 +24,11 @@ module load Anaconda3/2024.06-1
 
 
 ssh -L 5901:tcn679:5901 scur1160@snellius.surf.nl
+
+
+# generate tree
+python hierchical_datasets/preprocess.py \
+    --dataset imagenet \
+    --output_dir hierchical_datasets/ \
+    --checkpoint_path ./checkpoints/hycoclip_vit_s.pth \
+    --train_config ./hycoclip/configs/train_hycoclip_vit_s.py
