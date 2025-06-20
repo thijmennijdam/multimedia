@@ -1,6 +1,7 @@
 import argparse
 import logging
 import random
+import os
 
 import numpy as np
 import torch
@@ -288,24 +289,70 @@ def plot_low_dims(CO_SNE_embedding, colors, n, hierarchy_index):
 
 
 
-if __name__ == "__main__":
+def parse_arguments():
+    """Parse command line arguments."""
+    parser = argparse.ArgumentParser(description="Run CO-SNE visualization on HoroPCA-reduced embeddings")
+    parser.add_argument('--embedding-file', type=str, default="embeddings/compressed_embeddings_grit_50dim.pkl",
+                       help='Path to the 50D embedding file (default: embeddings/compressed_embeddings_grit_50dim.pkl)')
+    parser.add_argument('--n-samples', type=int, default=200, 
+                       help='Number of samples to use (default: 200)')
+    parser.add_argument('--generate-cosne', action='store_true', default=True,
+                       help='Generate CO-SNE embeddings from 50D embeddings (default: True)')
+    parser.add_argument('--load-precomputed', action='store_true', default=False,
+                       help='Load precomputed CO-SNE embeddings instead of generating')
+    parser.add_argument('--learning-rate', type=float, default=0.5,
+                       help='Learning rate for CO-SNE (default: 0.5)')
+    parser.add_argument('--learning-rate-h-loss', type=float, default=0.01,
+                       help='Learning rate for hyperbolic loss (default: 0.01)')
+    parser.add_argument('--perplexity', type=float, default=250,
+                       help='Perplexity for CO-SNE (default: 250)')
+    parser.add_argument('--early-exaggeration', type=float, default=10.0,
+                       help='Early exaggeration for CO-SNE (default: 10.0)')
+    parser.add_argument('--student-t-gamma', type=float, default=0.1,
+                       help='Student-t gamma for CO-SNE (default: 0.1)')
+    return parser.parse_args()
 
-    n = 200     # Randomly sample 100 samples for training
-    generate_cosne_embeds = False
+
+if __name__ == "__main__":
+    args = parse_arguments()
+    
+    # Create necessary directories
+    os.makedirs("embeddings", exist_ok=True)
+    os.makedirs("saved_figures", exist_ok=True)
+    
+    n = args.n_samples
+    generate_cosne_embeds = args.generate_cosne and not args.load_precomputed
+    
+    print("=" * 80)
+    print("CO-SNE VISUALIZATION ON HOROPCA-REDUCED EMBEDDINGS")
+    print("=" * 80)
+    print(f"Sample size: {n}")
+    print(f"Embedding file: {args.embedding_file}")
+    print(f"Generate CO-SNE: {generate_cosne_embeds}")
+    print("=" * 80)
 
     if generate_cosne_embeds:
-        embeddings, colors = load_embeddings("embeddings/compressed_embeddings_grit_50dim.pkl")
+        # Check if embedding file exists
+        if not os.path.exists(args.embedding_file):
+            print(f"❌ ERROR: Embedding file not found: {args.embedding_file}")
+            print("Please run visualize_embeddings.py with --task cosne first to generate the 50D embeddings.")
+            exit(1)
+            
+        print(f"📁 Loading 50D embeddings from: {args.embedding_file}")
+        embeddings, colors = load_embeddings(args.embedding_file, n)
 
-        learning_rate = 0.5
-        learning_rate_for_h_loss = 0.01
-        perplexity = 250
-        early_exaggeration = 10.0
-        student_t_gamma = 0.1
+        print(f"🔧 Running CO-SNE with parameters:")
+        print(f"   - Learning rate: {args.learning_rate}")
+        print(f"   - Learning rate (hyperbolic loss): {args.learning_rate_h_loss}")
+        print(f"   - Perplexity: {args.perplexity}")
+        print(f"   - Early exaggeration: {args.early_exaggeration}")
+        print(f"   - Student-t gamma: {args.student_t_gamma}")
 
-
-        CO_SNE_embedding  = run_TSNE(embeddings, learning_rate, learning_rate_for_h_loss, perplexity, early_exaggeration, student_t_gamma)
+        CO_SNE_embedding = run_TSNE(embeddings, args.learning_rate, args.learning_rate_h_loss, 
+                                   args.perplexity, args.early_exaggeration, args.student_t_gamma)
+        
+        # Center embeddings based on parent text mean
         all_parent_text_2d_embeddings = []
-
         for i, _emb in enumerate(CO_SNE_embedding):
             if colors[i] == COLOR_MAP['parent_text']:
                 all_parent_text_2d_embeddings.append(_emb)
@@ -323,13 +370,24 @@ if __name__ == "__main__":
             "colors": colors
         }
 
+        print(f"💾 Saving CO-SNE results to: embeddings/generated_embeddings.pkl")
         with open("embeddings/generated_embeddings.pkl", 'wb') as f:
             pickle.dump(cosne_embed_dict, f)
+    else:
+        print(f"📁 Loading precomputed CO-SNE embeddings from: embeddings/generated_embeddings.pkl")
+        if not os.path.exists("embeddings/generated_embeddings.pkl"):
+            print("❌ ERROR: Precomputed embeddings not found. Run with --generate-cosne first.")
+            exit(1)
     
+    # Load and plot results
     with open("embeddings/generated_embeddings.pkl", 'rb') as f:
         cosne_embed_dict = pickle.load(f)
 
-
+    print(f"🎨 Generating CO-SNE visualization...")
     hierarchy_index = 50
     plot_low_dims(cosne_embed_dict["embeds"], cosne_embed_dict["colors"], n, hierarchy_index)
+    
+    print("✅ CO-SNE visualization complete!")
+    print(f"📊 Plot saved to: saved_figures/CO-SNE.png")
+    print("=" * 80)
 

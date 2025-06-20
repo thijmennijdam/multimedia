@@ -9,6 +9,7 @@ import glob
 import numpy as np
 from PIL import Image
 import time
+import pickle
 
 
 # Add path imports
@@ -28,6 +29,10 @@ from prepare_GRIT_webdataset import ImageTextWebDataset
 # Import plotting utilities
 from plotting_utils import (plot_norm_histograms, plot_poincare_disk, plot_euclidean_2d, 
                            plot_comparison_poincare_euclidean, plot_cosne_results, plot_sample_overview)
+
+# Import hyptorch for CO-SNE computation  
+import hyptorch.pmath as pmath
+from htsne_impl import TSNE as hTSNE
 
 
 def parse_arguments():
@@ -326,6 +331,152 @@ def task_1_compute_norms(model, device, output_dir, max_samples=10000):
     print(f"Task 1 complete! Results saved to {output_dir}")
 
 
+def run_cosne_only(embeddings, learning_rate=1.0, learning_rate_for_h_loss=0.0, perplexity=5, early_exaggeration=1, student_t_gamma=1.0):
+    """Run only CO-SNE (comment out t-SNE and HT-SNE)."""
+    print("Running CO-SNE only...")
+    
+    # Comment out t-SNE
+    # tsne = TSNE(n_components=2, method='exact', perplexity=perplexity, learning_rate=learning_rate, early_exaggeration=1)
+    # tsne_embeddings = tsne.fit_transform(embeddings)
+    
+    # Run CO-SNE
+    co_sne = hTSNE(n_components=2, verbose=0, method='exact', square_distances=True, 
+                  metric='precomputed', learning_rate_for_h_loss=learning_rate_for_h_loss, 
+                  student_t_gamma=student_t_gamma, learning_rate=learning_rate, 
+                  n_iter=10000, perplexity=perplexity, early_exaggeration=early_exaggeration)
+
+    dists = pmath.dist_matrix(embeddings, embeddings, c=1).numpy()
+    CO_SNE_embedding = co_sne.fit_transform(dists, embeddings)
+
+    # Comment out HT-SNE
+    # _htsne = hTSNE(n_components=2, verbose=0, method='exact', square_distances=True, 
+    #               metric='precomputed', learning_rate_for_h_loss=0.0, student_t_gamma=1.0, 
+    #               learning_rate=learning_rate, n_iter=1000, perplexity=perplexity, early_exaggeration=early_exaggeration)
+    # HT_SNE_embeddings = _htsne.fit_transform(dists, embeddings)
+
+    return CO_SNE_embedding
+
+
+def plot_cosne_only(co_sne_embeddings, colors, save_path="co_sne_only.png"):
+    """Plot only CO-SNE results."""
+    import matplotlib.pyplot as plt
+    
+    fig = plt.figure(figsize=(10, 10))
+    ax = fig.add_subplot(111)
+
+    # Draw unit circle for Poincaré disk visualization
+    circle1 = plt.Circle((0, 0), 1, color='black', fill=False, linewidth=2)
+    plt.gca().add_patch(circle1)
+    
+    # Add gray background circle
+    max_radius = np.max(np.linalg.norm(co_sne_embeddings, axis=1))
+    max_lim = 1.05 * max_radius
+    circle_bg = plt.Circle((0, 0), max_lim, facecolor=(0.94, 0.94, 0.94), fill=True, linewidth=None, zorder=-3)
+    plt.gca().add_patch(circle_bg)
+    
+    # Add origin point
+    plt.plot([0], [0], 'o', markersize=3, color='black')
+    plt.text(max_lim*0.02, 0, "O", fontsize=12, ha='left')
+
+    # Plot CO-SNE embeddings
+    plt.scatter(co_sne_embeddings[:,0], co_sne_embeddings[:,1], c=colors, s=30, alpha=0.7, edgecolors='black', linewidth=0.5)
+    ax.set_aspect('equal')
+    ax.set_xlim(-max_lim, max_lim)
+    ax.set_ylim(-max_lim, max_lim)
+    plt.axis('off')
+    plt.title('CO-SNE 2D Embeddings', fontsize=16, fontweight='bold', pad=20)
+
+    plt.savefig(save_path, bbox_inches='tight', dpi=300)
+    plt.close()
+    print(f"CO-SNE plot saved to: {save_path}")
+
+
+def save_50d_embeddings_for_main(embeddings_50d, labels, output_dir):
+    """
+    Save 50D embeddings in the format expected by the original author's main.py.
+    
+    Args:
+        embeddings_50d: Tensor of 50D embeddings [total_samples, 50]
+        labels: List of labels corresponding to each embedding
+        output_dir: Directory to save the pickle file
+    """
+    import pickle
+    
+    # Convert to numpy if tensor
+    if torch.is_tensor(embeddings_50d):
+        embeddings_50d_np = embeddings_50d.detach().cpu().numpy()
+    else:
+        embeddings_50d_np = embeddings_50d
+    
+    # Initialize dictionaries to hold embeddings for each category
+    child_image_embeds = []
+    parent_image_embeds = []
+    child_text_embeds = []
+    parent_text_embeds = []
+    
+    # Split embeddings back into categories based on labels
+    for i, label in enumerate(labels):
+        embedding = embeddings_50d_np[i]
+        
+        if label == 'child_image':
+            child_image_embeds.append(embedding)
+        elif label == 'parent_image':
+            parent_image_embeds.append(embedding)
+        elif label == 'child_text':
+            child_text_embeds.append(embedding)
+        elif label == 'parent_text':
+            parent_text_embeds.append(embedding)
+    
+    # Convert lists to numpy arrays
+    child_image_feats = np.array(child_image_embeds) if child_image_embeds else np.empty((0, 50))
+    parent_image_feats = np.array(parent_image_embeds) if parent_image_embeds else np.empty((0, 50))
+    child_text_feats = np.array(child_text_embeds) if child_text_embeds else np.empty((0, 50))
+    parent_text_feats = np.array(parent_text_embeds) if parent_text_embeds else np.empty((0, 50))
+    
+    # Create the dictionary in the exact format expected by main.py
+    embed_dict = {
+        'child_image_feats': child_image_feats,
+        'parent_image_feats': parent_image_feats,
+        'child_text_feats': child_text_feats,
+        'parent_text_feats': parent_text_feats
+    }
+    
+    # Ensure output directory exists
+    os.makedirs(output_dir, exist_ok=True)
+    
+    # Save in the exact filename expected by main.py
+    save_path = os.path.join(output_dir, "compressed_embeddings_grit_50dim.pkl")
+    
+    # Also create a copy in the embeddings directory for main.py
+    embeddings_dir = os.path.join(os.path.dirname(output_dir), "avik", "embeddings")
+    os.makedirs(embeddings_dir, exist_ok=True)
+    save_path_for_main = os.path.join(embeddings_dir, "compressed_embeddings_grit_50dim.pkl")
+    
+    # Save in both locations
+    with open(save_path, 'wb') as f:
+        pickle.dump(embed_dict, f)
+    
+    with open(save_path_for_main, 'wb') as f:
+        pickle.dump(embed_dict, f)
+    
+    print(f"\n" + "="*80)
+    print("50D EMBEDDINGS SAVED FOR MAIN.PY COMPATIBILITY")
+    print("="*80)
+    print(f"Saved embeddings to: {save_path}")
+    print(f"Also saved to: {save_path_for_main}")
+    print(f"Format compatible with original author's main.py")
+    print("\nEmbedding shapes:")
+    print(f"  - child_image_feats: {child_image_feats.shape}")
+    print(f"  - parent_image_feats: {parent_image_feats.shape}")
+    print(f"  - child_text_feats: {child_text_feats.shape}")
+    print(f"  - parent_text_feats: {parent_text_feats.shape}")
+    print(f"\nTo use with main.py:")
+    print(f"  cd hycoclip-main/avik")
+    print(f"  python main.py")
+    print(f"  (The embeddings are now available at the expected path)")
+    print("="*80)
+
+
 def task_2_horopca_poincare(model, device, output_dir, max_samples=200):
     """Task 2: Load 200 samples, apply HoroPCA to 2D, plot on Poincare disk."""
     print("\n" + "="*80)
@@ -490,7 +641,7 @@ def task_3_horopca_cosne(model, device, output_dir, max_samples=200):
     if torch.cuda.is_available():
         embeddings = embeddings.cuda()
     
-    # embeddings = hyperboloid.to_poincare(embeddings)
+    embeddings = hyperboloid.to_poincare(embeddings)
     
     # Compute Frechet mean
     frechet = Frechet(lr=1e-2, eps=1e-5, max_steps=5000)
@@ -500,7 +651,7 @@ def task_3_horopca_cosne(model, device, output_dir, max_samples=200):
     
     # Apply HoroPCA to 50D
     original_dim = embeddings.shape[1]
-    horopca = HoroPCA(dim=original_dim, n_components=50, lr=1e-2, max_steps=500)
+    horopca = HoroPCA(dim=original_dim, n_components=50, lr=5e-2, max_steps=500)
     if torch.cuda.is_available():
         horopca.cuda()
     
@@ -508,6 +659,9 @@ def task_3_horopca_cosne(model, device, output_dir, max_samples=200):
     embeddings_50d = horopca.map_to_ball(x).detach().cpu().float()
     
     print(f"HoroPCA reduction complete! Shape: {embeddings_50d.shape}")
+    
+    # Save 50D embeddings in format compatible with main.py
+    save_50d_embeddings_for_main(embeddings_50d, labels, output_dir)
     
     # Apply CO-SNE reduction to 2D
     print("Applying CO-SNE reduction to 2D...")
@@ -523,7 +677,6 @@ def task_3_horopca_cosne(model, device, output_dir, max_samples=200):
     early_exaggeration = 10.0
     student_t_gamma = 0.1
 
-
     # Create colors list for CO-SNE (maps each data point to its color)
     color_map = {
         'child_image': 'tab:blue',
@@ -532,20 +685,17 @@ def task_3_horopca_cosne(model, device, output_dir, max_samples=200):
         'parent_text': 'tab:red'
     }
     
-    
-    tsne_embeddings, ht_sne_embeddings, co_sne_embeddings = run_TSNE(
+    # Run CO-SNE only (comment out t-SNE and HT-SNE)
+    co_sne_embeddings = run_cosne_only(
         embeddings_50d, learning_rate, learning_rate_for_h_loss, 
         perplexity, early_exaggeration, student_t_gamma
     )
     
     print("CO-SNE reduction complete!")
     colors = [color_map.get(label, 'gray') for label in labels]
-    plot_low_dims(tsne_embeddings, ht_sne_embeddings, co_sne_embeddings, colors, learning_rate, learning_rate_for_h_loss, perplexity, early_exaggeration, student_t_gamma)
     
-    
-    # Plot results
-    plot_cosne_results(tsne_embeddings, ht_sne_embeddings, co_sne_embeddings, 
-                      labels, save_path=os.path.join(output_dir, "task3_cosne_comparison.png"))
+    # Plot only CO-SNE results
+    plot_cosne_only(co_sne_embeddings, colors, save_path=os.path.join(output_dir, "task3_co_sne.png"))
     
     print(f"Task 3 complete! Results saved to {output_dir}")
 

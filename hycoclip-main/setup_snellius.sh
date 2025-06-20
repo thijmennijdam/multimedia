@@ -69,3 +69,31 @@ python scripts/visualize_embeddings.py --checkpoint-path checkpoints/hycoclip_vi
 
 python scripts/visualize_embeddings.py --checkpoint-path checkpoints/hycoclip_vit_b.pth \
     --train-config configs/train_hycoclip_vit_b.py
+
+
+
+python scripts/projection_methods_analysis.py \
+    --checkpoint-path checkpoints/hycoclip_vit_b.pth --train-config configs/train_hycoclip_vit_b.py \
+    --methods horopca \
+    --n-embed 200 \
+    --n-project 200
+
+python scripts/projection_methods_analysis.py \
+    --checkpoint-path checkpoints/hycoclip_vit_b.pth --train-config configs/train_hycoclip_vit_b.py \
+    --methods horopca \
+    --n-embed 1000 \
+    --n-project 1000
+
+python scripts/projection_methods_analysis.py \
+    --checkpoint-path checkpoints/hycoclip_vit_b.pth --train-config configs/train_hycoclip_vit_b.py \
+    --methods cosne \
+    --n-embed 1000 \
+    --n-project 1000
+
+python scripts/projection_methods_analysis.py \
+    --checkpoint-path checkpoints/hycoclip_vit_b.pth --train-config configs/train_hycoclip_vit_b.py \
+    --methods umap \
+    --umap-neighbors 100 \
+    --n-embed 1000 \
+    --n-project 1000 \
+    --umap-components
