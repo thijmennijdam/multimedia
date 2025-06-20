@@ -15,3 +15,6 @@ archive/
 hierchical_datasets/GRIT/
 hierchical_datasets/ImageNet/
 imagenet/
+
+ILSVRC2012_img_val.tar
+imagenet-subset/
