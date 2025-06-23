@@ -184,47 +184,19 @@ def _centre_panel() -> html.Div:
     return html.Div(
         [
             html.Div(
-                [
-                    html.Div(
-                        dcc.Graph(
-                            id="scatter-3d",
-                            figure=None,  # Will be set by callback
-                            style={"width": "100%", "height": "100%"},
-                            config={"displayModeBar": False},
-                        ),
-                        style={
-                            "flex": 1,
-                            "minWidth": 0,
-                            "aspectRatio": "1 / 1",
-                            "maxWidth": "600px",
-                            "marginRight": "1rem",
-                            "marginTop": "2rem",
-                        },
-                    ),
-                    html.Div(
-                        dcc.Graph(
-                            id="scatter-disk",
-                            figure=None,  # Will be set by callback
-                            style={"width": "100%", "height": "100%"},
-                            config={"displayModeBar": False},
-                        ),
-                        style={
-                            "flex": 1,
-                            "minWidth": 0,
-                            "aspectRatio": "1 / 1",
-                            "maxWidth": "600px",
-                            "marginTop": "2rem",
-                        },
-                    ),
-                ],
+                dcc.Graph(
+                    id="scatter-disk",
+                    figure=None,  # Will be set by callback
+                    style={"width": "100%", "height": "100%"},
+                    config={"displayModeBar": False},
+                ),
                 style={
-                    "display": "flex",
-                    "flexDirection": "row",
-                    "justifyContent": "center",
-                    "alignItems": "flex-start",
-                    "gap": "1rem",
                     "width": "100%",
                     "height": "100%",
+                    "maxWidth": "800px",
+                    "maxHeight": "800px",
+                    "aspectRatio": "1 / 1",
+                    "margin": "auto",
                 },
             ),
         ],
@@ -236,6 +208,8 @@ def _centre_panel() -> html.Div:
             "boxShadow": "0 1px 3px rgba(0,0,0,0.1)",
             "display": "flex",
             "flexDirection": "column",
+            "justifyContent": "center",
+            "alignItems": "center",
             "minHeight": 0,
             "overflow": "hidden",
         },

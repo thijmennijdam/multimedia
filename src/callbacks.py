@@ -200,7 +200,7 @@ def register_callbacks(app: dash.Dash) -> None:
         return dash.no_update
 
     @app.callback(
-        [Output("scatter-3d", "figure"), Output("scatter-disk", "figure")],
+        Output("scatter-disk", "figure"),
         Input("emb", "data"),
         Input("sel", "data"),
         Input("proj", "value"),
@@ -214,7 +214,7 @@ def register_callbacks(app: dash.Dash) -> None:
     def _scatter(edata, sel, proj, interpolated_point, labels_data, target_names, mode, k_neighbors, data_store):
         if edata is None or labels_data is None:
             print("Warning: No embedding or label data available for plotting")
-            return {}, {}
+            return {}
         emb = np.asarray(edata, dtype=np.float32)
         labels = np.asarray(labels_data, dtype=int)
         sel = sel or []
@@ -237,73 +237,7 @@ def register_callbacks(app: dash.Dash) -> None:
                 neighbor_indices = []
         else:
             neighbor_indices = []
-        # 3D plot (handle both 2D and 3D embeddings)
-        def _fig3d(emb, sel, labels, target_names, interpolated_point=None, neighbor_indices=None):
-            labels_txt = [
-                f"{i}: {target_names[labels[i]] if target_names is not None else labels[i]}"
-                for i in range(len(labels))
-            ]
-            # Handle 2D embeddings by adding a zero z-coordinate
-            if emb.shape[1] == 2:
-                z_coords = np.zeros(emb.shape[0])
-            else:
-                z_coords = emb[:, 2]
-            
-            base = go.Scatter3d(
-                x=emb[:, 0],
-                y=emb[:, 1],
-                z=z_coords,
-                mode="markers",
-                text=labels_txt,
-                hoverinfo="text",
-                marker=dict(size=6, opacity=0.8, color=labels, colorscale="Viridis"),
-                name="Data points",
-            )
-            traces = [base]
-            if neighbor_indices is not None and len(neighbor_indices) > 0:
-                traces.append(
-                    go.Scatter3d(
-                        x=emb[neighbor_indices, 0],
-                        y=emb[neighbor_indices, 1],
-                        z=z_coords[neighbor_indices],
-                        mode="markers",
-                        marker=dict(size=10, color="blue"),
-                        name="Neighbors",
-                    )
-                )
-            if sel:
-                traces.append(
-                    go.Scatter3d(
-                        x=emb[sel, 0],
-                        y=emb[sel, 1],
-                        z=z_coords[sel],
-                        mode="markers",
-                        marker=dict(size=12, color="red"),
-                        name="Selected point",
-                    )
-                )
-            if interpolated_point is not None:
-                # Handle 2D interpolated points
-                interp_z = interpolated_point[2] if len(interpolated_point) > 2 else 0
-                traces.append(
-                    go.Scatter3d(
-                        x=[interpolated_point[0]],
-                        y=[interpolated_point[1]],
-                        z=[interp_z],
-                        mode="markers",
-                        marker=dict(size=12, color="orange", symbol="diamond"),
-                        name="Interpolated point",
-                        text=["Interpolated point"],
-                        hoverinfo="text",
-                    )
-                )
-            fig = go.Figure(data=traces)
-            fig.update_layout(
-                margin=dict(l=0, r=0, b=0, t=0),
-                uirevision="embedding",
-                showlegend=False,
-            )
-            return fig
+
         # 2D disk plot
         def _fig_disk(x, y, sel, labels, target_names, interpolated_point=None, neighbor_indices=None):
             base = go.Scatter(
@@ -372,16 +306,14 @@ def register_callbacks(app: dash.Dash) -> None:
             interp_dx = interp_point[0] / (1.0 + interp_point[2])
             interp_dy = interp_point[1] / (1.0 + interp_point[2])
             interp_transformed = np.array([interp_dx, interp_dy])
-        fig_3d = _fig3d(emb, selected_idx if mode == "neighbors" else highlight, labels, target_names, interp_point, neighbor_indices)
         fig_disk = _fig_disk(dx, dy, selected_idx if mode == "neighbors" else highlight, labels, target_names, interp_transformed, neighbor_indices)
-        return fig_3d, fig_disk
+        return fig_disk
 
 
 
     @app.callback(
         Output("sel", "data"),
         [
-            Input("scatter-3d", "clickData"),
             Input("scatter-disk", "clickData"),
             Input({"type": "close-button", "index": dash.ALL}, "n_clicks")
         ],
@@ -389,7 +321,7 @@ def register_callbacks(app: dash.Dash) -> None:
         State("mode", "data"),
         prevent_initial_call=True,
     )
-    def _select(click_3d, click_disk, close_clicks, sel, mode):
+    def _select(click_disk, close_clicks, sel, mode):
         ctx = callback_context
         if not ctx.triggered or not ctx.triggered_id:
             return dash.no_update
@@ -403,8 +335,8 @@ def register_callbacks(app: dash.Dash) -> None:
                 return int(pt.get("pointIndex", pt["pointNumber"]))
             except (TypeError, KeyError, IndexError):
                 return None
-        if triggered_id in ["scatter-3d", "scatter-disk"]:
-            click_data = ctx.inputs[f"{triggered_id}.clickData"]
+        if triggered_id == "scatter-disk":
+            click_data = ctx.inputs["scatter-disk.clickData"]
             idx = _clicked(click_data)
             if idx is None:
                 return dash.no_update
