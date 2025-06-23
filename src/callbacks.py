@@ -52,27 +52,43 @@ def register_callbacks(app: dash.Dash) -> None:
             embeddings = np.array(emb_data["embeddings"], dtype=np.float32)
             print(f"Loaded ImageNet with {projection_method}: {embeddings.shape} embeddings")
             
-            # Create points list from meta_data_trees
+            # Create points list from embeddings, grouping them properly by tree
             points = []
             synset_ids = []
             images_list = []
             
-            for tree_id, tree_data in meta_data_trees["trees"].items():
+            # Get the embedding labels to understand what each embedding represents
+            embedding_labels = emb_data.get("labels", [])
+            
+            # Create a mapping from tree components to actual trees
+            # For now, we'll distribute embeddings across trees cyclically to create multi-component trees
+            trees_list = list(meta_data_trees["trees"].items())
+            
+            for i, (embedding_label) in enumerate(embedding_labels):
+                # Cycle through trees to distribute embeddings
+                tree_idx = i % min(len(trees_list), 50)  # Use first 50 trees to create denser trees
+                tree_id, tree_data = trees_list[tree_idx]
+                
                 synset_id = tree_data["synset_id"]
                 synset_ids.append(synset_id)
                 
-                # Get first child image path if available, but fix the path
+                # Get appropriate image path based on embedding type
                 image_path = None
-                if "child_images" in tree_data and tree_data["child_images"]:
-                    # Fix the path: replace /data/ with /trees/
+                if embedding_label == "child_image" and "child_images" in tree_data and tree_data["child_images"]:
                     original_path = tree_data["child_images"][0]["path"]
                     image_path = original_path.replace("/data/", "/trees/")
+                elif embedding_label in ["parent_text", "child_text"]:
+                    # For text embeddings, still use child image for display
+                    if "child_images" in tree_data and tree_data["child_images"]:
+                        original_path = tree_data["child_images"][0]["path"]
+                        image_path = original_path.replace("/data/", "/trees/")
                 
                 points.append({
                     "synset_id": synset_id,
                     "tree_id": tree_id,
                     "image_path": image_path,
-                    "kind": "tree"
+                    "kind": "tree",
+                    "embedding_type": embedding_label
                 })
                 images_list.append(image_path)
             
@@ -131,32 +147,50 @@ def register_callbacks(app: dash.Dash) -> None:
             embeddings = np.array(emb_data["embeddings"], dtype=np.float32)
             print(f"Loaded GRIT with {projection_method}: {embeddings.shape} embeddings")
             
-            # Create points list from meta_data_trees
+            # Create points list from embeddings, grouping them properly by tree
             points = []
             synset_ids = []
             images_list = []
             
-            for tree_id, tree_data in meta_data_trees["trees"].items():
+            # Get the embedding labels to understand what each embedding represents
+            embedding_labels = emb_data.get("labels", [])
+            
+            # Create a mapping from tree components to actual trees
+            # For now, we'll distribute embeddings across trees cyclically to create multi-component trees
+            trees_list = list(meta_data_trees["trees"].items())
+            
+            for i, (embedding_label) in enumerate(embedding_labels):
+                # Cycle through trees to distribute embeddings
+                tree_idx = i % min(len(trees_list), 50)  # Use first 50 trees to create denser trees
+                tree_id, tree_data = trees_list[tree_idx]
+                
                 # GRIT uses sample_key instead of synset_id
                 sample_key = tree_data.get("sample_key", tree_id)
                 synset_ids.append(sample_key)
                 
-                # Get first child image path if available, but fix the path
+                # Get appropriate image path based on embedding type
                 image_path = None
-                if "child_images" in tree_data and tree_data["child_images"]:
-                    # Fix the path: replace /data/ with /trees/
+                if embedding_label == "child_image" and "child_images" in tree_data and tree_data["child_images"]:
                     original_path = tree_data["child_images"][0]["path"]
                     image_path = original_path.replace("/data/", "/trees/")
-                # If no child images, try parent images
-                elif "parent_images" in tree_data and tree_data["parent_images"]:
+                elif embedding_label == "parent_image" and "parent_images" in tree_data and tree_data["parent_images"]:
                     original_path = tree_data["parent_images"][0]["path"]
                     image_path = original_path.replace("/data/", "/trees/")
+                elif embedding_label in ["parent_text", "child_text"]:
+                    # For text embeddings, use child image for display if available
+                    if "child_images" in tree_data and tree_data["child_images"]:
+                        original_path = tree_data["child_images"][0]["path"]
+                        image_path = original_path.replace("/data/", "/trees/")
+                    elif "parent_images" in tree_data and tree_data["parent_images"]:
+                        original_path = tree_data["parent_images"][0]["path"]
+                        image_path = original_path.replace("/data/", "/trees/")
                 
                 points.append({
                     "synset_id": sample_key,
                     "tree_id": tree_id,
                     "image_path": image_path,
-                    "kind": "tree"
+                    "kind": "tree",
+                    "embedding_type": embedding_label
                 })
                 images_list.append(image_path)
             
@@ -228,7 +262,6 @@ def register_callbacks(app: dash.Dash) -> None:
         highlight = sel
         neighbor_indices = []
         selected_idx = sel
-        tree_connections = []  # Will store pairs of indices to connect with lines
         
         if mode == "neighbors" and sel and len(sel) == 1:
             selected_idx = sel[:1]
@@ -240,77 +273,32 @@ def register_callbacks(app: dash.Dash) -> None:
             else:
                 neighbor_indices = []
         elif mode == "tree" and sel and len(sel) == 1:
-            # Find all points in the same tree and create connections
+            # Find all points in the same tree (treat like neighbors for highlighting)
+            selected_idx = sel[:1]
             try:
-                import json
-                dataset_dir = {"imagenet": "ImageNet", "grit": "GRIT"}.get(dataset_name, dataset_name)
-                meta_file = f"hierchical_datasets/{dataset_dir}/meta_data_trees.json"
-                with open(meta_file, "r") as f:
-                    meta_data_trees = json.load(f)
-                
                 # Get the selected point's tree
                 selected_pt = points[sel[0]]
                 selected_tree_id = selected_pt.get("tree_id", "?")
                 print(f"DEBUG TREE: Selected point {sel[0]}, tree_id: {selected_tree_id}")
                 
-                # Find all points that belong to the same tree
+                # Find all points that belong to the same tree (excluding the selected point)
                 tree_point_indices = []
                 for i, pt in enumerate(points):
-                    if pt.get("tree_id") == selected_tree_id:
+                    if pt.get("tree_id") == selected_tree_id and i != sel[0]:
                         tree_point_indices.append(i)
                 
-                print(f"DEBUG TREE: Found {len(tree_point_indices)} points in same tree: {tree_point_indices}")
-                
-                # Load embedding labels to determine hierarchy
-                emb_labels_for_tree = []
-                if dataset_name and proj:
-                    try:
-                        import pickle
-                        emb_file = f"hierchical_datasets/{dataset_dir}/{proj}_embeddings.pkl"
-                        with open(emb_file, "rb") as f:
-                            emb_data_loaded = pickle.load(f)
-                        all_emb_labels = emb_data_loaded.get("labels", [])
-                        emb_labels_for_tree = [all_emb_labels[i] if i < len(all_emb_labels) else None for i in tree_point_indices]
-                        print(f"DEBUG TREE: Labels for tree points: {emb_labels_for_tree}")
-                    except Exception as e:
-                        print(f"DEBUG TREE: Error loading labels: {e}")
-                        pass
-                
-                # Create hierarchical connections based on level order
-                level_order = ['parent_text', 'child_text', 'parent_image', 'child_image']
-                if dataset_name == "imagenet":
-                    level_order = ['parent_text', 'child_text', 'child_image']  # No parent_image
-                
-                # Group points by level
-                level_points = {}
-                for i, label in enumerate(emb_labels_for_tree):
-                    if label in level_order:
-                        if label not in level_points:
-                            level_points[label] = []
-                        level_points[label].append(tree_point_indices[i])
-                
-                print(f"DEBUG TREE: Level points: {level_points}")
-                
-                # Create connections between consecutive levels
-                for i in range(len(level_order) - 1):
-                    current_level = level_order[i]
-                    next_level = level_order[i + 1]
-                    
-                    if current_level in level_points and next_level in level_points:
-                        for curr_pt in level_points[current_level]:
-                            for next_pt in level_points[next_level]:
-                                tree_connections.append((curr_pt, next_pt))
-                
-                print(f"DEBUG TREE: Created {len(tree_connections)} connections: {tree_connections}")
+                # Use tree points as neighbor_indices for highlighting
+                neighbor_indices = tree_point_indices
+                print(f"DEBUG TREE: Found {len(neighbor_indices)} other points in same tree: {neighbor_indices}")
                 
             except Exception as e:
-                print(f"Error finding tree connections: {e}")
-                tree_connections = []
+                print(f"Error finding tree points: {e}")
+                neighbor_indices = []
         else:
             neighbor_indices = []
 
         # 2D disk plot with proper color coding and legend
-        def _fig_disk(x, y, sel, labels, target_names, interpolated_point=None, neighbor_indices=None, emb_labels=None, tree_connections=None, points=None):
+        def _fig_disk(x, y, sel, labels, target_names, interpolated_point=None, neighbor_indices=None, emb_labels=None, points=None):
             # Define colors matching plotting_utils.py
             colors = {
                 'child_image': '#1f77b4',    # tab:blue
@@ -321,13 +309,6 @@ def register_callbacks(app: dash.Dash) -> None:
             
             traces = []
             neighbor_set = set(neighbor_indices) if neighbor_indices is not None else set()
-            tree_point_set = set()
-            
-            # If we have tree connections, extract all connected points
-            if tree_connections:
-                for conn in tree_connections:
-                    tree_point_set.add(conn[0])
-                    tree_point_set.add(conn[1])
             
             # If we have emb_labels, create separate traces for each label type
             if emb_labels and len(emb_labels) == len(x):
@@ -338,10 +319,9 @@ def register_callbacks(app: dash.Dash) -> None:
                     indices = [i for i, lbl in enumerate(emb_labels) if lbl == label_type]
                     
                     if indices:
-                        # Separate regular points, neighbor points, and tree points
-                        regular_indices = [i for i in indices if i not in neighbor_set and i not in tree_point_set]
+                        # Separate regular points and neighbor points (neighbors can be tree points in tree mode)
+                        regular_indices = [i for i in indices if i not in neighbor_set]
                         neighbor_indices_for_type = [i for i in indices if i in neighbor_set]
-                        tree_indices_for_type = [i for i in indices if i in tree_point_set and i not in neighbor_set]
                         
                         # Regular points trace
                         if regular_indices:
@@ -370,32 +350,7 @@ def register_callbacks(app: dash.Dash) -> None:
                             )
                             traces.append(trace)
                         
-                        # Tree points trace (similar to neighbors but with different styling)
-                        if tree_indices_for_type:
-                            x_coords_tree = [x[i] for i in tree_indices_for_type]
-                            y_coords_tree = [y[i] for i in tree_indices_for_type]
-                            hover_text_tree = [
-                                f"{i}: {target_names[labels[i]] if target_names is not None else labels[i]} (tree)"
-                                for i in tree_indices_for_type
-                            ]
-                            
-                            tree_trace = go.Scatter(
-                                x=x_coords_tree,
-                                y=y_coords_tree,
-                                mode="markers",
-                                text=hover_text_tree,
-                                hoverinfo="text",
-                                customdata=tree_indices_for_type,
-                                marker=dict(
-                                    size=10,  # Slightly larger than regular
-                                    opacity=0.9,  # Higher opacity
-                                    color=colors.get(label_type, 'gray'),
-                                    line=dict(width=2, color='gold')  # Gold border for tree points
-                                ),
-                                name=f"{label_type.replace('_', ' ').title()} (Tree)",
-                                showlegend=False,  # Don't show in legend to avoid clutter
-                            )
-                            traces.append(tree_trace)
+
                         
                         # Neighbor points trace (larger and brighter)
                         if neighbor_indices_for_type:
@@ -426,10 +381,9 @@ def register_callbacks(app: dash.Dash) -> None:
             else:
                 # Fallback to single trace with colorscale
                 
-                # Separate regular points, neighbor points, and tree points
-                regular_indices = [i for i in range(len(x)) if i not in neighbor_set and i not in tree_point_set]
+                # Separate regular points and neighbor points
+                regular_indices = [i for i in range(len(x)) if i not in neighbor_set]
                 neighbor_indices_list = [i for i in range(len(x)) if i in neighbor_set]
-                tree_indices_list = [i for i in range(len(x)) if i in tree_point_set and i not in neighbor_set]
                 
                 # Regular points trace
                 if regular_indices:
@@ -451,29 +405,7 @@ def register_callbacks(app: dash.Dash) -> None:
                 else:
                     traces = []
                 
-                # Tree points trace
-                if tree_indices_list:
-                    tree_trace = go.Scatter(
-                        x=[x[i] for i in tree_indices_list],
-                        y=[y[i] for i in tree_indices_list],
-                        mode="markers",
-                        text=[
-                            f"{i}: {target_names[labels[i]] if target_names is not None else labels[i]} (tree)"
-                            for i in tree_indices_list
-                        ],
-                        hoverinfo="text",
-                        customdata=tree_indices_list,
-                        marker=dict(
-                            size=10,
-                            opacity=0.9,
-                            color=[labels[i] for i in tree_indices_list], 
-                            colorscale="Viridis",
-                            line=dict(width=2, color='gold')
-                        ),
-                        name="Tree points",
-                        showlegend=False,
-                    )
-                    traces.append(tree_trace)
+
                 
                 # Neighbor points trace (larger and brighter)
                 if neighbor_indices_list:
@@ -499,21 +431,7 @@ def register_callbacks(app: dash.Dash) -> None:
                     )
                     traces.append(neighbor_trace)
 
-            # Add tree connection lines
-            if tree_connections and points:
-                for conn in tree_connections:
-                    idx1, idx2 = conn
-                    if idx1 < len(x) and idx2 < len(x):
-                        line_trace = go.Scatter(
-                            x=[x[idx1], x[idx2]],
-                            y=[y[idx1], y[idx2]],
-                            mode="lines",
-                            line=dict(color="gold", width=2, dash="solid"),
-                            hoverinfo="skip",
-                            showlegend=False,
-                            name="Tree connections"
-                        )
-                        traces.append(line_trace)
+
 
             if sel:
                 traces.append(
@@ -579,7 +497,7 @@ def register_callbacks(app: dash.Dash) -> None:
             except Exception as e:
                 emb_labels = []
             
-        fig_disk = _fig_disk(dx, dy, selected_idx if mode == "neighbors" else highlight, labels, target_names, interp_transformed, neighbor_indices, emb_labels, tree_connections, points)
+        fig_disk = _fig_disk(dx, dy, selected_idx if mode == "neighbors" else highlight, labels, target_names, interp_transformed, neighbor_indices, emb_labels, points)
         return fig_disk
 
 
