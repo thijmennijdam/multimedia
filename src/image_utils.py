@@ -77,3 +77,48 @@ def _create_interpolated_img_tag(i: int, j: int, t_value: float, images: np.ndar
         src=uri,
         style={"marginRight": "0.5rem", "border": "2px solid orange"},
     )
+
+
+def _create_content_element(idx: int, images: np.ndarray | None, points: list | None = None, meta: dict | None = None) -> html.Div | html.Img | html.Span:
+    """Creates either a text element or image element based on the embedding type."""
+    # If we have points data, check the embedding type
+    if points and idx < len(points):
+        point = points[idx]
+        embedding_type = point.get("embedding_type", "")
+        
+        # For text embeddings, display the actual text content
+        if embedding_type in ["parent_text", "child_text"]:
+            synset_id = point.get("synset_id", "")
+            if meta and synset_id in meta:
+                if embedding_type == "parent_text":
+                    text_content = meta[synset_id].get("name", "No parent text available")
+                else:  # child_text
+                    text_content = meta[synset_id].get("description", "No child text available")
+                
+                return html.Div([
+                    html.P(text_content, style={
+                        "margin": "0", 
+                        "padding": "0.5rem", 
+                        "backgroundColor": "#f0f8ff",
+                        "border": "1px solid #d0d0d0",
+                        "borderRadius": "4px",
+                        "fontStyle": "italic",
+                        "maxWidth": "200px",
+                        "wordWrap": "break-word"
+                    })
+                ], style={"marginRight": "0.5rem"})
+            else:
+                return html.Div([
+                    html.P(f"Text content (type: {embedding_type})", style={
+                        "margin": "0", 
+                        "padding": "0.5rem", 
+                        "backgroundColor": "#f0f8ff",
+                        "border": "1px solid #d0d0d0",
+                        "borderRadius": "4px",
+                        "fontStyle": "italic",
+                        "color": "#666"
+                    })
+                ], style={"marginRight": "0.5rem"})
+    
+    # For image embeddings or when we don't have points data, fall back to image display
+    return _create_img_tag(idx, images)

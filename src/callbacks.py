@@ -4,7 +4,7 @@ import numpy as np
 import plotly.graph_objs as go
 from .projection import _interpolate_hyperbolic
 
-from .image_utils import _encode_image, _create_img_tag, _create_interpolated_img_tag
+from .image_utils import _encode_image, _create_img_tag, _create_interpolated_img_tag, _create_content_element
 from .layout import _tree_node
 import json
 
@@ -963,8 +963,10 @@ def register_callbacks(app: dash.Dash) -> None:
         State("images-store", "data"),
         State("emb", "data"),
         Input("neighbors-slider", "value"),
+        State("points-store", "data"),
+        State("meta-store", "data"),
     )
-    def _compare(sel, interpolated_point, t_value, mode, labels_data, target_names, images, emb_data, k_neighbors):
+    def _compare(sel, interpolated_point, t_value, mode, labels_data, target_names, images, emb_data, k_neighbors, points, meta):
         if labels_data is None:
             return html.Div(), html.P("Select a dataset to begin.")
         labels = np.asarray(labels_data)
@@ -980,6 +982,10 @@ def register_callbacks(app: dash.Dash) -> None:
             instructions = html.P("Select up to 5 points to compare.")
             for idx in sel:
                 label = target_names[labels[idx]] if target_names is not None else labels[idx]
+                
+                # Get the content to display based on embedding type
+                content_element = _create_content_element(idx, images, points, meta)
+                
                 components.append(
                     html.Div([
                         html.Button(
@@ -1006,7 +1012,7 @@ def register_callbacks(app: dash.Dash) -> None:
                                 "hover": {"backgroundColor": "#cc0000"}
                             }
                         ),
-                        _create_img_tag(idx, images),
+                        content_element,
                         html.P(f"Point {idx} label: {label}")
                     ], style={"display": "flex", "alignItems": "center", "padding": "0.5rem", "borderRadius": "4px", "position": "relative", "backgroundColor": "#f8f9fa", "marginBottom": "0.5rem"})
                 )
@@ -1016,6 +1022,10 @@ def register_callbacks(app: dash.Dash) -> None:
             if sel:
                 i, j = (sel[0], sel[1]) if len(sel) > 1 else (sel[0], None)
                 li = target_names[labels[i]] if target_names is not None else labels[i]
+                
+                # Get the content to display based on embedding type
+                content_element_i = _create_content_element(i, images, points, meta)
+                
                 components.append(
                     html.Div([
                         html.Button(
@@ -1042,12 +1052,16 @@ def register_callbacks(app: dash.Dash) -> None:
                                 "hover": {"backgroundColor": "#cc0000"}
                             }
                         ),
-                        _create_img_tag(i, images),
+                        content_element_i,
                         html.P(f"Point {i} label: {li}")
                     ], style={"display": "flex", "alignItems": "center", "padding": "0.5rem", "borderRadius": "4px", "position": "relative", "backgroundColor": "#f8f9fa", "marginBottom": "0.5rem"})
                 )
                 if j is not None:
                     lj = target_names[labels[j]] if target_names is not None else labels[j]
+                    
+                    # Get the content to display based on embedding type
+                    content_element_j = _create_content_element(j, images, points, meta)
+                    
                     components.append(
                         html.Div([
                             html.Button(
@@ -1074,7 +1088,7 @@ def register_callbacks(app: dash.Dash) -> None:
                                     "hover": {"backgroundColor": "#cc0000"}
                                 }
                             ),
-                            _create_img_tag(j, images),
+                            content_element_j,
                             html.P(f"Point {j} label: {lj}")
                         ], style={"display": "flex", "alignItems": "center", "padding": "0.5rem", "borderRadius": "4px", "position": "relative", "backgroundColor": "#f8f9fa", "marginBottom": "0.5rem"})
                     )
@@ -1099,6 +1113,10 @@ def register_callbacks(app: dash.Dash) -> None:
             neighbors = np.argsort(dists)
             neighbors = neighbors[neighbors != sel[0]][:k_neighbors]
             label = target_names[labels[sel[0]]] if target_names is not None else labels[sel[0]]
+            
+            # Get the content to display based on embedding type
+            content_element = _create_content_element(sel[0], images, points, meta)
+            
             components.append(
                 html.Div([
                     html.Button(
@@ -1125,7 +1143,7 @@ def register_callbacks(app: dash.Dash) -> None:
                             "hover": {"backgroundColor": "#cc0000"}
                         }
                     ),
-                    _create_img_tag(sel[0], images),
+                    content_element,
                     html.P(f"Selected point {sel[0]} label: {label}")
                 ], style={"display": "flex", "alignItems": "center", "padding": "0.5rem", "borderRadius": "4px", "position": "relative", "backgroundColor": "#e0f7fa", "marginBottom": "0.5rem"})
             )
@@ -1133,9 +1151,13 @@ def register_callbacks(app: dash.Dash) -> None:
                 components.append(html.H6("Neighbors:", style={"margin": "1rem 0 0.5rem 0", "color": "#666"}))
                 for nidx in neighbors:
                     nlabel = target_names[labels[nidx]] if target_names is not None else labels[nidx]
+                    
+                    # Get the content to display based on embedding type
+                    neighbor_content_element = _create_content_element(nidx, images, points, meta)
+                    
                     components.append(
                         html.Div([
-                            _create_img_tag(nidx, images),
+                            neighbor_content_element,
                             html.P(f"Neighbor {nidx} label: {nlabel}")
                         ], style={"display": "flex", "alignItems": "center", "padding": "0.5rem", "borderRadius": "4px", "backgroundColor": "#f8f9fa", "marginBottom": "0.5rem"})
                     )
