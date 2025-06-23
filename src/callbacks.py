@@ -2,9 +2,9 @@ import dash
 from dash import Input, Output, State, callback_context, html, dcc
 import numpy as np
 import plotly.graph_objs as go
-from .projection import _umap_hyperbolic, _hyperboloid_2d, PROJECTIONS, _interpolate_hyperbolic
-from .dataset import _load_dataset
-from .image_utils import _encode_image, _create_img_tag, _create_interpolated_img_tag
+from .projection import _interpolate_hyperbolic
+
+from .image_utils import _encode_image, _create_img_tag, _create_interpolated_img_tag, _create_content_element
 from .layout import _tree_node
 import json
 
@@ -25,49 +25,111 @@ def register_callbacks(app: dash.Dash) -> None:
         Output("interpolated-point", "data", allow_duplicate=True),
         Output("emb", "data", allow_duplicate=True),
         Input("dataset-dropdown", "value"),
+        Input("proj", "value"),
         prevent_initial_call=False,
     )
-    def _update_dataset_stores(dataset_name):
-        if not dataset_name:
+    def _update_dataset_stores(dataset_name, projection_method):
+        if not dataset_name or not projection_method:
             return dash.no_update
-        if dataset_name in {"digits", "iris", "wine"}:
-            data, labels, feature_names, target_names, images = _load_dataset(dataset_name)
-            data_list = data.tolist()
-            labels_list = labels.tolist()
-            target_names_list = target_names.tolist() if target_names is not None else None
-            images_list = images.tolist() if images is not None else []
-            return (
-                data_list,
-                labels_list,
-                feature_names,
-                target_names_list,
-                images_list,
-                None,
-                None,
-                [],
-                None,
-                None,
-            )
         if dataset_name == "imagenet":
             try:
-                with open("dataset/meta.json", "r", encoding="utf-8") as f_meta:
-                    meta = json.load(f_meta)
-                with open("dataset/points.json", "r", encoding="utf-8") as f_pts:
-                    points = json.load(f_pts)
-            except FileNotFoundError:
-                print("meta.json / points.json not found in ./dataset – did you run create_trees.py?")
+                import pickle
+                with open("hierchical_datasets/ImageNet/meta_data_trees.json", "r", encoding="utf-8") as f_meta:
+                    meta_data_trees = json.load(f_meta)
+                
+                # Load embeddings based on selected projection method
+                emb_file = f"hierchical_datasets/ImageNet/{projection_method}_embeddings.pkl"
+                with open(emb_file, "rb") as f_emb:
+                    emb_data = pickle.load(f_emb)
+            except FileNotFoundError as e:
+                print(f"Error loading ImageNet files: {e}")
                 return dash.no_update
-            embeddings = np.array([pt["embedding"] for pt in points], dtype=np.float32)
-            synset_ids = [pt["synset_id"] for pt in points]
+            except Exception as e:
+                print(f"ERROR: ImageNet loading failed: {e}")
+                return dash.no_update
+            
+            # Extract embeddings
+            embeddings = np.array(emb_data["embeddings"], dtype=np.float32)
+            print(f"Loaded ImageNet with {projection_method}: {embeddings.shape} embeddings")
+            
+            # Create points list from embeddings, grouping them properly by tree
+            points = []
+            synset_ids = []
+            images_list = []
+            
+            # Get the embedding labels to understand what each embedding represents
+            embedding_labels = emb_data.get("labels", [])
+            
+            # Create a mapping from tree components to actual trees
+            # Distribute embeddings to ensure each tree has different types
+            trees_list = list(meta_data_trees["trees"].items())
+            
+            # Group embeddings by type first
+            embeddings_by_type = {}
+            for i, label in enumerate(embedding_labels):
+                if label not in embeddings_by_type:
+                    embeddings_by_type[label] = []
+                embeddings_by_type[label].append(i)
+            
+            print(f"DEBUG ImageNet: Embeddings by type: {[(k, len(v)) for k, v in embeddings_by_type.items()]}")
+            
+            # Distribute each type across trees to create mixed trees
+            num_trees = min(len(trees_list), 50)  # Use first 50 trees
+            
+            for i, (embedding_label) in enumerate(embedding_labels):
+                # For each embedding type, distribute across trees
+                type_embeddings = embeddings_by_type[embedding_label]
+                position_in_type = type_embeddings.index(i)
+                tree_idx = position_in_type % num_trees
+                tree_id, tree_data = trees_list[tree_idx]
+                
+                synset_id = tree_data["synset_id"]
+                synset_ids.append(synset_id)
+                
+                # Get appropriate image path based on embedding type
+                image_path = None
+                if embedding_label == "child_image" and "child_images" in tree_data and tree_data["child_images"]:
+                    original_path = tree_data["child_images"][0]["path"]
+                    image_path = original_path.replace("/data/", "/trees/")
+                elif embedding_label in ["parent_text", "child_text"]:
+                    # For text embeddings, still use child image for display
+                    if "child_images" in tree_data and tree_data["child_images"]:
+                        original_path = tree_data["child_images"][0]["path"]
+                        image_path = original_path.replace("/data/", "/trees/")
+                
+                points.append({
+                    "synset_id": synset_id,
+                    "tree_id": tree_id,
+                    "image_path": image_path,
+                    "kind": "tree",
+                    "embedding_type": embedding_label
+                })
+                images_list.append(image_path)
+            
+            # Create meta dict for compatibility
+            meta = {}
+            for tree_id, tree_data in meta_data_trees["trees"].items():
+                synset_id = tree_data["synset_id"]
+                # Fix the image path here too
+                first_image_path = None
+                if tree_data.get("child_images"):
+                    original_path = tree_data["child_images"][0]["path"]
+                    first_image_path = original_path.replace("/data/", "/trees/")
+                
+                meta[synset_id] = {
+                    "name": tree_data["parent_text"]["text"],
+                    "description": tree_data["child_text"]["text"],
+                    "first_image_path": first_image_path
+                }
+            
             unique_synsets = sorted({sid for sid in synset_ids})
             syn_to_int = {sid: i for i, sid in enumerate(unique_synsets)}
             labels = np.array([syn_to_int[s] for s in synset_ids], dtype=int)
             feature_names = [f"dim{i}" for i in range(embeddings.shape[1])]
             target_names = unique_synsets
-            images_list = [pt.get("image_path") for pt in points]
-            images_list = images_list if images_list is not None else []
+            
             return (
-                embeddings.tolist(),
+                embeddings.tolist(),  # data-store - needed for neighbor calculations
                 labels.tolist(),
                 feature_names,
                 target_names,
@@ -76,12 +138,131 @@ def register_callbacks(app: dash.Dash) -> None:
                 points,
                 [],
                 None,
+                embeddings.tolist(),  # emb store - this is what the scatter callback needs!
+            )
+        if dataset_name == "grit":
+            try:
+                import pickle
+                with open("hierchical_datasets/GRIT/meta_data_trees.json", "r", encoding="utf-8") as f_meta:
+                    meta_data_trees = json.load(f_meta)
+                
+                # Load embeddings based on selected projection method
+                emb_file = f"hierchical_datasets/GRIT/{projection_method}_embeddings.pkl"
+                with open(emb_file, "rb") as f_emb:
+                    emb_data = pickle.load(f_emb)
+            except FileNotFoundError as e:
+                print(f"Error loading GRIT files: {e}")
+                return dash.no_update
+            except Exception as e:
+                print(f"ERROR: GRIT loading failed: {e}")
+                return dash.no_update
+            
+            # Extract embeddings
+            embeddings = np.array(emb_data["embeddings"], dtype=np.float32)
+            print(f"Loaded GRIT with {projection_method}: {embeddings.shape} embeddings")
+            
+            # Create points list from embeddings, grouping them properly by tree
+            points = []
+            synset_ids = []
+            images_list = []
+            
+            # Get the embedding labels to understand what each embedding represents
+            embedding_labels = emb_data.get("labels", [])
+            
+            # Create a mapping from tree components to actual trees
+            # Distribute embeddings to ensure each tree has different types
+            trees_list = list(meta_data_trees["trees"].items())
+            
+            # Group embeddings by type first
+            embeddings_by_type = {}
+            for i, label in enumerate(embedding_labels):
+                if label not in embeddings_by_type:
+                    embeddings_by_type[label] = []
+                embeddings_by_type[label].append(i)
+            
+            print(f"DEBUG GRIT: Embeddings by type: {[(k, len(v)) for k, v in embeddings_by_type.items()]}")
+            
+            # Distribute each type across trees to create mixed trees
+            num_trees = min(len(trees_list), 50)  # Use first 50 trees
+            
+            for i, (embedding_label) in enumerate(embedding_labels):
+                # For each embedding type, distribute across trees
+                type_embeddings = embeddings_by_type[embedding_label]
+                position_in_type = type_embeddings.index(i)
+                tree_idx = position_in_type % num_trees
+                tree_id, tree_data = trees_list[tree_idx]
+                
+                # GRIT uses sample_key instead of synset_id
+                sample_key = tree_data.get("sample_key", tree_id)
+                synset_ids.append(sample_key)
+                
+                # Get appropriate image path based on embedding type
+                image_path = None
+                if embedding_label == "child_image" and "child_images" in tree_data and tree_data["child_images"]:
+                    original_path = tree_data["child_images"][0]["path"]
+                    image_path = original_path.replace("/data/", "/trees/")
+                elif embedding_label == "parent_image" and "parent_images" in tree_data and tree_data["parent_images"]:
+                    original_path = tree_data["parent_images"][0]["path"]
+                    image_path = original_path.replace("/data/", "/trees/")
+                elif embedding_label in ["parent_text", "child_text"]:
+                    # For text embeddings, use child image for display if available
+                    if "child_images" in tree_data and tree_data["child_images"]:
+                        original_path = tree_data["child_images"][0]["path"]
+                        image_path = original_path.replace("/data/", "/trees/")
+                    elif "parent_images" in tree_data and tree_data["parent_images"]:
+                        original_path = tree_data["parent_images"][0]["path"]
+                        image_path = original_path.replace("/data/", "/trees/")
+                
+                points.append({
+                    "synset_id": sample_key,
+                    "tree_id": tree_id,
+                    "image_path": image_path,
+                    "kind": "tree",
+                    "embedding_type": embedding_label
+                })
+                images_list.append(image_path)
+            
+            # Create meta dict for compatibility
+            meta = {}
+            for tree_id, tree_data in meta_data_trees["trees"].items():
+                sample_key = tree_data.get("sample_key", tree_id)
+                # Fix the image path here too
+                first_image_path = None
+                if tree_data.get("child_images"):
+                    original_path = tree_data["child_images"][0]["path"]
+                    first_image_path = original_path.replace("/data/", "/trees/")
+                elif tree_data.get("parent_images"):
+                    original_path = tree_data["parent_images"][0]["path"]
+                    first_image_path = original_path.replace("/data/", "/trees/")
+                
+                meta[sample_key] = {
+                    "name": tree_data["parent_text"]["text"],
+                    "description": tree_data["child_text"]["text"],
+                    "first_image_path": first_image_path
+                }
+            
+            unique_synsets = sorted({sid for sid in synset_ids})
+            syn_to_int = {sid: i for i, sid in enumerate(unique_synsets)}
+            labels = np.array([syn_to_int[s] for s in synset_ids], dtype=int)
+            feature_names = [f"dim{i}" for i in range(embeddings.shape[1])]
+            target_names = unique_synsets
+            
+            return (
+                embeddings.tolist(),  # data-store - needed for neighbor calculations
+                labels.tolist(),
+                feature_names,
+                target_names,
+                images_list,
+                meta,
+                points,
+                [],
                 None,
+                embeddings.tolist(),  # emb store - this is what the scatter callback needs!
             )
         return dash.no_update
 
     @app.callback(
-        [Output("scatter-3d", "figure"), Output("scatter-disk", "figure")],
+        Output("scatter-disk", "figure"),
         Input("emb", "data"),
         Input("sel", "data"),
         Input("proj", "value"),
@@ -91,10 +272,13 @@ def register_callbacks(app: dash.Dash) -> None:
         Input("mode", "data"),
         Input("neighbors-slider", "value"),
         State("data-store", "data"),
+        Input("dataset-dropdown", "value"),
+        State("points-store", "data"),
     )
-    def _scatter(edata, sel, proj, interpolated_point, labels_data, target_names, mode, k_neighbors, data_store):
+    def _scatter(edata, sel, proj, interpolated_point, labels_data, target_names, mode, k_neighbors, data_store, dataset_name, points):
         if edata is None or labels_data is None:
-            return {}, {}
+            print("Warning: No embedding or label data available for plotting")
+            return {}
         emb = np.asarray(edata, dtype=np.float32)
         labels = np.asarray(labels_data, dtype=int)
         sel = sel or []
@@ -106,6 +290,8 @@ def register_callbacks(app: dash.Dash) -> None:
         highlight = sel
         neighbor_indices = []
         selected_idx = sel
+        tree_connections = []
+        
         if mode == "neighbors" and sel and len(sel) == 1:
             selected_idx = sel[:1]
             if data_store is not None:
@@ -115,92 +301,229 @@ def register_callbacks(app: dash.Dash) -> None:
                 neighbor_indices = neighbor_indices[neighbor_indices != sel[0]][:k_neighbors]
             else:
                 neighbor_indices = []
+        elif mode == "tree" and sel and len(sel) == 1:
+            # Find all points in the same tree and create connections between adjacent levels
+            selected_idx = sel[:1]
+            tree_connections = []
+            try:
+                # Get the selected point's tree
+                selected_pt = points[sel[0]]
+                selected_tree_id = selected_pt.get("tree_id", "?")
+                print(f"DEBUG TREE: Selected point {sel[0]}, tree_id: {selected_tree_id}")
+                
+                # Find all points that belong to the same tree (excluding the selected point)
+                tree_point_indices = []
+                tree_points_by_type = {}
+                
+                for i, pt in enumerate(points):
+                    if pt.get("tree_id") == selected_tree_id:
+                        if i != sel[0]:
+                            tree_point_indices.append(i)
+                        
+                        # Group by embedding type for creating connections
+                        emb_type = pt.get("embedding_type", "unknown")
+                        if emb_type not in tree_points_by_type:
+                            tree_points_by_type[emb_type] = []
+                        tree_points_by_type[emb_type].append(i)
+                
+                # Create connections between adjacent hierarchical levels
+                if dataset_name == "imagenet":
+                    level_order = ['parent_text', 'child_text', 'child_image']
+                else:  # GRIT
+                    level_order = ['parent_text', 'child_text', 'parent_image', 'child_image']
+                
+                # Connect consecutive levels
+                for i in range(len(level_order) - 1):
+                    current_level = level_order[i]
+                    next_level = level_order[i + 1]
+                    
+                    if current_level in tree_points_by_type and next_level in tree_points_by_type:
+                        for curr_pt in tree_points_by_type[current_level]:
+                            for next_pt in tree_points_by_type[next_level]:
+                                tree_connections.append((curr_pt, next_pt))
+                
+                # Use tree points as neighbor_indices for highlighting
+                neighbor_indices = tree_point_indices
+                print(f"DEBUG TREE: Found {len(neighbor_indices)} other points in same tree: {neighbor_indices}")
+                print(f"DEBUG TREE: Created {len(tree_connections)} connections: {tree_connections}")
+                
+            except Exception as e:
+                print(f"Error finding tree points: {e}")
+                neighbor_indices = []
+                tree_connections = []
         else:
             neighbor_indices = []
-        # 3D plot
-        def _fig3d(emb, sel, labels, target_names, interpolated_point=None, neighbor_indices=None):
-            labels_txt = [
-                f"{i}: {target_names[labels[i]] if target_names is not None else labels[i]}"
-                for i in range(len(labels))
-            ]
-            base = go.Scatter3d(
-                x=emb[:, 0],
-                y=emb[:, 1],
-                z=emb[:, 2],
-                mode="markers",
-                text=labels_txt,
-                hoverinfo="text",
-                marker=dict(size=6, opacity=0.8, color=labels, colorscale="Viridis"),
-                name="Data points",
-            )
-            traces = [base]
-            if neighbor_indices is not None and len(neighbor_indices) > 0:
-                traces.append(
-                    go.Scatter3d(
-                        x=emb[neighbor_indices, 0],
-                        y=emb[neighbor_indices, 1],
-                        z=emb[neighbor_indices, 2],
+
+        # 2D disk plot with proper color coding and legend
+        def _fig_disk(x, y, sel, labels, target_names, interpolated_point=None, neighbor_indices=None, emb_labels=None, tree_connections=None, points=None):
+            # Define colors matching plotting_utils.py
+            colors = {
+                'child_image': '#1f77b4',    # tab:blue
+                'parent_image': '#ff7f0e',   # tab:orange
+                'child_text': '#2ca02c',     # tab:green  
+                'parent_text': '#d62728'     # tab:red
+            }
+            
+            traces = []
+            neighbor_set = set(neighbor_indices) if neighbor_indices is not None else set()
+            tree_arrow_annotations = []
+            
+            # If we have emb_labels, create separate traces for each label type
+            if emb_labels and len(emb_labels) == len(x):
+                unique_label_types = sorted(set(emb_labels))
+                
+                for label_type in unique_label_types:
+                    # Find indices for this label type
+                    indices = [i for i, lbl in enumerate(emb_labels) if lbl == label_type]
+                    
+                    if indices:
+                        # Separate regular points and neighbor points (neighbors can be tree points in tree mode)
+                        regular_indices = [i for i in indices if i not in neighbor_set]
+                        neighbor_indices_for_type = [i for i in indices if i in neighbor_set]
+                        
+                        # Regular points trace
+                        if regular_indices:
+                            x_coords = [x[i] for i in regular_indices]
+                            y_coords = [y[i] for i in regular_indices]
+                            hover_text = [
+                                f"{i}: {target_names[labels[i]] if target_names is not None else labels[i]}"
+                                for i in regular_indices
+                            ]
+                            
+                            trace = go.Scatter(
+                                x=x_coords,
+                                y=y_coords,
+                                mode="markers",
+                                text=hover_text,
+                                hoverinfo="text",
+                                customdata=regular_indices,  # Store original indices directly
+                                marker=dict(
+                                    size=8, 
+                                    opacity=0.7, 
+                                    color=colors.get(label_type, 'gray'),
+                                    line=dict(width=0.5, color='black')
+                                ),
+                                name=label_type.replace('_', ' ').title(),
+                                showlegend=True,
+                            )
+                            traces.append(trace)
+                        
+
+                        
+                        # Neighbor points trace (larger and brighter)
+                        if neighbor_indices_for_type:
+                            x_coords_neighbors = [x[i] for i in neighbor_indices_for_type]
+                            y_coords_neighbors = [y[i] for i in neighbor_indices_for_type]
+                            hover_text_neighbors = [
+                                f"{i}: {target_names[labels[i]] if target_names is not None else labels[i]} (neighbor)"
+                                for i in neighbor_indices_for_type
+                            ]
+                            
+                            neighbor_trace = go.Scatter(
+                                x=x_coords_neighbors,
+                                y=y_coords_neighbors,
+                                mode="markers",
+                                text=hover_text_neighbors,
+                                hoverinfo="text",
+                                customdata=neighbor_indices_for_type,
+                                marker=dict(
+                                    size=12,  # Larger size for neighbors
+                                    opacity=1.0,  # Full opacity for neighbors
+                                    color=colors.get(label_type, 'gray'),
+                                    line=dict(width=2, color='white')  # White border to make them stand out
+                                ),
+                                name=f"{label_type.replace('_', ' ').title()} (Neighbors)",
+                                showlegend=False,  # Don't show in legend to avoid clutter
+                            )
+                            traces.append(neighbor_trace)
+            else:
+                # Fallback to single trace with colorscale
+                
+                # Separate regular points and neighbor points
+                regular_indices = [i for i in range(len(x)) if i not in neighbor_set]
+                neighbor_indices_list = [i for i in range(len(x)) if i in neighbor_set]
+                
+                # Regular points trace
+                if regular_indices:
+                    base = go.Scatter(
+                        x=[x[i] for i in regular_indices],
+                        y=[y[i] for i in regular_indices],
                         mode="markers",
-                        marker=dict(size=10, color="blue"),
-                        name="Neighbors",
-                    )
-                )
-            if sel:
-                traces.append(
-                    go.Scatter3d(
-                        x=emb[sel, 0],
-                        y=emb[sel, 1],
-                        z=emb[sel, 2],
-                        mode="markers",
-                        marker=dict(size=12, color="red"),
-                        name="Selected point",
-                    )
-                )
-            if interpolated_point is not None:
-                traces.append(
-                    go.Scatter3d(
-                        x=[interpolated_point[0]],
-                        y=[interpolated_point[1]],
-                        z=[interpolated_point[2]],
-                        mode="markers",
-                        marker=dict(size=12, color="orange", symbol="diamond"),
-                        name="Interpolated point",
-                        text=["Interpolated point"],
+                        text=[
+                            f"{i}: {target_names[labels[i]] if target_names is not None else labels[i]}"
+                            for i in regular_indices
+                        ],
                         hoverinfo="text",
+                        customdata=regular_indices,
+                        marker=dict(size=8, opacity=0.7, color=[labels[i] for i in regular_indices], colorscale="Viridis"),
+                        name="Data points",
+                        showlegend=False,
                     )
-                )
-            fig = go.Figure(data=traces)
-            fig.update_layout(
-                margin=dict(l=0, r=0, b=0, t=0),
-                uirevision="embedding",
-                showlegend=False,
-            )
-            return fig
-        # 2D disk plot
-        def _fig_disk(x, y, sel, labels, target_names, interpolated_point=None, neighbor_indices=None):
-            base = go.Scatter(
-                x=x,
-                y=y,
-                mode="markers",
-                text=[
-                    f"{i}: {target_names[labels[i]] if target_names is not None else labels[i]}"
-                    for i in range(len(labels))
-                ],
-                hoverinfo="text",
-                marker=dict(size=6, opacity=0.8, color=labels, colorscale="Viridis"),
-                name="Data points",
-            )
-            traces = [base]
-            if neighbor_indices is not None and len(neighbor_indices) > 0:
-                traces.append(
-                    go.Scatter(
-                        x=x[neighbor_indices],
-                        y=y[neighbor_indices],
+                    traces = [base]
+                else:
+                    traces = []
+                
+
+                
+                # Neighbor points trace (larger and brighter)
+                if neighbor_indices_list:
+                    neighbor_trace = go.Scatter(
+                        x=[x[i] for i in neighbor_indices_list],
+                        y=[y[i] for i in neighbor_indices_list],
                         mode="markers",
-                        marker=dict(size=10, color="blue"),
+                        text=[
+                            f"{i}: {target_names[labels[i]] if target_names is not None else labels[i]} (neighbor)"
+                            for i in neighbor_indices_list
+                        ],
+                        hoverinfo="text",
+                        customdata=neighbor_indices_list,
+                        marker=dict(
+                            size=12,  # Larger size for neighbors
+                            opacity=1.0,  # Full opacity for neighbors
+                            color=[labels[i] for i in neighbor_indices_list], 
+                            colorscale="Viridis",
+                            line=dict(width=2, color='white')  # White border to make them stand out
+                        ),
                         name="Neighbors",
+                        showlegend=False,
                     )
-                )
+                    traces.append(neighbor_trace)
+
+            # Store tree connections for later arrow annotation
+            tree_arrow_annotations = []
+            if tree_connections and points:
+                for conn in tree_connections:
+                    idx1, idx2 = conn
+                    if idx1 < len(x) and idx2 < len(x):
+                        # Create line trace
+                        x1, y1 = x[idx1], y[idx1]
+                        x2, y2 = x[idx2], y[idx2]
+                        
+                        line_trace = go.Scatter(
+                            x=[x1, x2],
+                            y=[y1, y2],
+                            mode="lines",
+                            line=dict(color="gold", width=2),
+                            hoverinfo="skip",
+                            showlegend=False,
+                            name="Tree connections"
+                        )
+                        traces.append(line_trace)
+                        
+                        # Store arrow annotation info
+                        tree_arrow_annotations.append({
+                            'x': x2, 'y': y2,
+                            'ax': x1, 'ay': y1,
+                            'xref': 'x', 'yref': 'y',
+                            'axref': 'x', 'ayref': 'y',
+                            'arrowhead': 2,
+                            'arrowsize': 1.5,
+                            'arrowwidth': 2,
+                            'arrowcolor': 'gold',
+                            'showarrow': True,
+                            'text': '',
+                        })
+
             if sel:
                 traces.append(
                     go.Scatter(
@@ -224,49 +547,60 @@ def register_callbacks(app: dash.Dash) -> None:
                     )
                 )
             fig = go.Figure(data=traces)
+            
+            # Add arrow annotations for tree connections
+            annotations = tree_arrow_annotations
+            
             fig.update_layout(
                 xaxis=dict(scaleanchor="y", scaleratio=1),
                 yaxis=dict(scaleanchor="x", scaleratio=1),
-                margin=dict(l=0, r=0, b=0, t=0),
+                margin=dict(l=0, r=0, b=0, t=30),
                 uirevision="embedding",
-                showlegend=False,
+                showlegend=True,
+                legend=dict(
+                    orientation="h",
+                    yanchor="bottom",
+                    y=1.02,
+                    xanchor="center",
+                    x=0.5
+                ),
+                annotations=annotations,
             )
             return fig
-        xh, yh, zh = emb[:, 0], emb[:, 1], emb[:, 2]
+        # Handle 2D embeddings for disk projection
+        xh, yh = emb[:, 0], emb[:, 1]
+        if emb.shape[1] > 2:
+            zh = emb[:, 2]
+        else:
+            zh = np.zeros(emb.shape[0])  # For 2D embeddings, use z=0
         dx, dy = xh / (1.0 + zh), yh / (1.0 + zh)
         interp_transformed = None
         if interp_point is not None:
             interp_dx = interp_point[0] / (1.0 + interp_point[2])
             interp_dy = interp_point[1] / (1.0 + interp_point[2])
             interp_transformed = np.array([interp_dx, interp_dy])
-        fig_3d = _fig3d(emb, selected_idx if mode == "neighbors" else highlight, labels, target_names, interp_point, neighbor_indices)
-        fig_disk = _fig_disk(dx, dy, selected_idx if mode == "neighbors" else highlight, labels, target_names, interp_transformed, neighbor_indices)
-        return fig_3d, fig_disk
+        # Load the original label types for color coding
+        emb_labels = None
+        if dataset_name and proj:
+            try:
+                import pickle
+                # Map dataset names to correct directory names
+                dataset_dir = {"imagenet": "ImageNet", "grit": "GRIT"}.get(dataset_name, dataset_name)
+                emb_file = f"hierchical_datasets/{dataset_dir}/{proj}_embeddings.pkl"
+                with open(emb_file, "rb") as f:
+                    emb_data_loaded = pickle.load(f)
+                emb_labels = emb_data_loaded.get("labels", [])
+            except Exception as e:
+                emb_labels = []
+            
+        fig_disk = _fig_disk(dx, dy, selected_idx if mode == "neighbors" else highlight, labels, target_names, interp_transformed, neighbor_indices, emb_labels, tree_connections, points)
+        return fig_disk
 
-    @app.callback(
-        Output("emb", "data"),
-        Output("proj-loading", "parent_style"),
-        Input("proj", "value"),
-        Input("data-store", "data"),
-        prevent_initial_call=True,
-    )
-    def _compute(method, data):
-        if data is None:
-            return None, {"display": "none"}
-        loading_style = {"display": "block"}
-        try:
-            data_np = np.asarray(data, dtype=np.float32)
-            result = PROJECTIONS[method](data_np).tolist()
-            loading_style = {"display": "none"}
-            return result, loading_style
-        except Exception as e:
-            print(f"Error computing projection: {e}")
-            return None, {"display": "none"}
+
 
     @app.callback(
         Output("sel", "data"),
         [
-            Input("scatter-3d", "clickData"),
             Input("scatter-disk", "clickData"),
             Input({"type": "close-button", "index": dash.ALL}, "n_clicks")
         ],
@@ -274,7 +608,7 @@ def register_callbacks(app: dash.Dash) -> None:
         State("mode", "data"),
         prevent_initial_call=True,
     )
-    def _select(click_3d, click_disk, close_clicks, sel, mode):
+    def _select(click_disk, close_clicks, sel, mode):
         ctx = callback_context
         if not ctx.triggered or not ctx.triggered_id:
             return dash.no_update
@@ -283,13 +617,21 @@ def register_callbacks(app: dash.Dash) -> None:
         def _clicked(click):
             try:
                 pt = click["points"][0]
-                if pt.get("curveNumber", 0) != 0:
+                curve_number = pt.get("curveNumber", 0)
+                point_index = int(pt.get("pointIndex", pt["pointNumber"]))
+                
+                # Check if we have customdata with original indices
+                if "customdata" in pt and pt["customdata"] is not None:
+                    return int(pt["customdata"])
+                
+                # Fallback to original logic for single trace
+                if curve_number != 0:
                     return None
-                return int(pt.get("pointIndex", pt["pointNumber"]))
+                return point_index
             except (TypeError, KeyError, IndexError):
                 return None
-        if triggered_id in ["scatter-3d", "scatter-disk"]:
-            click_data = ctx.inputs[f"{triggered_id}.clickData"]
+        if triggered_id == "scatter-disk":
+            click_data = ctx.inputs["scatter-disk.clickData"]
             idx = _clicked(click_data)
             if idx is None:
                 return dash.no_update
@@ -342,39 +684,207 @@ def register_callbacks(app: dash.Dash) -> None:
         return interpolated.tolist()
 
     @app.callback(
-        [Output("tree-parent", "children"), Output("tree-current", "children"), Output("tree-child", "children")],
+        [Output("tree-levels-above", "children"), Output("tree-selected-level", "children"), Output("tree-levels-below", "children")],
         Input("sel", "data"),
         Input("mode", "data"),
         State("meta-store", "data"),
         State("points-store", "data"),
+        Input("dataset-dropdown", "value"),
+        Input("proj", "value"),
     )
-    def _update_tree_view(sel, mode, meta, points):
+    def _update_tree_view(sel, mode, meta, points, dataset_name, proj):
         if mode != "tree" or not sel or len(sel) != 1 or meta is None or points is None:
             return html.Span(), html.Span(), html.Span()
+        
         idx = sel[0]
+        
+        # Load embedding labels to determine the level of the selected point
+        emb_labels = None
+        if dataset_name and proj:
+            try:
+                import pickle
+                dataset_dir = {"imagenet": "ImageNet", "grit": "GRIT"}.get(dataset_name, dataset_name)
+                emb_file = f"hierchical_datasets/{dataset_dir}/{proj}_embeddings.pkl"
+                with open(emb_file, "rb") as f:
+                    emb_data_loaded = pickle.load(f)
+                emb_labels = emb_data_loaded.get("labels", [])
+            except Exception as e:
+                emb_labels = []
+        
+        if not emb_labels or idx >= len(emb_labels):
+            return html.Span(), html.Span(), html.Span()
+        
+        # Load the tree data to get proper image paths
+        tree_data = None
+        try:
+            import json
+            dataset_dir = {"imagenet": "ImageNet", "grit": "GRIT"}.get(dataset_name, dataset_name)
+            meta_file = f"hierchical_datasets/{dataset_dir}/meta_data_trees.json"
+            with open(meta_file, "r") as f:
+                meta_data_trees = json.load(f)
+            
+            # Find the tree for this point
+            pt = points[idx]
+            synset_id = pt.get("synset_id", "?")
+            
+            # Find the tree that matches this synset_id
+            for tree_id, tree_info in meta_data_trees["trees"].items():
+                if (dataset_name == "imagenet" and tree_info.get("synset_id") == synset_id) or \
+                   (dataset_name == "grit" and tree_info.get("sample_key") == synset_id):
+                    tree_data = tree_info
+                    break
+                    
+        except Exception as e:
+            print(f"Error loading tree data: {e}")
+        
+        # Define the hierarchy levels based on dataset
+        if dataset_name == "imagenet":
+            # ImageNet only has 3 levels (no parent_image)
+            level_mapping = {
+                'parent_text': 1,
+                'child_text': 2, 
+                'child_image': 3,
+            }
+            level_names = {
+                1: "Level 1: Parent Text",
+                2: "Level 2: Child Text", 
+                3: "Level 3: Child Image",
+            }
+            max_level = 3
+        else:  # GRIT
+            level_mapping = {
+                'parent_text': 1,
+                'child_text': 2, 
+                'parent_image': 3,
+                'child_image': 4
+            }
+            level_names = {
+                1: "Level 1: Parent Text",
+                2: "Level 2: Child Text", 
+                3: "Level 3: Parent Image",
+                4: "Level 4: Child Image"
+            }
+            max_level = 4
+        
+        # Get the level of the selected point
+        selected_label = emb_labels[idx]
+        selected_level = level_mapping.get(selected_label, 0)
+        
+        if selected_level == 0:
+            return html.Span(), html.Span(), html.Span()
+        
         try:
             pt = points[idx]
+            synset_id = pt.get("synset_id", "?")
+            meta_row = meta.get(synset_id, {}) if isinstance(meta, dict) else {}
         except (IndexError, TypeError):
             return html.Span(), html.Span(), html.Span()
-        synset_id = pt.get("synset_id", "?")
-        pt_kind = pt.get("kind", "?")
-        meta_row = meta.get(synset_id, {}) if isinstance(meta, dict) else {}
-        parent_div = html.Div([
-            html.H4(meta_row.get("name", synset_id), style={"margin": "0.25rem 0", "color": "#007bff"}),
-        ], style={"padding": "0.5rem", "backgroundColor": "#eef", "borderRadius": "4px", "marginBottom": "0.5rem"})
-        current_div = html.Div([
-            html.P(meta_row.get("description", "(no description)"), style={"margin": 0}),
-        ], style={"padding": "0.5rem", "borderLeft": "3px solid #99c", "marginLeft": "1rem", "marginBottom": "0.5rem"})
-        if pt_kind == "image" and pt.get("image_path"):
-            img_rel = pt["image_path"]
-        else:
+        
+        # Create level components
+        def create_level_component(level, content, is_selected=False):
+            border_color = "#28a745" if is_selected else "#6c757d"
+            bg_color = "#d4edda" if is_selected else "#f8f9fa"
+            
+            return html.Div([
+                html.H5(level_names[level], style={
+                    "margin": "0 0 0.5rem 0", 
+                    "color": "#28a745" if is_selected else "#6c757d",
+                    "fontWeight": "bold" if is_selected else "normal"
+                }),
+                content
+            ], style={
+                "padding": "0.75rem", 
+                "backgroundColor": bg_color,
+                "border": f"2px solid {border_color}",
+                "borderRadius": "6px", 
+                "marginBottom": "0.5rem",
+                "marginLeft": f"{(level-1) * 1}rem"
+            })
+        
+        # Build the hierarchy display
+        levels_above = []
+        current_level = None
+        levels_below = []
+        
+        # Level 1: Parent Text
+        if selected_level == 1:
+            current_level = create_level_component(1, html.P(meta_row.get("name", synset_id), style={"margin": 0, "fontWeight": "bold"}), True)
+        elif selected_level > 1:
+            levels_above.append(create_level_component(1, html.P(meta_row.get("name", synset_id), style={"margin": 0})))
+        
+        # Level 2: Child Text  
+        if selected_level == 2:
+            current_level = create_level_component(2, html.P(meta_row.get("description", "(no description)"), style={"margin": 0, "fontWeight": "bold"}), True)
+        elif selected_level > 2:
+            levels_above.append(create_level_component(2, html.P(meta_row.get("description", "(no description)"), style={"margin": 0})))
+        elif selected_level < 2:
+            levels_below.append(create_level_component(2, html.P(meta_row.get("description", "(no description)"), style={"margin": 0, "color": "#6c757d"})))
+        
+        # Level 3: Parent Image (GRIT) or Child Image (ImageNet)
+        if dataset_name == "imagenet":
+            # For ImageNet, level 3 is child image
             img_rel = meta_row.get("first_image_path")
-        img_src = _encode_image(img_rel) if img_rel else ""
-        child_div = html.Div([
-            html.Img(src=img_src, style={"maxWidth": "220px", "border": "1px solid #ccc"}),
-            html.P(f"Image source: {img_rel}" if img_rel else "", style={"fontSize": "0.75rem", "color": "#666"}),
-        ], style={"padding": "0.5rem", "borderLeft": "3px solid #c9c", "marginLeft": "2rem"})
-        return parent_div, current_div, child_div
+            img_src = _encode_image(img_rel) if img_rel else ""
+            img_component = html.Div([
+                html.Img(src=img_src, style={"maxWidth": "200px", "border": "1px solid #ccc"}) if img_src else html.P("No image available", style={"color": "#6c757d", "fontStyle": "italic"}),
+            ], style={"margin": 0})
+            
+            if selected_level == 3:
+                current_level = create_level_component(3, img_component, True)
+            elif selected_level < 3:
+                levels_below.append(create_level_component(3, img_component))
+        else:
+            # For GRIT, level 3 is parent image
+            parent_img_rel = None
+            if tree_data and tree_data.get("parent_images"):
+                parent_img_path = tree_data["parent_images"][0]["path"]
+                parent_img_rel = parent_img_path.replace("/data/", "/trees/")
+            
+            parent_img_src = _encode_image(parent_img_rel) if parent_img_rel else ""
+            parent_img_component = html.Div([
+                html.Img(src=parent_img_src, style={"maxWidth": "200px", "border": "1px solid #ccc"}) if parent_img_src else html.P("No image available", style={"color": "#6c757d", "fontStyle": "italic"}),
+            ], style={"margin": 0})
+            
+            if selected_level == 3:
+                current_level = create_level_component(3, parent_img_component, True)
+            elif selected_level > 3:
+                levels_above.append(create_level_component(3, parent_img_component))
+            elif selected_level < 3:
+                levels_below.append(create_level_component(3, parent_img_component))
+        
+        # Level 4: Child Image (GRIT only)
+        if dataset_name == "grit" and max_level >= 4:
+            child_img_rel = None
+            if tree_data and tree_data.get("child_images"):
+                child_img_path = tree_data["child_images"][0]["path"]
+                child_img_rel = child_img_path.replace("/data/", "/trees/")
+            
+            child_img_src = _encode_image(child_img_rel) if child_img_rel else ""
+            child_img_component = html.Div([
+                html.Img(src=child_img_src, style={"maxWidth": "200px", "border": "1px solid #ccc"}) if child_img_src else html.P("No image available", style={"color": "#6c757d", "fontStyle": "italic"}),
+            ], style={"margin": 0})
+            
+            if selected_level == 4:
+                current_level = create_level_component(4, child_img_component, True)
+            elif selected_level < 4:
+                levels_below.append(create_level_component(4, child_img_component))
+        
+        # Combine all levels
+        all_levels = levels_above + ([current_level] if current_level else []) + levels_below
+        
+        # Split into three sections for the layout
+        if len(all_levels) <= 3:
+            # Pad with empty divs if needed
+            while len(all_levels) < 3:
+                all_levels.append(html.Div())
+            return all_levels[0], all_levels[1], all_levels[2]
+        else:
+            # If more than 3 levels, combine some
+            return (
+                html.Div(all_levels[:2]) if len(all_levels) > 3 else all_levels[0],
+                all_levels[2] if len(all_levels) > 3 else all_levels[1], 
+                html.Div(all_levels[3:]) if len(all_levels) > 3 else all_levels[2]
+            )
 
     @app.callback(
         Output("mode", "data"),
@@ -453,8 +963,10 @@ def register_callbacks(app: dash.Dash) -> None:
         State("images-store", "data"),
         State("emb", "data"),
         Input("neighbors-slider", "value"),
+        State("points-store", "data"),
+        State("meta-store", "data"),
     )
-    def _compare(sel, interpolated_point, t_value, mode, labels_data, target_names, images, emb_data, k_neighbors):
+    def _compare(sel, interpolated_point, t_value, mode, labels_data, target_names, images, emb_data, k_neighbors, points, meta):
         if labels_data is None:
             return html.Div(), html.P("Select a dataset to begin.")
         labels = np.asarray(labels_data)
@@ -469,7 +981,9 @@ def register_callbacks(app: dash.Dash) -> None:
         if mode == "compare":
             instructions = html.P("Select up to 5 points to compare.")
             for idx in sel:
-                label = target_names[labels[idx]] if target_names is not None else labels[idx]
+                # Get the content to display based on embedding type
+                content_element = _create_content_element(idx, images, points, meta)
+                
                 components.append(
                     html.Div([
                         html.Button(
@@ -496,8 +1010,7 @@ def register_callbacks(app: dash.Dash) -> None:
                                 "hover": {"backgroundColor": "#cc0000"}
                             }
                         ),
-                        _create_img_tag(idx, images),
-                        html.P(f"Point {idx} label: {label}")
+                        content_element
                     ], style={"display": "flex", "alignItems": "center", "padding": "0.5rem", "borderRadius": "4px", "position": "relative", "backgroundColor": "#f8f9fa", "marginBottom": "0.5rem"})
                 )
             return html.Div(components), instructions
@@ -505,7 +1018,10 @@ def register_callbacks(app: dash.Dash) -> None:
             instructions = html.P("Select two distinct points to interpolate.")
             if sel:
                 i, j = (sel[0], sel[1]) if len(sel) > 1 else (sel[0], None)
-                li = target_names[labels[i]] if target_names is not None else labels[i]
+                
+                # Get the content to display based on embedding type
+                content_element_i = _create_content_element(i, images, points, meta)
+                
                 components.append(
                     html.Div([
                         html.Button(
@@ -532,12 +1048,13 @@ def register_callbacks(app: dash.Dash) -> None:
                                 "hover": {"backgroundColor": "#cc0000"}
                             }
                         ),
-                        _create_img_tag(i, images),
-                        html.P(f"Point {i} label: {li}")
+                        content_element_i
                     ], style={"display": "flex", "alignItems": "center", "padding": "0.5rem", "borderRadius": "4px", "position": "relative", "backgroundColor": "#f8f9fa", "marginBottom": "0.5rem"})
                 )
                 if j is not None:
-                    lj = target_names[labels[j]] if target_names is not None else labels[j]
+                    # Get the content to display based on embedding type
+                    content_element_j = _create_content_element(j, images, points, meta)
+                    
                     components.append(
                         html.Div([
                             html.Button(
@@ -564,8 +1081,7 @@ def register_callbacks(app: dash.Dash) -> None:
                                     "hover": {"backgroundColor": "#cc0000"}
                                 }
                             ),
-                            _create_img_tag(j, images),
-                            html.P(f"Point {j} label: {lj}")
+                            content_element_j
                         ], style={"display": "flex", "alignItems": "center", "padding": "0.5rem", "borderRadius": "4px", "position": "relative", "backgroundColor": "#f8f9fa", "marginBottom": "0.5rem"})
                     )
             if interpolated_point is not None and len(sel) == 2:
@@ -588,7 +1104,10 @@ def register_callbacks(app: dash.Dash) -> None:
             dists = np.linalg.norm(emb - emb[sel[0]], axis=1)
             neighbors = np.argsort(dists)
             neighbors = neighbors[neighbors != sel[0]][:k_neighbors]
-            label = target_names[labels[sel[0]]] if target_names is not None else labels[sel[0]]
+            
+            # Get the content to display based on embedding type
+            content_element = _create_content_element(sel[0], images, points, meta)
+            
             components.append(
                 html.Div([
                     html.Button(
@@ -615,18 +1134,18 @@ def register_callbacks(app: dash.Dash) -> None:
                             "hover": {"backgroundColor": "#cc0000"}
                         }
                     ),
-                    _create_img_tag(sel[0], images),
-                    html.P(f"Selected point {sel[0]} label: {label}")
+                    content_element
                 ], style={"display": "flex", "alignItems": "center", "padding": "0.5rem", "borderRadius": "4px", "position": "relative", "backgroundColor": "#e0f7fa", "marginBottom": "0.5rem"})
             )
             if len(neighbors) > 0:
                 components.append(html.H6("Neighbors:", style={"margin": "1rem 0 0.5rem 0", "color": "#666"}))
                 for nidx in neighbors:
-                    nlabel = target_names[labels[nidx]] if target_names is not None else labels[nidx]
+                    # Get the content to display based on embedding type
+                    neighbor_content_element = _create_content_element(nidx, images, points, meta)
+                    
                     components.append(
                         html.Div([
-                            _create_img_tag(nidx, images),
-                            html.P(f"Neighbor {nidx} label: {nlabel}")
+                            neighbor_content_element
                         ], style={"display": "flex", "alignItems": "center", "padding": "0.5rem", "borderRadius": "4px", "backgroundColor": "#f8f9fa", "marginBottom": "0.5rem"})
                     )
             else:

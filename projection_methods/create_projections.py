@@ -79,7 +79,11 @@ def parse_arguments():
     
     # Data args
     parser.add_argument("--dataset-path", required=True, help="Path to dataset folder (e.g., hierchical_datasets/ImageNet)")
-    parser.add_argument("--n-project", type=int, default=0, help="Number of samples to project (0 = all)")
+    parser.add_argument("--n-project", type=int, default=0, help="Number of samples to project (0 = all, >0 = balanced tree sampling)")
+    parser.add_argument("--children-per-tree", type=int, default=5, help="Number of child images to sample per tree when using balanced sampling")
+    
+    # Reproducibility
+    parser.add_argument("--seed", type=int, default=42, help="Random seed for reproducibility")
     
     # Plotting args
     parser.add_argument("--plot", action="store_true", help="Generate and save plots")
@@ -117,7 +121,7 @@ class EmbeddingLoader:
     def __init__(self, dataset_path):
         self.dataset_path = Path(dataset_path)
         
-    def load_embeddings(self):
+    def load_embeddings(self, n_project=0, children_per_tree=5, seed=42):
         """Load embeddings from embeddings.pkl file."""
         embeddings_path = self.dataset_path / "embeddings.pkl"
         
@@ -131,6 +135,14 @@ class EmbeddingLoader:
         
         # Extract embeddings and create labels
         embeddings_dict = embed_data['embeddings']
+        
+        if n_project > 0:
+            return self._load_balanced_trees(embeddings_dict, n_project, children_per_tree, seed)
+        else:
+            return self._load_all_embeddings(embeddings_dict)
+    
+    def _load_all_embeddings(self, embeddings_dict):
+        """Load all embeddings (original behavior)."""
         embeddings = []
         labels = []
         
@@ -155,6 +167,94 @@ class EmbeddingLoader:
         print(f"  Label distribution: {dict(zip(*np.unique(labels, return_counts=True)))}")
         
         return {'embeddings': embeddings, 'labels': labels}
+    
+    def _load_balanced_trees(self, embeddings_dict, n_project, children_per_tree, seed=42):
+        """Load balanced trees to reach approximately n_project embeddings."""
+        import random
+        random.seed(seed)
+        
+        # Calculate how many trees we need to reach n_project embeddings
+        # Each tree contributes: 1 parent_text + 1 child_text + children_per_tree child_images
+        embeddings_per_tree = 2 + children_per_tree  # parent_text + child_text + child_images
+        balanced_trees = max(1, n_project // embeddings_per_tree)
+        
+        
+        # Group embeddings by tree
+        trees = {}
+        for embed_id, embedding in embeddings_dict.items():
+            # Extract tree number from embed_id (e.g., 'pt_tree1' -> 'tree1')
+            if '_tree' in embed_id:
+                tree_part = embed_id.split('_tree')[1]
+                if '_' in tree_part:
+                    tree_id = tree_part.split('_')[0]  # Handle 'ci_tree1_001' -> '1'
+                else:
+                    tree_id = tree_part  # Handle 'pt_tree1' -> '1'
+                
+                tree_key = f"tree{tree_id}"
+                
+                if tree_key not in trees:
+                    trees[tree_key] = {'parent_text': [], 'child_text': [], 'child_image': [], 'parent_image': []}
+                
+                # Categorize embedding
+                if embed_id.startswith('pt_'):
+                    trees[tree_key]['parent_text'].append((embed_id, embedding))
+                elif embed_id.startswith('ct_'):
+                    trees[tree_key]['child_text'].append((embed_id, embedding))
+                elif embed_id.startswith('pi_'):
+                    trees[tree_key]['parent_image'].append((embed_id, embedding))
+                elif embed_id.startswith('ci_'):
+                    trees[tree_key]['child_image'].append((embed_id, embedding))
+        
+        print(f"Found {len(trees)} trees in dataset")
+        
+        # Select random trees
+        available_trees = list(trees.keys())
+        if len(available_trees) < balanced_trees:
+            print(f"Warning: Only {len(available_trees)} trees available, using all")
+            selected_trees = available_trees
+        else:
+            selected_trees = random.sample(available_trees, balanced_trees)
+        
+        print(f"Selected trees: {selected_trees[:10]}{'...' if len(selected_trees) > 10 else ''}")
+        
+        # Collect embeddings from selected trees
+        embeddings = []
+        labels = []
+        
+        for tree_key in selected_trees:
+            tree_data = trees[tree_key]
+            
+            # Add parent_text (should be 1 per tree)
+            for embed_id, embedding in tree_data['parent_text']:
+                embeddings.append(embedding)
+                labels.append('parent_text')
+            
+            # Add child_text (should be 1 per tree)
+            for embed_id, embedding in tree_data['child_text']:
+                embeddings.append(embedding)
+                labels.append('child_text')
+            
+            # Add parent_image (if any)
+            for embed_id, embedding in tree_data['parent_image']:
+                embeddings.append(embedding)
+                labels.append('parent_image')
+            
+            # Sample limited child_images
+            child_images = tree_data['child_image']
+            if len(child_images) > children_per_tree:
+                child_images = random.sample(child_images, children_per_tree)
+            
+            for embed_id, embedding in child_images:
+                embeddings.append(embedding)
+                labels.append('child_image')
+        
+        embeddings = torch.tensor(np.array(embeddings), dtype=torch.float32)
+        
+        print(f"✓ Loaded {len(embeddings)} embeddings from {len(selected_trees)} trees")
+        print(f"  Label distribution: {dict(zip(*np.unique(labels, return_counts=True)))}")
+        print(f"  Expected: {len(selected_trees)} parent_text, {len(selected_trees)} child_text, ~{len(selected_trees) * children_per_tree} child_image")
+        
+        return {'embeddings': embeddings, 'labels': labels}
 
 
 class ProjectionMethods:
@@ -163,9 +263,13 @@ class ProjectionMethods:
     def __init__(self, device):
         self.device = device
     
-    def apply_horopca(self, embeddings, n_components=2, lr=5e-2, max_steps=500):
+    def apply_horopca(self, embeddings, n_components=2, lr=5e-2, max_steps=500, seed=42):
         """Apply HoroPCA reduction."""
         print(f"Applying HoroPCA (dim: {n_components})...")
+        
+        # Set random seeds for reproducibility
+        torch.manual_seed(seed)
+        np.random.seed(seed)
         
         torch.set_default_dtype(torch.float64)
         embeddings = embeddings.double().to(self.device)
@@ -187,15 +291,20 @@ class ProjectionMethods:
         return reduced
     
     def apply_cosne(self, embeddings, lr=0.5, lr_h=0.01, perplexity=30, 
-                   exaggeration=12.0, gamma=0.1):
+                   exaggeration=12.0, gamma=0.1, seed=42):
         """Apply CO-SNE reduction."""
         print("Applying CO-SNE...")
+        
+        # Set random seeds for reproducibility
+        torch.manual_seed(seed)
+        np.random.seed(seed)
         
         co_sne = hTSNE(
             n_components=2, verbose=0, method='exact', square_distances=True,
             metric='precomputed', learning_rate_for_h_loss=lr_h,
             student_t_gamma=gamma, learning_rate=lr, n_iter=1000,
-            perplexity=perplexity, early_exaggeration=exaggeration
+            perplexity=perplexity, early_exaggeration=exaggeration,
+            random_state=seed
         )
         
         dists = pmath.dist_matrix(embeddings, embeddings, c=1).numpy()
@@ -204,9 +313,12 @@ class ProjectionMethods:
         print(f"✓ CO-SNE complete: {embeddings.shape} → {reduced.shape}")
         return torch.tensor(reduced, dtype=torch.float32)
     
-    def apply_umap(self, embeddings, n_components=3, n_neighbors=15, min_dist=0.1):
+    def apply_umap(self, embeddings, n_components=3, n_neighbors=15, min_dist=0.1, seed=42):
         """Apply UMAP with hyperbolic metric."""
         print(f"Applying UMAP (dim: {n_components})...")
+        
+        # Set random seeds for reproducibility
+        np.random.seed(seed)
         
         # Keep embeddings in hyperboloid coordinates for hyperboloid metric
         embeddings_np = embeddings.detach().cpu().numpy()
@@ -217,7 +329,7 @@ class ProjectionMethods:
             min_dist=min_dist,
             metric=hyperboloid_distance_grad,
             output_metric='hyperboloid',
-            random_state=42
+            random_state=seed
         )
         reduced = reducer.fit_transform(embeddings_np)
         
@@ -238,6 +350,12 @@ def main():
     """Main execution function."""
     args = parse_arguments()
     
+    # Set global seeds for reproducibility
+    torch.manual_seed(args.seed)
+    np.random.seed(args.seed)
+    import random
+    random.seed(args.seed)
+    
     # Setup
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     
@@ -253,19 +371,32 @@ def main():
     # Load embeddings
     print("\n📁 Loading embeddings...")
     loader = EmbeddingLoader(args.dataset_path)
-    embed_data = loader.load_embeddings()
+    embed_data = loader.load_embeddings(args.n_project, args.children_per_tree, args.seed)
     
-    # Sample subset for projection if specified
+    # Embeddings are already sampled by the loader if n_project > 0
     embeddings = embed_data['embeddings']
     labels = embed_data['labels']
     
-    if args.n_project > 0 and len(embeddings) > args.n_project:
-        indices = torch.randperm(len(embeddings))[:args.n_project]
-        embeddings = embeddings[indices]
-        labels = [labels[i] for i in indices]
-        print(f"\n🎯 Using {args.n_project:,} samples for projection")
+    if args.n_project > 0:
+        print(f"\n🎯 Using balanced tree sampling: {len(embeddings):,} embeddings with {args.children_per_tree} children per tree")
+    else:
+        print(f"\n🎯 Using all {len(embeddings):,} embeddings")
     
-
+    # Save subset of original embeddings (method-agnostic)
+    embeddings_subset_path = Path(args.dataset_path) / "embeddings_subset.pkl"
+    
+    if not embeddings_subset_path.exists():
+        print(f"\n💾 Saving original embeddings subset...")
+        embeddings_subset_data = {
+            'embeddings': embeddings.numpy(),
+            'labels': labels
+        }
+        
+        with open(embeddings_subset_path, 'wb') as f:
+            pickle.dump(embeddings_subset_data, f)
+        print(f"✓ Saved original embeddings subset: {embeddings_subset_path}")
+    else:
+        print(f"\n💾 Using existing embeddings subset: {embeddings_subset_path}")
     
     # Initialize projection methods
     projector = ProjectionMethods(device)
@@ -275,7 +406,7 @@ def main():
     
     if "horopca" in args.methods:
         horopca_result = projector.apply_horopca(
-            embeddings, args.horopca_components, args.horopca_lr, args.horopca_steps
+            embeddings, args.horopca_components, args.horopca_lr, args.horopca_steps, args.seed
         )
         
         # Save HoroPCA result
@@ -303,7 +434,7 @@ def main():
     
     if "umap" in args.methods:
         umap_result = projector.apply_umap(
-            embeddings, args.umap_components, args.umap_neighbors, args.umap_min_dist
+            embeddings, args.umap_components, args.umap_neighbors, args.umap_min_dist, args.seed
         )
         
         # Save UMAP result
@@ -336,17 +467,17 @@ def main():
         if args.cosne_reduce_method == "horopca":
             print(f"  Pre-reducing with HoroPCA to {args.cosne_reduce_dim}D...")
             cosne_input = projector.apply_horopca(
-                embeddings, args.cosne_reduce_dim, args.horopca_lr, args.horopca_steps
+                embeddings, args.cosne_reduce_dim, args.horopca_lr, args.horopca_steps, args.seed
             )
         elif args.cosne_reduce_method == "umap":
             print(f"  Pre-reducing with UMAP to {args.cosne_reduce_dim}D...")
             cosne_input = projector.apply_umap(
-                embeddings, args.cosne_reduce_dim, args.umap_neighbors, args.umap_min_dist
+                embeddings, args.cosne_reduce_dim, args.umap_neighbors, args.umap_min_dist, args.seed
             )
         
         cosne_result = projector.apply_cosne(
             cosne_input, args.cosne_lr, args.cosne_lr_h, args.cosne_perplexity,
-            args.cosne_exaggeration, args.cosne_gamma
+            args.cosne_exaggeration, args.cosne_gamma, args.seed
         )
         
         # Save CO-SNE result

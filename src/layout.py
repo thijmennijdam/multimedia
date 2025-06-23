@@ -1,10 +1,6 @@
 import dash
 from dash import dcc, html
 
-# ... existing code for layout functions ... 
-
-# UI helper components (pure functions → no side-effects)
-
 def _config_panel() -> html.Div:
     return html.Div(
         [
@@ -13,12 +9,10 @@ def _config_panel() -> html.Div:
             dcc.Dropdown(
                 id="dataset-dropdown",
                 options=[
-                    {"label": "Digits", "value": "digits"},
-                    {"label": "Wine", "value": "wine"},
-                    {"label": "Iris", "value": "iris"},
                     {"label": "ImageNet subset", "value": "imagenet"},
+                    {"label": "GRIT", "value": "grit"},
                 ],
-                value="digits",  # Default, can be overridden
+                value="imagenet",  # Default, can be overridden
                 clearable=False,
                 style={
                     "backgroundColor": "white",
@@ -28,25 +22,21 @@ def _config_panel() -> html.Div:
                 },
             ),
             html.Label("Projection"),
-            html.Div([
-                dcc.Dropdown(
-                    id="proj",
-                    options=[{"label": "UMAP", "value": "UMAP"}],
-                    value="UMAP",
-                    clearable=False,
-                    style={
-                        "backgroundColor": "white",
-                        "border": "1px solid #ccc",
-                        "borderRadius": "6px",
-                        "color": "black",
-                    },
-                ),
-                dcc.Loading(
-                    id="proj-loading",
-                    type="circle",
-                    style={"position": "absolute", "right": "10px", "top": "50%", "transform": "translateY(-50%)"},
-                ),
-            ], style={"position": "relative"}),
+            dcc.Dropdown(
+                id="proj",
+                options=[
+                    {"label": "HoroPCA", "value": "horopca"},
+                    {"label": "CO-SNE", "value": "cosne"}
+                ],
+                value="horopca",
+                clearable=False,
+                style={
+                    "backgroundColor": "white",
+                    "border": "1px solid #ccc",
+                    "borderRadius": "6px",
+                    "color": "black",
+                },
+            ),
             html.Br(),
             html.Label("Mode"),
             html.Div(
@@ -194,47 +184,19 @@ def _centre_panel() -> html.Div:
     return html.Div(
         [
             html.Div(
-                [
-                    html.Div(
-                        dcc.Graph(
-                            id="scatter-3d",
-                            figure=None,  # Will be set by callback
-                            style={"width": "100%", "height": "100%"},
-                            config={"displayModeBar": False},
-                        ),
-                        style={
-                            "flex": 1,
-                            "minWidth": 0,
-                            "aspectRatio": "1 / 1",
-                            "maxWidth": "600px",
-                            "marginRight": "1rem",
-                            "marginTop": "2rem",
-                        },
-                    ),
-                    html.Div(
-                        dcc.Graph(
-                            id="scatter-disk",
-                            figure=None,  # Will be set by callback
-                            style={"width": "100%", "height": "100%"},
-                            config={"displayModeBar": False},
-                        ),
-                        style={
-                            "flex": 1,
-                            "minWidth": 0,
-                            "aspectRatio": "1 / 1",
-                            "maxWidth": "600px",
-                            "marginTop": "2rem",
-                        },
-                    ),
-                ],
+                dcc.Graph(
+                    id="scatter-disk",
+                    figure=None,  # Will be set by callback
+                    style={"width": "100%", "height": "100%"},
+                    config={"displayModeBar": False},
+                ),
                 style={
-                    "display": "flex",
-                    "flexDirection": "row",
-                    "justifyContent": "center",
-                    "alignItems": "flex-start",
-                    "gap": "1rem",
                     "width": "100%",
                     "height": "100%",
+                    "maxWidth": "800px",
+                    "maxHeight": "800px",
+                    "aspectRatio": "1 / 1",
+                    "margin": "auto",
                 },
             ),
         ],
@@ -246,6 +208,8 @@ def _centre_panel() -> html.Div:
             "boxShadow": "0 1px 3px rgba(0,0,0,0.1)",
             "display": "flex",
             "flexDirection": "column",
+            "justifyContent": "center",
+            "alignItems": "center",
             "minHeight": 0,
             "overflow": "hidden",
         },
@@ -295,7 +259,7 @@ def _cmp_panel() -> html.Div:
                         [
                             html.Div(
                                 [
-                                    _tree_node("Parent Node", html.Div(id="tree-parent")),
+                                    _tree_node("Levels Above", html.Div(id="tree-levels-above")),
                                     html.Div(
                                         style={
                                             "height": "2rem",
@@ -305,7 +269,7 @@ def _cmp_panel() -> html.Div:
                                             "position": "relative",
                                         }
                                     ),
-                                    _tree_node("Current Node", html.Div(id="tree-current"), is_current=True),
+                                    _tree_node("Selected Level", html.Div(id="tree-selected-level"), is_current=True),
                                     html.Div(
                                         style={
                                             "height": "2rem",
@@ -315,7 +279,7 @@ def _cmp_panel() -> html.Div:
                                             "position": "relative",
                                         }
                                     ),
-                                    _tree_node("Child Node", html.Div(id="tree-child")),
+                                    _tree_node("Levels Below", html.Div(id="tree-levels-below")),
                                 ],
                                 id="tree-traversal",
                             ),
