@@ -275,6 +275,7 @@ def register_callbacks(app: dash.Dash) -> None:
                             mode="markers",
                             text=hover_text,
                             hoverinfo="text",
+                            customdata=indices,  # Store original indices directly
                             marker=dict(
                                 size=8, 
                                 opacity=0.7, 
@@ -403,10 +404,25 @@ def register_callbacks(app: dash.Dash) -> None:
         def _clicked(click):
             try:
                 pt = click["points"][0]
-                if pt.get("curveNumber", 0) != 0:
+                curve_number = pt.get("curveNumber", 0)
+                point_index = int(pt.get("pointIndex", pt["pointNumber"]))
+                
+                print(f"DEBUG CLICK: curve_number={curve_number}, point_index={point_index}")
+                print(f"DEBUG CLICK: point data keys: {list(pt.keys())}")
+                
+                # Check if we have customdata with original indices
+                if "customdata" in pt and pt["customdata"] is not None:
+                    result = int(pt["customdata"])
+                    print(f"DEBUG CLICK: using customdata, returning: {result}")
+                    return result
+                
+                # Fallback to original logic for single trace
+                print(f"DEBUG CLICK: using fallback logic")
+                if curve_number != 0:
                     return None
-                return int(pt.get("pointIndex", pt["pointNumber"]))
-            except (TypeError, KeyError, IndexError):
+                return point_index
+            except (TypeError, KeyError, IndexError) as e:
+                print(f"DEBUG CLICK: exception: {e}")
                 return None
         if triggered_id == "scatter-disk":
             click_data = ctx.inputs["scatter-disk.clickData"]
