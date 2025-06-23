@@ -99,7 +99,7 @@ def register_callbacks(app: dash.Dash) -> None:
             target_names = unique_synsets
             
             return (
-                None,  # data-store (not needed anymore)
+                embeddings.tolist(),  # data-store - needed for neighbor calculations
                 labels.tolist(),
                 feature_names,
                 target_names,
@@ -186,7 +186,7 @@ def register_callbacks(app: dash.Dash) -> None:
             target_names = unique_synsets
             
             return (
-                None,  # data-store (not needed anymore)
+                embeddings.tolist(),  # data-store - needed for neighbor calculations
                 labels.tolist(),
                 feature_names,
                 target_names,
@@ -229,15 +229,21 @@ def register_callbacks(app: dash.Dash) -> None:
         selected_idx = sel
         if mode == "neighbors" and sel and len(sel) == 1:
             selected_idx = sel[:1]
+            print(f"DEBUG NEIGHBORS CALC: mode={mode}, sel={sel}, k_neighbors={k_neighbors}")
+            print(f"DEBUG NEIGHBORS CALC: data_store is None: {data_store is None}")
             if data_store is not None:
                 data_np = np.asarray(data_store, dtype=np.float32)
+                print(f"DEBUG NEIGHBORS CALC: data_np shape: {data_np.shape}")
                 dists = np.linalg.norm(data_np - data_np[sel[0]], axis=1)
                 neighbor_indices = np.argsort(dists)
                 neighbor_indices = neighbor_indices[neighbor_indices != sel[0]][:k_neighbors]
+                print(f"DEBUG NEIGHBORS CALC: found {len(neighbor_indices)} neighbors: {neighbor_indices}")
             else:
                 neighbor_indices = []
+                print("DEBUG NEIGHBORS CALC: data_store is None, no neighbors calculated")
         else:
             neighbor_indices = []
+            print(f"DEBUG NEIGHBORS CALC: not in neighbors mode or no selection, neighbor_indices = []")
 
         # 2D disk plot with proper color coding and legend
         def _fig_disk(x, y, sel, labels, target_names, interpolated_point=None, neighbor_indices=None, emb_labels=None):
@@ -250,6 +256,11 @@ def register_callbacks(app: dash.Dash) -> None:
             }
             
             traces = []
+            neighbor_set = set(neighbor_indices) if neighbor_indices is not None else set()
+            
+            print(f"DEBUG NEIGHBORS: neighbor_indices = {neighbor_indices}")
+            print(f"DEBUG NEIGHBORS: neighbor_set = {neighbor_set}")
+            print(f"DEBUG NEIGHBORS: len(neighbor_set) = {len(neighbor_set)}")
             
             # If we have emb_labels, create separate traces for each label type
             print(f"DEBUG: emb_labels length: {len(emb_labels) if emb_labels else 'None'}, x length: {len(x)}")
@@ -262,57 +273,115 @@ def register_callbacks(app: dash.Dash) -> None:
                     indices = [i for i, lbl in enumerate(emb_labels) if lbl == label_type]
                     
                     if indices:
-                        x_coords = [x[i] for i in indices]
-                        y_coords = [y[i] for i in indices]
-                        hover_text = [
-                            f"{i}: {target_names[labels[i]] if target_names is not None else labels[i]}"
-                            for i in indices
-                        ]
+                        # Separate regular points from neighbor points
+                        regular_indices = [i for i in indices if i not in neighbor_set]
+                        neighbor_indices_for_type = [i for i in indices if i in neighbor_set]
                         
-                        trace = go.Scatter(
-                            x=x_coords,
-                            y=y_coords,
-                            mode="markers",
-                            text=hover_text,
-                            hoverinfo="text",
-                            customdata=indices,  # Store original indices directly
-                            marker=dict(
-                                size=8, 
-                                opacity=0.7, 
-                                color=colors.get(label_type, 'gray'),
-                                line=dict(width=0.5, color='black')
-                            ),
-                            name=label_type.replace('_', ' ').title(),
-                            showlegend=True,
-                        )
-                        traces.append(trace)
+                        # Regular points trace
+                        if regular_indices:
+                            x_coords = [x[i] for i in regular_indices]
+                            y_coords = [y[i] for i in regular_indices]
+                            hover_text = [
+                                f"{i}: {target_names[labels[i]] if target_names is not None else labels[i]}"
+                                for i in regular_indices
+                            ]
+                            
+                            trace = go.Scatter(
+                                x=x_coords,
+                                y=y_coords,
+                                mode="markers",
+                                text=hover_text,
+                                hoverinfo="text",
+                                customdata=regular_indices,  # Store original indices directly
+                                marker=dict(
+                                    size=8, 
+                                    opacity=0.7, 
+                                    color=colors.get(label_type, 'gray'),
+                                    line=dict(width=0.5, color='black')
+                                ),
+                                name=label_type.replace('_', ' ').title(),
+                                showlegend=True,
+                            )
+                            traces.append(trace)
+                        
+                        # Neighbor points trace (larger and brighter)
+                        if neighbor_indices_for_type:
+                            x_coords_neighbors = [x[i] for i in neighbor_indices_for_type]
+                            y_coords_neighbors = [y[i] for i in neighbor_indices_for_type]
+                            hover_text_neighbors = [
+                                f"{i}: {target_names[labels[i]] if target_names is not None else labels[i]} (neighbor)"
+                                for i in neighbor_indices_for_type
+                            ]
+                            
+                            neighbor_trace = go.Scatter(
+                                x=x_coords_neighbors,
+                                y=y_coords_neighbors,
+                                mode="markers",
+                                text=hover_text_neighbors,
+                                hoverinfo="text",
+                                customdata=neighbor_indices_for_type,
+                                marker=dict(
+                                    size=12,  # Larger size for neighbors
+                                    opacity=1.0,  # Full opacity for neighbors
+                                    color=colors.get(label_type, 'gray'),
+                                    line=dict(width=2, color='white')  # White border to make them stand out
+                                ),
+                                name=f"{label_type.replace('_', ' ').title()} (Neighbors)",
+                                showlegend=False,  # Don't show in legend to avoid clutter
+                            )
+                            traces.append(neighbor_trace)
             else:
                 # Fallback to single trace with colorscale
                 print("DEBUG: Using fallback single trace with colorscale")
-                base = go.Scatter(
-                    x=x,
-                    y=y,
-                    mode="markers",
-                    text=[
-                        f"{i}: {target_names[labels[i]] if target_names is not None else labels[i]}"
-                        for i in range(len(labels))
-                    ],
-                    hoverinfo="text",
-                    marker=dict(size=8, opacity=0.7, color=labels, colorscale="Viridis"),
-                    name="Data points",
-                    showlegend=False,
-                )
-                traces = [base]
-            if neighbor_indices is not None and len(neighbor_indices) > 0:
-                traces.append(
-                    go.Scatter(
-                        x=x[neighbor_indices],
-                        y=y[neighbor_indices],
+                
+                # Separate regular points from neighbor points
+                regular_indices = [i for i in range(len(x)) if i not in neighbor_set]
+                neighbor_indices_list = [i for i in range(len(x)) if i in neighbor_set]
+                
+                # Regular points trace
+                if regular_indices:
+                    base = go.Scatter(
+                        x=[x[i] for i in regular_indices],
+                        y=[y[i] for i in regular_indices],
                         mode="markers",
-                        marker=dict(size=10, color="blue"),
-                        name="Neighbors",
+                        text=[
+                            f"{i}: {target_names[labels[i]] if target_names is not None else labels[i]}"
+                            for i in regular_indices
+                        ],
+                        hoverinfo="text",
+                        customdata=regular_indices,
+                        marker=dict(size=8, opacity=0.7, color=[labels[i] for i in regular_indices], colorscale="Viridis"),
+                        name="Data points",
+                        showlegend=False,
                     )
-                )
+                    traces = [base]
+                else:
+                    traces = []
+                
+                # Neighbor points trace (larger and brighter)
+                if neighbor_indices_list:
+                    neighbor_trace = go.Scatter(
+                        x=[x[i] for i in neighbor_indices_list],
+                        y=[y[i] for i in neighbor_indices_list],
+                        mode="markers",
+                        text=[
+                            f"{i}: {target_names[labels[i]] if target_names is not None else labels[i]} (neighbor)"
+                            for i in neighbor_indices_list
+                        ],
+                        hoverinfo="text",
+                        customdata=neighbor_indices_list,
+                        marker=dict(
+                            size=12,  # Larger size for neighbors
+                            opacity=1.0,  # Full opacity for neighbors
+                            color=[labels[i] for i in neighbor_indices_list], 
+                            colorscale="Viridis",
+                            line=dict(width=2, color='white')  # White border to make them stand out
+                        ),
+                        name="Neighbors",
+                        showlegend=False,
+                    )
+                    traces.append(neighbor_trace)
+
             if sel:
                 traces.append(
                     go.Scatter(
@@ -407,22 +476,15 @@ def register_callbacks(app: dash.Dash) -> None:
                 curve_number = pt.get("curveNumber", 0)
                 point_index = int(pt.get("pointIndex", pt["pointNumber"]))
                 
-                print(f"DEBUG CLICK: curve_number={curve_number}, point_index={point_index}")
-                print(f"DEBUG CLICK: point data keys: {list(pt.keys())}")
-                
                 # Check if we have customdata with original indices
                 if "customdata" in pt and pt["customdata"] is not None:
-                    result = int(pt["customdata"])
-                    print(f"DEBUG CLICK: using customdata, returning: {result}")
-                    return result
+                    return int(pt["customdata"])
                 
                 # Fallback to original logic for single trace
-                print(f"DEBUG CLICK: using fallback logic")
                 if curve_number != 0:
                     return None
                 return point_index
-            except (TypeError, KeyError, IndexError) as e:
-                print(f"DEBUG CLICK: exception: {e}")
+            except (TypeError, KeyError, IndexError):
                 return None
         if triggered_id == "scatter-disk":
             click_data = ctx.inputs["scatter-disk.clickData"]
