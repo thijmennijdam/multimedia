@@ -229,21 +229,15 @@ def register_callbacks(app: dash.Dash) -> None:
         selected_idx = sel
         if mode == "neighbors" and sel and len(sel) == 1:
             selected_idx = sel[:1]
-            print(f"DEBUG NEIGHBORS CALC: mode={mode}, sel={sel}, k_neighbors={k_neighbors}")
-            print(f"DEBUG NEIGHBORS CALC: data_store is None: {data_store is None}")
             if data_store is not None:
                 data_np = np.asarray(data_store, dtype=np.float32)
-                print(f"DEBUG NEIGHBORS CALC: data_np shape: {data_np.shape}")
                 dists = np.linalg.norm(data_np - data_np[sel[0]], axis=1)
                 neighbor_indices = np.argsort(dists)
                 neighbor_indices = neighbor_indices[neighbor_indices != sel[0]][:k_neighbors]
-                print(f"DEBUG NEIGHBORS CALC: found {len(neighbor_indices)} neighbors: {neighbor_indices}")
             else:
                 neighbor_indices = []
-                print("DEBUG NEIGHBORS CALC: data_store is None, no neighbors calculated")
         else:
             neighbor_indices = []
-            print(f"DEBUG NEIGHBORS CALC: not in neighbors mode or no selection, neighbor_indices = []")
 
         # 2D disk plot with proper color coding and legend
         def _fig_disk(x, y, sel, labels, target_names, interpolated_point=None, neighbor_indices=None, emb_labels=None):
@@ -258,15 +252,9 @@ def register_callbacks(app: dash.Dash) -> None:
             traces = []
             neighbor_set = set(neighbor_indices) if neighbor_indices is not None else set()
             
-            print(f"DEBUG NEIGHBORS: neighbor_indices = {neighbor_indices}")
-            print(f"DEBUG NEIGHBORS: neighbor_set = {neighbor_set}")
-            print(f"DEBUG NEIGHBORS: len(neighbor_set) = {len(neighbor_set)}")
-            
             # If we have emb_labels, create separate traces for each label type
-            print(f"DEBUG: emb_labels length: {len(emb_labels) if emb_labels else 'None'}, x length: {len(x)}")
             if emb_labels and len(emb_labels) == len(x):
                 unique_label_types = sorted(set(emb_labels))
-                print(f"DEBUG: Using color-coded traces for: {unique_label_types}")
                 
                 for label_type in unique_label_types:
                     # Find indices for this label type
@@ -332,7 +320,6 @@ def register_callbacks(app: dash.Dash) -> None:
                             traces.append(neighbor_trace)
             else:
                 # Fallback to single trace with colorscale
-                print("DEBUG: Using fallback single trace with colorscale")
                 
                 # Separate regular points from neighbor points
                 regular_indices = [i for i in range(len(x)) if i not in neighbor_set]
@@ -440,13 +427,10 @@ def register_callbacks(app: dash.Dash) -> None:
                 # Map dataset names to correct directory names
                 dataset_dir = {"imagenet": "ImageNet", "grit": "GRIT"}.get(dataset_name, dataset_name)
                 emb_file = f"hierchical_datasets/{dataset_dir}/{proj}_embeddings.pkl"
-                print(f"DEBUG: Loading labels from {emb_file}")
                 with open(emb_file, "rb") as f:
                     emb_data_loaded = pickle.load(f)
                 emb_labels = emb_data_loaded.get("labels", [])
-                print(f"DEBUG: Loaded {len(emb_labels)} labels: {set(emb_labels[:5]) if emb_labels else 'None'}")
             except Exception as e:
-                print(f"DEBUG: Error loading labels: {e}")
                 emb_labels = []
             
         fig_disk = _fig_disk(dx, dy, selected_idx if mode == "neighbors" else highlight, labels, target_names, interp_transformed, neighbor_indices, emb_labels)
@@ -545,34 +529,205 @@ def register_callbacks(app: dash.Dash) -> None:
         Input("mode", "data"),
         State("meta-store", "data"),
         State("points-store", "data"),
+        Input("dataset-dropdown", "value"),
+        Input("proj", "value"),
     )
-    def _update_tree_view(sel, mode, meta, points):
+    def _update_tree_view(sel, mode, meta, points, dataset_name, proj):
         if mode != "tree" or not sel or len(sel) != 1 or meta is None or points is None:
             return html.Span(), html.Span(), html.Span()
+        
         idx = sel[0]
+        
+        # Load embedding labels to determine the level of the selected point
+        emb_labels = None
+        if dataset_name and proj:
+            try:
+                import pickle
+                dataset_dir = {"imagenet": "ImageNet", "grit": "GRIT"}.get(dataset_name, dataset_name)
+                emb_file = f"hierchical_datasets/{dataset_dir}/{proj}_embeddings.pkl"
+                with open(emb_file, "rb") as f:
+                    emb_data_loaded = pickle.load(f)
+                emb_labels = emb_data_loaded.get("labels", [])
+            except Exception as e:
+                emb_labels = []
+        
+        if not emb_labels or idx >= len(emb_labels):
+            return html.Span(), html.Span(), html.Span()
+        
+        # Load the tree data to get proper image paths
+        tree_data = None
+        try:
+            import json
+            dataset_dir = {"imagenet": "ImageNet", "grit": "GRIT"}.get(dataset_name, dataset_name)
+            meta_file = f"hierchical_datasets/{dataset_dir}/meta_data_trees.json"
+            with open(meta_file, "r") as f:
+                meta_data_trees = json.load(f)
+            
+            # Find the tree for this point
+            pt = points[idx]
+            synset_id = pt.get("synset_id", "?")
+            
+            # Find the tree that matches this synset_id
+            for tree_id, tree_info in meta_data_trees["trees"].items():
+                if (dataset_name == "imagenet" and tree_info.get("synset_id") == synset_id) or \
+                   (dataset_name == "grit" and tree_info.get("sample_key") == synset_id):
+                    tree_data = tree_info
+                    break
+                    
+        except Exception as e:
+            print(f"Error loading tree data: {e}")
+        
+        # Define the hierarchy levels based on dataset
+        if dataset_name == "imagenet":
+            # ImageNet only has 3 levels (no parent_image)
+            level_mapping = {
+                'parent_text': 1,
+                'child_text': 2, 
+                'child_image': 3,
+            }
+            level_names = {
+                1: "Level 1: Parent Text",
+                2: "Level 2: Child Text", 
+                3: "Level 3: Child Image",
+            }
+            max_level = 3
+        else:  # GRIT
+            level_mapping = {
+                'parent_text': 1,
+                'child_text': 2, 
+                'parent_image': 3,
+                'child_image': 4
+            }
+            level_names = {
+                1: "Level 1: Parent Text",
+                2: "Level 2: Child Text", 
+                3: "Level 3: Parent Image",
+                4: "Level 4: Child Image"
+            }
+            max_level = 4
+        
+        # Get the level of the selected point
+        selected_label = emb_labels[idx]
+        selected_level = level_mapping.get(selected_label, 0)
+        
+        if selected_level == 0:
+            return html.Span(), html.Span(), html.Span()
+        
         try:
             pt = points[idx]
+            synset_id = pt.get("synset_id", "?")
+            meta_row = meta.get(synset_id, {}) if isinstance(meta, dict) else {}
         except (IndexError, TypeError):
             return html.Span(), html.Span(), html.Span()
-        synset_id = pt.get("synset_id", "?")
-        pt_kind = pt.get("kind", "?")
-        meta_row = meta.get(synset_id, {}) if isinstance(meta, dict) else {}
-        parent_div = html.Div([
-            html.H4(meta_row.get("name", synset_id), style={"margin": "0.25rem 0", "color": "#007bff"}),
-        ], style={"padding": "0.5rem", "backgroundColor": "#eef", "borderRadius": "4px", "marginBottom": "0.5rem"})
-        current_div = html.Div([
-            html.P(meta_row.get("description", "(no description)"), style={"margin": 0}),
-        ], style={"padding": "0.5rem", "borderLeft": "3px solid #99c", "marginLeft": "1rem", "marginBottom": "0.5rem"})
-        if pt_kind == "image" and pt.get("image_path"):
-            img_rel = pt["image_path"]
-        else:
+        
+        # Create level components
+        def create_level_component(level, content, is_selected=False):
+            border_color = "#28a745" if is_selected else "#6c757d"
+            bg_color = "#d4edda" if is_selected else "#f8f9fa"
+            
+            return html.Div([
+                html.H5(level_names[level], style={
+                    "margin": "0 0 0.5rem 0", 
+                    "color": "#28a745" if is_selected else "#6c757d",
+                    "fontWeight": "bold" if is_selected else "normal"
+                }),
+                content
+            ], style={
+                "padding": "0.75rem", 
+                "backgroundColor": bg_color,
+                "border": f"2px solid {border_color}",
+                "borderRadius": "6px", 
+                "marginBottom": "0.5rem",
+                "marginLeft": f"{(level-1) * 1}rem"
+            })
+        
+        # Build the hierarchy display
+        levels_above = []
+        current_level = None
+        levels_below = []
+        
+        # Level 1: Parent Text
+        if selected_level == 1:
+            current_level = create_level_component(1, html.P(meta_row.get("name", synset_id), style={"margin": 0, "fontWeight": "bold"}), True)
+        elif selected_level > 1:
+            levels_above.append(create_level_component(1, html.P(meta_row.get("name", synset_id), style={"margin": 0})))
+        
+        # Level 2: Child Text  
+        if selected_level == 2:
+            current_level = create_level_component(2, html.P(meta_row.get("description", "(no description)"), style={"margin": 0, "fontWeight": "bold"}), True)
+        elif selected_level > 2:
+            levels_above.append(create_level_component(2, html.P(meta_row.get("description", "(no description)"), style={"margin": 0})))
+        elif selected_level < 2:
+            levels_below.append(create_level_component(2, html.P(meta_row.get("description", "(no description)"), style={"margin": 0, "color": "#6c757d"})))
+        
+        # Level 3: Parent Image (GRIT) or Child Image (ImageNet)
+        if dataset_name == "imagenet":
+            # For ImageNet, level 3 is child image
             img_rel = meta_row.get("first_image_path")
-        img_src = _encode_image(img_rel) if img_rel else ""
-        child_div = html.Div([
-            html.Img(src=img_src, style={"maxWidth": "220px", "border": "1px solid #ccc"}),
-            html.P(f"Image source: {img_rel}" if img_rel else "", style={"fontSize": "0.75rem", "color": "#666"}),
-        ], style={"padding": "0.5rem", "borderLeft": "3px solid #c9c", "marginLeft": "2rem"})
-        return parent_div, current_div, child_div
+            img_src = _encode_image(img_rel) if img_rel else ""
+            img_component = html.Div([
+                html.Img(src=img_src, style={"maxWidth": "200px", "border": "1px solid #ccc"}) if img_src else html.P("No image available", style={"color": "#6c757d", "fontStyle": "italic"}),
+                html.P(f"Source: {img_rel}" if img_rel else "", style={"fontSize": "0.7rem", "color": "#6c757d", "margin": "0.25rem 0 0 0"})
+            ], style={"margin": 0})
+            
+            if selected_level == 3:
+                current_level = create_level_component(3, img_component, True)
+            elif selected_level < 3:
+                levels_below.append(create_level_component(3, img_component))
+        else:
+            # For GRIT, level 3 is parent image
+            parent_img_rel = None
+            if tree_data and tree_data.get("parent_images"):
+                parent_img_path = tree_data["parent_images"][0]["path"]
+                parent_img_rel = parent_img_path.replace("/data/", "/trees/")
+            
+            parent_img_src = _encode_image(parent_img_rel) if parent_img_rel else ""
+            parent_img_component = html.Div([
+                html.Img(src=parent_img_src, style={"maxWidth": "200px", "border": "1px solid #ccc"}) if parent_img_src else html.P("No parent image available", style={"color": "#6c757d", "fontStyle": "italic"}),
+                html.P(f"Source: {parent_img_rel}" if parent_img_rel else "", style={"fontSize": "0.7rem", "color": "#6c757d", "margin": "0.25rem 0 0 0"})
+            ], style={"margin": 0})
+            
+            if selected_level == 3:
+                current_level = create_level_component(3, parent_img_component, True)
+            elif selected_level > 3:
+                levels_above.append(create_level_component(3, parent_img_component))
+            elif selected_level < 3:
+                levels_below.append(create_level_component(3, parent_img_component))
+        
+        # Level 4: Child Image (GRIT only)
+        if dataset_name == "grit" and max_level >= 4:
+            child_img_rel = None
+            if tree_data and tree_data.get("child_images"):
+                child_img_path = tree_data["child_images"][0]["path"]
+                child_img_rel = child_img_path.replace("/data/", "/trees/")
+            
+            child_img_src = _encode_image(child_img_rel) if child_img_rel else ""
+            child_img_component = html.Div([
+                html.Img(src=child_img_src, style={"maxWidth": "200px", "border": "1px solid #ccc"}) if child_img_src else html.P("No child image available", style={"color": "#6c757d", "fontStyle": "italic"}),
+                html.P(f"Source: {child_img_rel}" if child_img_rel else "", style={"fontSize": "0.7rem", "color": "#6c757d", "margin": "0.25rem 0 0 0"})
+            ], style={"margin": 0})
+            
+            if selected_level == 4:
+                current_level = create_level_component(4, child_img_component, True)
+            elif selected_level < 4:
+                levels_below.append(create_level_component(4, child_img_component))
+        
+        # Combine all levels
+        all_levels = levels_above + ([current_level] if current_level else []) + levels_below
+        
+        # Split into three sections for the layout
+        if len(all_levels) <= 3:
+            # Pad with empty divs if needed
+            while len(all_levels) < 3:
+                all_levels.append(html.Div())
+            return all_levels[0], all_levels[1], all_levels[2]
+        else:
+            # If more than 3 levels, combine some
+            return (
+                html.Div(all_levels[:2]) if len(all_levels) > 3 else all_levels[0],
+                all_levels[2] if len(all_levels) > 3 else all_levels[1], 
+                html.Div(all_levels[3:]) if len(all_levels) > 3 else all_levels[2]
+            )
 
     @app.callback(
         Output("mode", "data"),
