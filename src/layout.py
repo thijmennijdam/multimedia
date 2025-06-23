@@ -259,7 +259,7 @@ def _cmp_panel() -> html.Div:
                         [
                             html.Div(
                                 [
-                                    _tree_node("Parent Node", html.Div(id="tree-parent")),
+                                    _tree_node("Levels Above", html.Div(id="tree-levels-above")),
                                     html.Div(
                                         style={
                                             "height": "2rem",
@@ -269,7 +269,7 @@ def _cmp_panel() -> html.Div:
                                             "position": "relative",
                                         }
                                     ),
-                                    _tree_node("Current Node", html.Div(id="tree-current"), is_current=True),
+                                    _tree_node("Selected Level", html.Div(id="tree-selected-level"), is_current=True),
                                     html.Div(
                                         style={
                                             "height": "2rem",
@@ -279,7 +279,7 @@ def _cmp_panel() -> html.Div:
                                             "position": "relative",
                                         }
                                     ),
-                                    _tree_node("Child Node", html.Div(id="tree-child")),
+                                    _tree_node("Levels Below", html.Div(id="tree-levels-below")),
                                 ],
                                 id="tree-traversal",
                             ),
