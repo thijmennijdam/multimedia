@@ -210,8 +210,9 @@ def register_callbacks(app: dash.Dash) -> None:
         Input("mode", "data"),
         Input("neighbors-slider", "value"),
         State("data-store", "data"),
+        Input("dataset-dropdown", "value"),
     )
-    def _scatter(edata, sel, proj, interpolated_point, labels_data, target_names, mode, k_neighbors, data_store):
+    def _scatter(edata, sel, proj, interpolated_point, labels_data, target_names, mode, k_neighbors, data_store, dataset_name):
         if edata is None or labels_data is None:
             print("Warning: No embedding or label data available for plotting")
             return {}
@@ -238,21 +239,69 @@ def register_callbacks(app: dash.Dash) -> None:
         else:
             neighbor_indices = []
 
-        # 2D disk plot
-        def _fig_disk(x, y, sel, labels, target_names, interpolated_point=None, neighbor_indices=None):
-            base = go.Scatter(
-                x=x,
-                y=y,
-                mode="markers",
-                text=[
-                    f"{i}: {target_names[labels[i]] if target_names is not None else labels[i]}"
-                    for i in range(len(labels))
-                ],
-                hoverinfo="text",
-                marker=dict(size=6, opacity=0.8, color=labels, colorscale="Viridis"),
-                name="Data points",
-            )
-            traces = [base]
+        # 2D disk plot with proper color coding and legend
+        def _fig_disk(x, y, sel, labels, target_names, interpolated_point=None, neighbor_indices=None, emb_labels=None):
+            # Define colors matching plotting_utils.py
+            colors = {
+                'child_image': '#1f77b4',    # tab:blue
+                'parent_image': '#ff7f0e',   # tab:orange
+                'child_text': '#2ca02c',     # tab:green  
+                'parent_text': '#d62728'     # tab:red
+            }
+            
+            traces = []
+            
+            # If we have emb_labels, create separate traces for each label type
+            print(f"DEBUG: emb_labels length: {len(emb_labels) if emb_labels else 'None'}, x length: {len(x)}")
+            if emb_labels and len(emb_labels) == len(x):
+                unique_label_types = sorted(set(emb_labels))
+                print(f"DEBUG: Using color-coded traces for: {unique_label_types}")
+                
+                for label_type in unique_label_types:
+                    # Find indices for this label type
+                    indices = [i for i, lbl in enumerate(emb_labels) if lbl == label_type]
+                    
+                    if indices:
+                        x_coords = [x[i] for i in indices]
+                        y_coords = [y[i] for i in indices]
+                        hover_text = [
+                            f"{i}: {target_names[labels[i]] if target_names is not None else labels[i]}"
+                            for i in indices
+                        ]
+                        
+                        trace = go.Scatter(
+                            x=x_coords,
+                            y=y_coords,
+                            mode="markers",
+                            text=hover_text,
+                            hoverinfo="text",
+                            marker=dict(
+                                size=8, 
+                                opacity=0.7, 
+                                color=colors.get(label_type, 'gray'),
+                                line=dict(width=0.5, color='black')
+                            ),
+                            name=label_type.replace('_', ' ').title(),
+                            showlegend=True,
+                        )
+                        traces.append(trace)
+            else:
+                # Fallback to single trace with colorscale
+                print("DEBUG: Using fallback single trace with colorscale")
+                base = go.Scatter(
+                    x=x,
+                    y=y,
+                    mode="markers",
+                    text=[
+                        f"{i}: {target_names[labels[i]] if target_names is not None else labels[i]}"
+                        for i in range(len(labels))
+                    ],
+                    hoverinfo="text",
+                    marker=dict(size=8, opacity=0.7, color=labels, colorscale="Viridis"),
+                    name="Data points",
+                    showlegend=False,
+                )
+                traces = [base]
             if neighbor_indices is not None and len(neighbor_indices) > 0:
                 traces.append(
                     go.Scatter(
@@ -289,9 +338,16 @@ def register_callbacks(app: dash.Dash) -> None:
             fig.update_layout(
                 xaxis=dict(scaleanchor="y", scaleratio=1),
                 yaxis=dict(scaleanchor="x", scaleratio=1),
-                margin=dict(l=0, r=0, b=0, t=0),
+                margin=dict(l=0, r=0, b=0, t=30),
                 uirevision="embedding",
-                showlegend=False,
+                showlegend=True,
+                legend=dict(
+                    orientation="h",
+                    yanchor="bottom",
+                    y=1.02,
+                    xanchor="center",
+                    x=0.5
+                ),
             )
             return fig
         # Handle 2D embeddings for disk projection
@@ -306,7 +362,24 @@ def register_callbacks(app: dash.Dash) -> None:
             interp_dx = interp_point[0] / (1.0 + interp_point[2])
             interp_dy = interp_point[1] / (1.0 + interp_point[2])
             interp_transformed = np.array([interp_dx, interp_dy])
-        fig_disk = _fig_disk(dx, dy, selected_idx if mode == "neighbors" else highlight, labels, target_names, interp_transformed, neighbor_indices)
+        # Load the original label types for color coding
+        emb_labels = None
+        if dataset_name and proj:
+            try:
+                import pickle
+                # Map dataset names to correct directory names
+                dataset_dir = {"imagenet": "ImageNet", "grit": "GRIT"}.get(dataset_name, dataset_name)
+                emb_file = f"hierchical_datasets/{dataset_dir}/{proj}_embeddings.pkl"
+                print(f"DEBUG: Loading labels from {emb_file}")
+                with open(emb_file, "rb") as f:
+                    emb_data_loaded = pickle.load(f)
+                emb_labels = emb_data_loaded.get("labels", [])
+                print(f"DEBUG: Loaded {len(emb_labels)} labels: {set(emb_labels[:5]) if emb_labels else 'None'}")
+            except Exception as e:
+                print(f"DEBUG: Error loading labels: {e}")
+                emb_labels = []
+            
+        fig_disk = _fig_disk(dx, dy, selected_idx if mode == "neighbors" else highlight, labels, target_names, interp_transformed, neighbor_indices, emb_labels)
         return fig_disk
 
 
