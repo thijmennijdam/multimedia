@@ -362,7 +362,21 @@ def main():
     else:
         print(f"\n🎯 Using all {len(embeddings):,} embeddings")
     
-
+    # Save subset of original embeddings (method-agnostic)
+    embeddings_subset_path = Path(args.dataset_path) / "embeddings_subset.pkl"
+    
+    if not embeddings_subset_path.exists():
+        print(f"\n💾 Saving original embeddings subset...")
+        embeddings_subset_data = {
+            'embeddings': embeddings.numpy(),
+            'labels': labels
+        }
+        
+        with open(embeddings_subset_path, 'wb') as f:
+            pickle.dump(embeddings_subset_data, f)
+        print(f"✓ Saved original embeddings subset: {embeddings_subset_path}")
+    else:
+        print(f"\n💾 Using existing embeddings subset: {embeddings_subset_path}")
     
     # Initialize projection methods
     projector = ProjectionMethods(device)
