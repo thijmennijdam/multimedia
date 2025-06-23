@@ -98,25 +98,32 @@ def _create_content_element(idx: int, images: np.ndarray | None, points: list | 
                 return html.Div([
                     html.P(text_content, style={
                         "margin": "0", 
-                        "padding": "0.5rem", 
-                        "backgroundColor": "#f0f8ff",
-                        "border": "1px solid #d0d0d0",
-                        "borderRadius": "4px",
-                        "fontStyle": "italic",
-                        "maxWidth": "200px",
-                        "wordWrap": "break-word"
+                        "padding": "0.75rem", 
+                        "backgroundColor": "#f8fdff",
+                        "border": "1px solid #e1e8ed",
+                        "borderRadius": "6px",
+                        "fontFamily": "system-ui, -apple-system, sans-serif",
+                        "fontSize": "0.9rem",
+                        "lineHeight": "1.4",
+                        "color": "#2c3e50",
+                        "maxWidth": "220px",
+                        "wordWrap": "break-word",
+                        "boxShadow": "0 1px 3px rgba(0,0,0,0.1)"
                     })
                 ], style={"marginRight": "0.5rem"})
             else:
                 return html.Div([
-                    html.P(f"Text content (type: {embedding_type})", style={
+                    html.P(f"Text content unavailable", style={
                         "margin": "0", 
-                        "padding": "0.5rem", 
-                        "backgroundColor": "#f0f8ff",
-                        "border": "1px solid #d0d0d0",
-                        "borderRadius": "4px",
+                        "padding": "0.75rem", 
+                        "backgroundColor": "#f8f9fa",
+                        "border": "1px solid #e1e8ed",
+                        "borderRadius": "6px",
+                        "fontFamily": "system-ui, -apple-system, sans-serif",
+                        "fontSize": "0.9rem",
                         "fontStyle": "italic",
-                        "color": "#666"
+                        "color": "#6c757d",
+                        "maxWidth": "220px"
                     })
                 ], style={"marginRight": "0.5rem"})
     

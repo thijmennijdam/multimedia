@@ -981,8 +981,6 @@ def register_callbacks(app: dash.Dash) -> None:
         if mode == "compare":
             instructions = html.P("Select up to 5 points to compare.")
             for idx in sel:
-                label = target_names[labels[idx]] if target_names is not None else labels[idx]
-                
                 # Get the content to display based on embedding type
                 content_element = _create_content_element(idx, images, points, meta)
                 
@@ -1012,8 +1010,7 @@ def register_callbacks(app: dash.Dash) -> None:
                                 "hover": {"backgroundColor": "#cc0000"}
                             }
                         ),
-                        content_element,
-                        html.P(f"Point {idx} label: {label}")
+                        content_element
                     ], style={"display": "flex", "alignItems": "center", "padding": "0.5rem", "borderRadius": "4px", "position": "relative", "backgroundColor": "#f8f9fa", "marginBottom": "0.5rem"})
                 )
             return html.Div(components), instructions
@@ -1021,7 +1018,6 @@ def register_callbacks(app: dash.Dash) -> None:
             instructions = html.P("Select two distinct points to interpolate.")
             if sel:
                 i, j = (sel[0], sel[1]) if len(sel) > 1 else (sel[0], None)
-                li = target_names[labels[i]] if target_names is not None else labels[i]
                 
                 # Get the content to display based on embedding type
                 content_element_i = _create_content_element(i, images, points, meta)
@@ -1052,13 +1048,10 @@ def register_callbacks(app: dash.Dash) -> None:
                                 "hover": {"backgroundColor": "#cc0000"}
                             }
                         ),
-                        content_element_i,
-                        html.P(f"Point {i} label: {li}")
+                        content_element_i
                     ], style={"display": "flex", "alignItems": "center", "padding": "0.5rem", "borderRadius": "4px", "position": "relative", "backgroundColor": "#f8f9fa", "marginBottom": "0.5rem"})
                 )
                 if j is not None:
-                    lj = target_names[labels[j]] if target_names is not None else labels[j]
-                    
                     # Get the content to display based on embedding type
                     content_element_j = _create_content_element(j, images, points, meta)
                     
@@ -1088,8 +1081,7 @@ def register_callbacks(app: dash.Dash) -> None:
                                     "hover": {"backgroundColor": "#cc0000"}
                                 }
                             ),
-                            content_element_j,
-                            html.P(f"Point {j} label: {lj}")
+                            content_element_j
                         ], style={"display": "flex", "alignItems": "center", "padding": "0.5rem", "borderRadius": "4px", "position": "relative", "backgroundColor": "#f8f9fa", "marginBottom": "0.5rem"})
                     )
             if interpolated_point is not None and len(sel) == 2:
@@ -1112,7 +1104,6 @@ def register_callbacks(app: dash.Dash) -> None:
             dists = np.linalg.norm(emb - emb[sel[0]], axis=1)
             neighbors = np.argsort(dists)
             neighbors = neighbors[neighbors != sel[0]][:k_neighbors]
-            label = target_names[labels[sel[0]]] if target_names is not None else labels[sel[0]]
             
             # Get the content to display based on embedding type
             content_element = _create_content_element(sel[0], images, points, meta)
@@ -1143,22 +1134,18 @@ def register_callbacks(app: dash.Dash) -> None:
                             "hover": {"backgroundColor": "#cc0000"}
                         }
                     ),
-                    content_element,
-                    html.P(f"Selected point {sel[0]} label: {label}")
+                    content_element
                 ], style={"display": "flex", "alignItems": "center", "padding": "0.5rem", "borderRadius": "4px", "position": "relative", "backgroundColor": "#e0f7fa", "marginBottom": "0.5rem"})
             )
             if len(neighbors) > 0:
                 components.append(html.H6("Neighbors:", style={"margin": "1rem 0 0.5rem 0", "color": "#666"}))
                 for nidx in neighbors:
-                    nlabel = target_names[labels[nidx]] if target_names is not None else labels[nidx]
-                    
                     # Get the content to display based on embedding type
                     neighbor_content_element = _create_content_element(nidx, images, points, meta)
                     
                     components.append(
                         html.Div([
-                            neighbor_content_element,
-                            html.P(f"Neighbor {nidx} label: {nlabel}")
+                            neighbor_content_element
                         ], style={"display": "flex", "alignItems": "center", "padding": "0.5rem", "borderRadius": "4px", "backgroundColor": "#f8f9fa", "marginBottom": "0.5rem"})
                     )
             else:
