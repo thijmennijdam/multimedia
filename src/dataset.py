@@ -27,5 +27,3 @@ def _load_dataset(name: str):
         targ_names,
         images,
     )
-
-# ... existing code for dataset loading ... 

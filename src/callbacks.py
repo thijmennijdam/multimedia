@@ -2,8 +2,8 @@ import dash
 from dash import Input, Output, State, callback_context, html, dcc
 import numpy as np
 import plotly.graph_objs as go
-from .projection import _umap_hyperbolic, _hyperboloid_2d, PROJECTIONS, _interpolate_hyperbolic
-from .dataset import _load_dataset
+from .projection import _interpolate_hyperbolic
+
 from .image_utils import _encode_image, _create_img_tag, _create_interpolated_img_tag
 from .layout import _tree_node
 import json
@@ -25,49 +25,81 @@ def register_callbacks(app: dash.Dash) -> None:
         Output("interpolated-point", "data", allow_duplicate=True),
         Output("emb", "data", allow_duplicate=True),
         Input("dataset-dropdown", "value"),
+        Input("proj", "value"),
         prevent_initial_call=False,
     )
-    def _update_dataset_stores(dataset_name):
-        if not dataset_name:
+    def _update_dataset_stores(dataset_name, projection_method):
+        if not dataset_name or not projection_method:
             return dash.no_update
-        if dataset_name in {"digits", "iris", "wine"}:
-            data, labels, feature_names, target_names, images = _load_dataset(dataset_name)
-            data_list = data.tolist()
-            labels_list = labels.tolist()
-            target_names_list = target_names.tolist() if target_names is not None else None
-            images_list = images.tolist() if images is not None else []
-            return (
-                data_list,
-                labels_list,
-                feature_names,
-                target_names_list,
-                images_list,
-                None,
-                None,
-                [],
-                None,
-                None,
-            )
         if dataset_name == "imagenet":
             try:
-                with open("dataset/meta.json", "r", encoding="utf-8") as f_meta:
-                    meta = json.load(f_meta)
-                with open("dataset/points.json", "r", encoding="utf-8") as f_pts:
-                    points = json.load(f_pts)
-            except FileNotFoundError:
-                print("meta.json / points.json not found in ./dataset – did you run create_trees.py?")
+                import pickle
+                with open("hierchical_datasets/ImageNet/meta_data_trees.json", "r", encoding="utf-8") as f_meta:
+                    meta_data_trees = json.load(f_meta)
+                
+                # Load embeddings based on selected projection method
+                emb_file = f"hierchical_datasets/ImageNet/{projection_method}_embeddings.pkl"
+                with open(emb_file, "rb") as f_emb:
+                    emb_data = pickle.load(f_emb)
+            except FileNotFoundError as e:
+                print(f"Error loading ImageNet files: {e}")
                 return dash.no_update
-            embeddings = np.array([pt["embedding"] for pt in points], dtype=np.float32)
-            synset_ids = [pt["synset_id"] for pt in points]
+            except Exception as e:
+                print(f"ERROR: ImageNet loading failed: {e}")
+                return dash.no_update
+            
+            # Extract embeddings
+            embeddings = np.array(emb_data["embeddings"], dtype=np.float32)
+            print(f"Loaded ImageNet with {projection_method}: {embeddings.shape} embeddings")
+            
+            # Create points list from meta_data_trees
+            points = []
+            synset_ids = []
+            images_list = []
+            
+            for tree_id, tree_data in meta_data_trees["trees"].items():
+                synset_id = tree_data["synset_id"]
+                synset_ids.append(synset_id)
+                
+                # Get first child image path if available, but fix the path
+                image_path = None
+                if "child_images" in tree_data and tree_data["child_images"]:
+                    # Fix the path: replace /data/ with /trees/
+                    original_path = tree_data["child_images"][0]["path"]
+                    image_path = original_path.replace("/data/", "/trees/")
+                
+                points.append({
+                    "synset_id": synset_id,
+                    "tree_id": tree_id,
+                    "image_path": image_path,
+                    "kind": "tree"
+                })
+                images_list.append(image_path)
+            
+            # Create meta dict for compatibility
+            meta = {}
+            for tree_id, tree_data in meta_data_trees["trees"].items():
+                synset_id = tree_data["synset_id"]
+                # Fix the image path here too
+                first_image_path = None
+                if tree_data.get("child_images"):
+                    original_path = tree_data["child_images"][0]["path"]
+                    first_image_path = original_path.replace("/data/", "/trees/")
+                
+                meta[synset_id] = {
+                    "name": tree_data["parent_text"]["text"],
+                    "description": tree_data["child_text"]["text"],
+                    "first_image_path": first_image_path
+                }
+            
             unique_synsets = sorted({sid for sid in synset_ids})
             syn_to_int = {sid: i for i, sid in enumerate(unique_synsets)}
             labels = np.array([syn_to_int[s] for s in synset_ids], dtype=int)
             feature_names = [f"dim{i}" for i in range(embeddings.shape[1])]
             target_names = unique_synsets
-            images_list = [pt.get("image_path") for pt in points]
-            images_list = images_list if images_list is not None else []
+            
             return (
-                embeddings.tolist(),
+                None,  # data-store (not needed anymore)
                 labels.tolist(),
                 feature_names,
                 target_names,
@@ -76,7 +108,94 @@ def register_callbacks(app: dash.Dash) -> None:
                 points,
                 [],
                 None,
+                embeddings.tolist(),  # emb store - this is what the scatter callback needs!
+            )
+        if dataset_name == "grit":
+            try:
+                import pickle
+                with open("hierchical_datasets/GRIT/meta_data_trees.json", "r", encoding="utf-8") as f_meta:
+                    meta_data_trees = json.load(f_meta)
+                
+                # Load embeddings based on selected projection method
+                emb_file = f"hierchical_datasets/GRIT/{projection_method}_embeddings.pkl"
+                with open(emb_file, "rb") as f_emb:
+                    emb_data = pickle.load(f_emb)
+            except FileNotFoundError as e:
+                print(f"Error loading GRIT files: {e}")
+                return dash.no_update
+            except Exception as e:
+                print(f"ERROR: GRIT loading failed: {e}")
+                return dash.no_update
+            
+            # Extract embeddings
+            embeddings = np.array(emb_data["embeddings"], dtype=np.float32)
+            print(f"Loaded GRIT with {projection_method}: {embeddings.shape} embeddings")
+            
+            # Create points list from meta_data_trees
+            points = []
+            synset_ids = []
+            images_list = []
+            
+            for tree_id, tree_data in meta_data_trees["trees"].items():
+                # GRIT uses sample_key instead of synset_id
+                sample_key = tree_data.get("sample_key", tree_id)
+                synset_ids.append(sample_key)
+                
+                # Get first child image path if available, but fix the path
+                image_path = None
+                if "child_images" in tree_data and tree_data["child_images"]:
+                    # Fix the path: replace /data/ with /trees/
+                    original_path = tree_data["child_images"][0]["path"]
+                    image_path = original_path.replace("/data/", "/trees/")
+                # If no child images, try parent images
+                elif "parent_images" in tree_data and tree_data["parent_images"]:
+                    original_path = tree_data["parent_images"][0]["path"]
+                    image_path = original_path.replace("/data/", "/trees/")
+                
+                points.append({
+                    "synset_id": sample_key,
+                    "tree_id": tree_id,
+                    "image_path": image_path,
+                    "kind": "tree"
+                })
+                images_list.append(image_path)
+            
+            # Create meta dict for compatibility
+            meta = {}
+            for tree_id, tree_data in meta_data_trees["trees"].items():
+                sample_key = tree_data.get("sample_key", tree_id)
+                # Fix the image path here too
+                first_image_path = None
+                if tree_data.get("child_images"):
+                    original_path = tree_data["child_images"][0]["path"]
+                    first_image_path = original_path.replace("/data/", "/trees/")
+                elif tree_data.get("parent_images"):
+                    original_path = tree_data["parent_images"][0]["path"]
+                    first_image_path = original_path.replace("/data/", "/trees/")
+                
+                meta[sample_key] = {
+                    "name": tree_data["parent_text"]["text"],
+                    "description": tree_data["child_text"]["text"],
+                    "first_image_path": first_image_path
+                }
+            
+            unique_synsets = sorted({sid for sid in synset_ids})
+            syn_to_int = {sid: i for i, sid in enumerate(unique_synsets)}
+            labels = np.array([syn_to_int[s] for s in synset_ids], dtype=int)
+            feature_names = [f"dim{i}" for i in range(embeddings.shape[1])]
+            target_names = unique_synsets
+            
+            return (
+                None,  # data-store (not needed anymore)
+                labels.tolist(),
+                feature_names,
+                target_names,
+                images_list,
+                meta,
+                points,
+                [],
                 None,
+                embeddings.tolist(),  # emb store - this is what the scatter callback needs!
             )
         return dash.no_update
 
@@ -94,6 +213,7 @@ def register_callbacks(app: dash.Dash) -> None:
     )
     def _scatter(edata, sel, proj, interpolated_point, labels_data, target_names, mode, k_neighbors, data_store):
         if edata is None or labels_data is None:
+            print("Warning: No embedding or label data available for plotting")
             return {}, {}
         emb = np.asarray(edata, dtype=np.float32)
         labels = np.asarray(labels_data, dtype=int)
@@ -117,16 +237,22 @@ def register_callbacks(app: dash.Dash) -> None:
                 neighbor_indices = []
         else:
             neighbor_indices = []
-        # 3D plot
+        # 3D plot (handle both 2D and 3D embeddings)
         def _fig3d(emb, sel, labels, target_names, interpolated_point=None, neighbor_indices=None):
             labels_txt = [
                 f"{i}: {target_names[labels[i]] if target_names is not None else labels[i]}"
                 for i in range(len(labels))
             ]
+            # Handle 2D embeddings by adding a zero z-coordinate
+            if emb.shape[1] == 2:
+                z_coords = np.zeros(emb.shape[0])
+            else:
+                z_coords = emb[:, 2]
+            
             base = go.Scatter3d(
                 x=emb[:, 0],
                 y=emb[:, 1],
-                z=emb[:, 2],
+                z=z_coords,
                 mode="markers",
                 text=labels_txt,
                 hoverinfo="text",
@@ -139,7 +265,7 @@ def register_callbacks(app: dash.Dash) -> None:
                     go.Scatter3d(
                         x=emb[neighbor_indices, 0],
                         y=emb[neighbor_indices, 1],
-                        z=emb[neighbor_indices, 2],
+                        z=z_coords[neighbor_indices],
                         mode="markers",
                         marker=dict(size=10, color="blue"),
                         name="Neighbors",
@@ -150,18 +276,20 @@ def register_callbacks(app: dash.Dash) -> None:
                     go.Scatter3d(
                         x=emb[sel, 0],
                         y=emb[sel, 1],
-                        z=emb[sel, 2],
+                        z=z_coords[sel],
                         mode="markers",
                         marker=dict(size=12, color="red"),
                         name="Selected point",
                     )
                 )
             if interpolated_point is not None:
+                # Handle 2D interpolated points
+                interp_z = interpolated_point[2] if len(interpolated_point) > 2 else 0
                 traces.append(
                     go.Scatter3d(
                         x=[interpolated_point[0]],
                         y=[interpolated_point[1]],
-                        z=[interpolated_point[2]],
+                        z=[interp_z],
                         mode="markers",
                         marker=dict(size=12, color="orange", symbol="diamond"),
                         name="Interpolated point",
@@ -232,7 +360,12 @@ def register_callbacks(app: dash.Dash) -> None:
                 showlegend=False,
             )
             return fig
-        xh, yh, zh = emb[:, 0], emb[:, 1], emb[:, 2]
+        # Handle 2D embeddings for disk projection
+        xh, yh = emb[:, 0], emb[:, 1]
+        if emb.shape[1] > 2:
+            zh = emb[:, 2]
+        else:
+            zh = np.zeros(emb.shape[0])  # For 2D embeddings, use z=0
         dx, dy = xh / (1.0 + zh), yh / (1.0 + zh)
         interp_transformed = None
         if interp_point is not None:
@@ -243,25 +376,7 @@ def register_callbacks(app: dash.Dash) -> None:
         fig_disk = _fig_disk(dx, dy, selected_idx if mode == "neighbors" else highlight, labels, target_names, interp_transformed, neighbor_indices)
         return fig_3d, fig_disk
 
-    @app.callback(
-        Output("emb", "data"),
-        Output("proj-loading", "parent_style"),
-        Input("proj", "value"),
-        Input("data-store", "data"),
-        prevent_initial_call=True,
-    )
-    def _compute(method, data):
-        if data is None:
-            return None, {"display": "none"}
-        loading_style = {"display": "block"}
-        try:
-            data_np = np.asarray(data, dtype=np.float32)
-            result = PROJECTIONS[method](data_np).tolist()
-            loading_style = {"display": "none"}
-            return result, loading_style
-        except Exception as e:
-            print(f"Error computing projection: {e}")
-            return None, {"display": "none"}
+
 
     @app.callback(
         Output("sel", "data"),

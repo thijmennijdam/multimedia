@@ -1,10 +1,6 @@
 import dash
 from dash import dcc, html
 
-# ... existing code for layout functions ... 
-
-# UI helper components (pure functions → no side-effects)
-
 def _config_panel() -> html.Div:
     return html.Div(
         [
@@ -13,12 +9,10 @@ def _config_panel() -> html.Div:
             dcc.Dropdown(
                 id="dataset-dropdown",
                 options=[
-                    {"label": "Digits", "value": "digits"},
-                    {"label": "Wine", "value": "wine"},
-                    {"label": "Iris", "value": "iris"},
                     {"label": "ImageNet subset", "value": "imagenet"},
+                    {"label": "GRIT", "value": "grit"},
                 ],
-                value="digits",  # Default, can be overridden
+                value="imagenet",  # Default, can be overridden
                 clearable=False,
                 style={
                     "backgroundColor": "white",
@@ -28,25 +22,21 @@ def _config_panel() -> html.Div:
                 },
             ),
             html.Label("Projection"),
-            html.Div([
-                dcc.Dropdown(
-                    id="proj",
-                    options=[{"label": "UMAP", "value": "UMAP"}],
-                    value="UMAP",
-                    clearable=False,
-                    style={
-                        "backgroundColor": "white",
-                        "border": "1px solid #ccc",
-                        "borderRadius": "6px",
-                        "color": "black",
-                    },
-                ),
-                dcc.Loading(
-                    id="proj-loading",
-                    type="circle",
-                    style={"position": "absolute", "right": "10px", "top": "50%", "transform": "translateY(-50%)"},
-                ),
-            ], style={"position": "relative"}),
+            dcc.Dropdown(
+                id="proj",
+                options=[
+                    {"label": "HoroPCA", "value": "horopca"},
+                    {"label": "CO-SNE", "value": "cosne"}
+                ],
+                value="horopca",
+                clearable=False,
+                style={
+                    "backgroundColor": "white",
+                    "border": "1px solid #ccc",
+                    "borderRadius": "6px",
+                    "color": "black",
+                },
+            ),
             html.Br(),
             html.Label("Mode"),
             html.Div(

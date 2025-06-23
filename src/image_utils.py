@@ -8,8 +8,13 @@ from dash import html
 _IMAGENET_ROOT = Path("imagenet-subset")
 
 def _encode_image(rel_path: str) -> str:
-    """Return base64 data URI for *rel_path* (relative to *_IMAGENET_ROOT*)."""
-    img_path = _IMAGENET_ROOT / rel_path
+    """Return base64 data URI for *rel_path* (relative to *_IMAGENET_ROOT* or absolute path)."""
+    # Handle both old imagenet-subset paths and new hierarchical dataset paths
+    if rel_path.startswith("hierchical_datasets/"):
+        img_path = Path(rel_path)
+    else:
+        img_path = _IMAGENET_ROOT / rel_path
+    
     mime = {
         ".jpeg": "jpeg",
         ".jpg": "jpeg",
@@ -35,7 +40,7 @@ def _create_img_tag(idx: int, images: np.ndarray | None) -> html.Img | html.Span
         images_np = np.asarray(images)
         pil = (
             Image.fromarray((images_np[idx] * 16).astype("uint8"), mode="L")
-            .resize((64, 64), Image.NEAREST)
+            .resize((64, 64), Image.Resampling.NEAREST if hasattr(Image, 'Resampling') else Image.NEAREST)
         )
         buf = io.BytesIO()
         pil.save(buf, format="PNG")
@@ -64,7 +69,7 @@ def _create_interpolated_img_tag(i: int, j: int, t_value: float, images: np.ndar
     interpolated_img_data = (1 - t_value) * img1 + t_value * img2
     pil = Image.fromarray(
         (interpolated_img_data * 16).astype("uint8"), mode="L"
-    ).resize((64, 64), Image.NEAREST)
+    ).resize((64, 64), Image.Resampling.NEAREST if hasattr(Image, 'Resampling') else Image.NEAREST)
     buf = io.BytesIO()
     pil.save(buf, format="PNG")
     uri = "data:image/png;base64," + base64.b64encode(buf.getvalue()).decode()
@@ -72,5 +77,3 @@ def _create_interpolated_img_tag(i: int, j: int, t_value: float, images: np.ndar
         src=uri,
         style={"marginRight": "0.5rem", "border": "2px solid orange"},
     )
-
-# ... existing code for image helpers ... 

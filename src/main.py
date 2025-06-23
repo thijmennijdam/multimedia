@@ -12,4 +12,4 @@ def build_app(debug: bool = False) -> dash.Dash:
 
 if __name__ == "__main__":
     app = build_app(debug=True)
-    app.run(debug=True)
+    app.run(debug=True, host="0.0.0.0", port=8080)
