@@ -79,7 +79,8 @@ def parse_arguments():
     
     # Data args
     parser.add_argument("--dataset-path", required=True, help="Path to dataset folder (e.g., hierchical_datasets/ImageNet)")
-    parser.add_argument("--n-project", type=int, default=0, help="Number of samples to project (0 = all)")
+    parser.add_argument("--n-project", type=int, default=0, help="Number of samples to project (0 = all, >0 = balanced tree sampling)")
+    parser.add_argument("--children-per-tree", type=int, default=5, help="Number of child images to sample per tree when using balanced sampling")
     
     # Plotting args
     parser.add_argument("--plot", action="store_true", help="Generate and save plots")
@@ -117,7 +118,7 @@ class EmbeddingLoader:
     def __init__(self, dataset_path):
         self.dataset_path = Path(dataset_path)
         
-    def load_embeddings(self):
+    def load_embeddings(self, n_project=0, children_per_tree=5):
         """Load embeddings from embeddings.pkl file."""
         embeddings_path = self.dataset_path / "embeddings.pkl"
         
@@ -131,6 +132,14 @@ class EmbeddingLoader:
         
         # Extract embeddings and create labels
         embeddings_dict = embed_data['embeddings']
+        
+        if n_project > 0:
+            return self._load_balanced_trees(embeddings_dict, n_project, children_per_tree)
+        else:
+            return self._load_all_embeddings(embeddings_dict)
+    
+    def _load_all_embeddings(self, embeddings_dict):
+        """Load all embeddings (original behavior)."""
         embeddings = []
         labels = []
         
@@ -153,6 +162,95 @@ class EmbeddingLoader:
         
         print(f"✓ Loaded {len(embeddings)} embeddings of dimension {embeddings.shape[1]}")
         print(f"  Label distribution: {dict(zip(*np.unique(labels, return_counts=True)))}")
+        
+        return {'embeddings': embeddings, 'labels': labels}
+    
+    def _load_balanced_trees(self, embeddings_dict, n_project, children_per_tree):
+        """Load balanced trees to reach approximately n_project embeddings."""
+        import random
+        
+        # Calculate how many trees we need to reach n_project embeddings
+        # Each tree contributes: 1 parent_text + 1 child_text + children_per_tree child_images
+        embeddings_per_tree = 2 + children_per_tree  # parent_text + child_text + child_images
+        balanced_trees = max(1, n_project // embeddings_per_tree)
+        
+        print(f"Using balanced tree sampling: {balanced_trees} trees with {children_per_tree} child images each")
+        print(f"Target: ~{n_project} embeddings, Expected: ~{balanced_trees * embeddings_per_tree} embeddings")
+        
+        # Group embeddings by tree
+        trees = {}
+        for embed_id, embedding in embeddings_dict.items():
+            # Extract tree number from embed_id (e.g., 'pt_tree1' -> 'tree1')
+            if '_tree' in embed_id:
+                tree_part = embed_id.split('_tree')[1]
+                if '_' in tree_part:
+                    tree_id = tree_part.split('_')[0]  # Handle 'ci_tree1_001' -> '1'
+                else:
+                    tree_id = tree_part  # Handle 'pt_tree1' -> '1'
+                
+                tree_key = f"tree{tree_id}"
+                
+                if tree_key not in trees:
+                    trees[tree_key] = {'parent_text': [], 'child_text': [], 'child_image': [], 'parent_image': []}
+                
+                # Categorize embedding
+                if embed_id.startswith('pt_'):
+                    trees[tree_key]['parent_text'].append((embed_id, embedding))
+                elif embed_id.startswith('ct_'):
+                    trees[tree_key]['child_text'].append((embed_id, embedding))
+                elif embed_id.startswith('pi_'):
+                    trees[tree_key]['parent_image'].append((embed_id, embedding))
+                elif embed_id.startswith('ci_'):
+                    trees[tree_key]['child_image'].append((embed_id, embedding))
+        
+        print(f"Found {len(trees)} trees in dataset")
+        
+        # Select random trees
+        available_trees = list(trees.keys())
+        if len(available_trees) < balanced_trees:
+            print(f"Warning: Only {len(available_trees)} trees available, using all")
+            selected_trees = available_trees
+        else:
+            selected_trees = random.sample(available_trees, balanced_trees)
+        
+        print(f"Selected trees: {selected_trees[:10]}{'...' if len(selected_trees) > 10 else ''}")
+        
+        # Collect embeddings from selected trees
+        embeddings = []
+        labels = []
+        
+        for tree_key in selected_trees:
+            tree_data = trees[tree_key]
+            
+            # Add parent_text (should be 1 per tree)
+            for embed_id, embedding in tree_data['parent_text']:
+                embeddings.append(embedding)
+                labels.append('parent_text')
+            
+            # Add child_text (should be 1 per tree)
+            for embed_id, embedding in tree_data['child_text']:
+                embeddings.append(embedding)
+                labels.append('child_text')
+            
+            # Add parent_image (if any)
+            for embed_id, embedding in tree_data['parent_image']:
+                embeddings.append(embedding)
+                labels.append('parent_image')
+            
+            # Sample limited child_images
+            child_images = tree_data['child_image']
+            if len(child_images) > children_per_tree:
+                child_images = random.sample(child_images, children_per_tree)
+            
+            for embed_id, embedding in child_images:
+                embeddings.append(embedding)
+                labels.append('child_image')
+        
+        embeddings = torch.tensor(np.array(embeddings), dtype=torch.float32)
+        
+        print(f"✓ Loaded {len(embeddings)} embeddings from {len(selected_trees)} trees")
+        print(f"  Label distribution: {dict(zip(*np.unique(labels, return_counts=True)))}")
+        print(f"  Expected: {len(selected_trees)} parent_text, {len(selected_trees)} child_text, ~{len(selected_trees) * children_per_tree} child_image")
         
         return {'embeddings': embeddings, 'labels': labels}
 
@@ -253,17 +351,16 @@ def main():
     # Load embeddings
     print("\n📁 Loading embeddings...")
     loader = EmbeddingLoader(args.dataset_path)
-    embed_data = loader.load_embeddings()
+    embed_data = loader.load_embeddings(args.n_project, args.children_per_tree)
     
-    # Sample subset for projection if specified
+    # Embeddings are already sampled by the loader if n_project > 0
     embeddings = embed_data['embeddings']
     labels = embed_data['labels']
     
-    if args.n_project > 0 and len(embeddings) > args.n_project:
-        indices = torch.randperm(len(embeddings))[:args.n_project]
-        embeddings = embeddings[indices]
-        labels = [labels[i] for i in indices]
-        print(f"\n🎯 Using {args.n_project:,} samples for projection")
+    if args.n_project > 0:
+        print(f"\n🎯 Using balanced tree sampling: {len(embeddings):,} embeddings with {args.children_per_tree} children per tree")
+    else:
+        print(f"\n🎯 Using all {len(embeddings):,} embeddings")
     
 
     
