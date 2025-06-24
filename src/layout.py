@@ -225,7 +225,7 @@ def _centre_panel() -> html.Div:
                 id="comparison-plot-container",
                 children=[
                     html.Div([
-                        html.H5("Projection 1", style={"textAlign": "center", "margin": "0 0 1rem 0", "color": "#333"}),
+                        html.H5("HoroPCA", style={"textAlign": "center", "margin": "0 0 1rem 0", "color": "#333"}),
                         dcc.Graph(
                             id="scatter-disk-1",
                             figure=None,
@@ -234,7 +234,7 @@ def _centre_panel() -> html.Div:
                         ),
                     ], style={"flex": "1", "display": "flex", "flexDirection": "column"}),
                     html.Div([
-                        html.H5("Projection 2", style={"textAlign": "center", "margin": "0 0 1rem 0", "color": "#333"}),
+                        html.H5("CO-SNE", style={"textAlign": "center", "margin": "0 0 1rem 0", "color": "#333"}),
                         dcc.Graph(
                             id="scatter-disk-2",
                             figure=None,

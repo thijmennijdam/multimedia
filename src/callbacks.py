@@ -1724,7 +1724,7 @@ def register_callbacks(app: dash.Dash) -> None:
                 emb_labels = []
         
         # Create the figure with all mode features
-        fig = _create_full_interactive_scatter(dx, dy, labels, target_names, emb_labels, f"{opposite_proj.upper()}", sel, neighbor_indices, tree_connections, interp_transformed, mode)
+        fig = _create_full_interactive_scatter(dx, dy, labels, target_names, emb_labels, "", sel, neighbor_indices, tree_connections, interp_transformed, mode)
         return fig
 
     @app.callback(
@@ -1843,7 +1843,7 @@ def register_callbacks(app: dash.Dash) -> None:
                 emb_labels = []
         
         # Create the figure with all mode features
-        fig = _create_full_interactive_scatter(dx, dy, labels, target_names, emb_labels, f"{proj.upper()}", sel, neighbor_indices, tree_connections, interp_transformed, mode)
+        fig = _create_full_interactive_scatter(dx, dy, labels, target_names, emb_labels, "", sel, neighbor_indices, tree_connections, interp_transformed, mode)
         return fig
 
     @app.callback(
