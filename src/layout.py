@@ -415,7 +415,6 @@ def make_layout() -> html.Div:
             dcc.Store(id="mode", data="compare"),
             dcc.Store(id="interpolated-point"),
             dcc.Store(id="comparison-mode", data=False),
-            dcc.Store(id="emb2"),  # Store for second projection embeddings
             html.Div(
                 [_config_panel(), _centre_panel(), _cmp_panel()],
                 style={

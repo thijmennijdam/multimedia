@@ -1556,27 +1556,36 @@ def register_callbacks(app: dash.Dash) -> None:
 
     @app.callback(
         Output("scatter-disk-2", "figure"),
-        Input("emb2", "data"),
-        Input("proj", "value"),
+        Input("dataset-dropdown", "value"),
         Input("sel", "data"),
         Input("mode", "data"),
         Input("neighbors-slider", "value"),
         Input("interpolated-point", "data"),
         State("labels-store", "data"),
         State("target-names-store", "data"),
-        State("dataset-dropdown", "value"),
         State("data-store", "data"),
         State("points-store", "data"),
         Input("comparison-mode", "data"),
     )
-    def _scatter_plot_2(edata, main_proj, sel, mode, k_neighbors, traversal_path, labels_data, target_names, dataset_name, data_store, points, comparison_mode):
-        if not comparison_mode or edata is None or labels_data is None:
+    def _scatter_plot_2(dataset_name, sel, mode, k_neighbors, traversal_path, labels_data, target_names, data_store, points, comparison_mode):
+        if not comparison_mode or labels_data is None or not dataset_name:
             return {}
         
-        # Use the opposite projection method for the title
-        opposite_proj = "cosne" if main_proj == "horopca" else "horopca"
+        # Always load CO-SNE for right plot
+        try:
+            import pickle
+            dataset_dir = {"imagenet": "ImageNet", "grit": "GRIT"}.get(dataset_name, dataset_name)
+            emb_file = f"hierchical_datasets/{dataset_dir}/cosne_embeddings.pkl"
+            
+            with open(emb_file, "rb") as f_emb:
+                emb_data = pickle.load(f_emb)
+            
+            embeddings = np.array(emb_data["embeddings"], dtype=np.float32)
+            emb = embeddings
+        except Exception as e:
+            print(f"Error loading CO-SNE embeddings: {e}")
+            return {}
         
-        emb = np.asarray(edata, dtype=np.float32)
         labels = np.asarray(labels_data, dtype=int)
         sel = sel or []
         interp_point = (
@@ -1659,18 +1668,8 @@ def register_callbacks(app: dash.Dash) -> None:
                 neighbor_indices = []
                 tree_connections = []
         
-        # Load the original label types for color coding (for the opposite projection)
-        emb_labels = []
-        if dataset_name and opposite_proj:
-            try:
-                import pickle
-                dataset_dir = {"imagenet": "ImageNet", "grit": "GRIT"}.get(dataset_name, dataset_name)
-                emb_file = f"hierchical_datasets/{dataset_dir}/{opposite_proj}_embeddings.pkl"
-                with open(emb_file, "rb") as f:
-                    emb_data_loaded = pickle.load(f)
-                emb_labels = emb_data_loaded.get("labels", [])
-            except Exception as e:
-                emb_labels = []
+        # Load the original label types for color coding (always CO-SNE for right plot)
+        emb_labels = emb_data.get("labels", [])
         
         # Create the figure with all mode features
         fig = _create_full_interactive_scatter(dx, dy, labels, target_names, emb_labels, "", sel, neighbor_indices, tree_connections, interp_transformed, mode)
@@ -1678,24 +1677,36 @@ def register_callbacks(app: dash.Dash) -> None:
 
     @app.callback(
         Output("scatter-disk-1", "figure"),
-        Input("emb", "data"),
-        Input("proj", "value"),
+        Input("dataset-dropdown", "value"),
         Input("sel", "data"),
         Input("mode", "data"),
         Input("neighbors-slider", "value"),
         Input("interpolated-point", "data"),
         State("labels-store", "data"),
         State("target-names-store", "data"),
-        State("dataset-dropdown", "value"),
         State("data-store", "data"),
         State("points-store", "data"),
         Input("comparison-mode", "data"),
     )
-    def _scatter_plot_1(edata, proj, sel, mode, k_neighbors, traversal_path, labels_data, target_names, dataset_name, data_store, points, comparison_mode):
-        if not comparison_mode or edata is None or labels_data is None:
+    def _scatter_plot_1(dataset_name, sel, mode, k_neighbors, traversal_path, labels_data, target_names, data_store, points, comparison_mode):
+        if not comparison_mode or labels_data is None or not dataset_name:
             return {}
         
-        emb = np.asarray(edata, dtype=np.float32)
+        # Always load HoroPCA for left plot
+        try:
+            import pickle
+            dataset_dir = {"imagenet": "ImageNet", "grit": "GRIT"}.get(dataset_name, dataset_name)
+            emb_file = f"hierchical_datasets/{dataset_dir}/horopca_embeddings.pkl"
+            
+            with open(emb_file, "rb") as f_emb:
+                emb_data = pickle.load(f_emb)
+            
+            embeddings = np.array(emb_data["embeddings"], dtype=np.float32)
+            emb = embeddings
+        except Exception as e:
+            print(f"Error loading HoroPCA embeddings: {e}")
+            return {}
+        
         labels = np.asarray(labels_data, dtype=int)
         sel = sel or []
         interp_point = (
@@ -1778,57 +1789,14 @@ def register_callbacks(app: dash.Dash) -> None:
                 neighbor_indices = []
                 tree_connections = []
         
-        # Load the original label types for color coding
-        emb_labels = []
-        if dataset_name and proj:
-            try:
-                import pickle
-                dataset_dir = {"imagenet": "ImageNet", "grit": "GRIT"}.get(dataset_name, dataset_name)
-                emb_file = f"hierchical_datasets/{dataset_dir}/{proj}_embeddings.pkl"
-                with open(emb_file, "rb") as f:
-                    emb_data_loaded = pickle.load(f)
-                emb_labels = emb_data_loaded.get("labels", [])
-            except Exception as e:
-                emb_labels = []
+        # Load the original label types for color coding (always HoroPCA for left plot)
+        emb_labels = emb_data.get("labels", [])
         
         # Create the figure with all mode features
         fig = _create_full_interactive_scatter(dx, dy, labels, target_names, emb_labels, "", sel, neighbor_indices, tree_connections, interp_transformed, mode)
         return fig
 
-    @app.callback(
-        Output("emb2", "data"),
-        Input("dataset-dropdown", "value"),
-        Input("proj", "value"),
-        Input("comparison-mode", "data"),
-        prevent_initial_call=False,
-    )
-    def _load_opposite_projection(dataset_name, projection_method, comparison_mode):
-        if not comparison_mode or not dataset_name or not projection_method:
-            return None
-        
-        # Use the opposite projection method
-        opposite_projection = "cosne" if projection_method == "horopca" else "horopca"
-        
-        try:
-            import pickle
-            # Map dataset names to correct directory names
-            dataset_dir = {"imagenet": "ImageNet", "grit": "GRIT"}.get(dataset_name, dataset_name)
-            emb_file = f"hierchical_datasets/{dataset_dir}/{opposite_projection}_embeddings.pkl"
-            
-            with open(emb_file, "rb") as f_emb:
-                emb_data = pickle.load(f_emb)
-            
-            embeddings = np.array(emb_data["embeddings"], dtype=np.float32)
-            print(f"Loaded opposite projection {dataset_name} with {opposite_projection}: {embeddings.shape} embeddings")
-            
-            return embeddings.tolist()
-            
-        except FileNotFoundError as e:
-            print(f"Error loading opposite projection files: {e}")
-            return None
-        except Exception as e:
-            print(f"ERROR: Opposite projection loading failed: {e}")
-            return None
+
 
     @app.callback(
         Output("hyperparams-table", "children"),
