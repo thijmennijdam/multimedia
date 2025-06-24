@@ -201,6 +201,51 @@ def _create_full_interactive_scatter(x, y, labels, target_names, emb_labels, tit
     traces = []
     neighbor_set = set(neighbor_indices) if neighbor_indices is not None else set()
     
+    # Add interpolated path FIRST (like single mode) so colored points appear on top
+    if interp_point is not None:
+        if len(interp_point.shape) == 2 and interp_point.shape[0] > 1:
+            # Multiple points forming a path - match single mode styling exactly
+            # Plot orange diamond markers for all traversal points
+            traces.append(
+                go.Scatter(
+                    x=interp_point[:, 0],
+                    y=interp_point[:, 1],
+                    mode="markers",
+                    marker=dict(size=12, color="orange", symbol="diamond"),
+                    name="Traversal Path Points",
+                    text=[f"Traversal {i}" for i in range(len(interp_point))],
+                    hoverinfo="text",
+                    showlegend=True,
+                )
+            )
+            # Plot a dashed orange line between every two adjacent points
+            for i in range(len(interp_point) - 1):
+                traces.append(
+                    go.Scatter(
+                        x=[interp_point[i, 0], interp_point[i+1, 0]],
+                        y=[interp_point[i, 1], interp_point[i+1, 1]],
+                        mode="lines",
+                        line=dict(color="orange", width=2, dash="dash"),
+                        name="Traversal Segment" if i == 0 else None,
+                        showlegend=(i == 0),
+                        hoverinfo="skip",
+                    )
+                )
+        else:
+            # Single interpolated point
+            traces.append(
+                go.Scatter(
+                    x=[interp_point[0]],
+                    y=[interp_point[1]],
+                    mode="markers",
+                    marker=dict(size=12, color="orange", symbol="diamond"),
+                    name="Interpolated point",
+                    text=["Interpolated point"],
+                    hoverinfo="text",
+                    showlegend=False,
+                )
+            )
+    
     # If we have emb_labels, create separate traces for each label type
     if emb_labels and len(emb_labels) == len(x):
         unique_label_types = sorted(set(emb_labels))
@@ -353,20 +398,7 @@ def _create_full_interactive_scatter(x, y, labels, target_names, emb_labels, tit
             )
             traces.append(selected_trace)
     
-    # # Add interpolated point
-    # if interp_point is not None:
-    #     traces.append(
-    #         go.Scatter(
-    #             x=[interp_point[0]],
-    #             y=[interp_point[1]],
-    #             mode="markers",
-    #             marker=dict(size=12, color="orange", symbol="diamond"),
-    #             name="Interpolated point",
-    #             text=["Interpolated point"],
-    #             hoverinfo="text",
-    #             showlegend=False,
-    #         )
-    #     )
+
     
     fig = go.Figure(data=traces)
     fig.update_layout(
@@ -1064,14 +1096,28 @@ def register_callbacks(app: dash.Dash) -> None:
         Input("run-interpolate-btn", "n_clicks"),
         Input("interpolation-slider", "value"),
         State("sel", "data"),
-        State("emb", "data"),
         State("proj", "value"),
+        State("dataset-dropdown", "value"),
         prevent_initial_call=True,
     )
-    def _interpolate(n_clicks, t, sel, edata, proj):
-        if not (n_clicks and sel and len(sel) == 2 and edata):
+    def _interpolate(n_clicks, t, sel, proj, dataset_name):
+        if not (n_clicks and sel and len(sel) == 2 and proj and dataset_name):
             return None
-        emb = np.asarray(edata, dtype=np.float32)
+        
+        # Load the embeddings for the selected projection method
+        try:
+            import pickle
+            dataset_dir = {"imagenet": "ImageNet", "grit": "GRIT"}.get(dataset_name, dataset_name)
+            emb_file = f"hierchical_datasets/{dataset_dir}/{proj}_embeddings.pkl"
+            
+            with open(emb_file, "rb") as f_emb:
+                emb_data = pickle.load(f_emb)
+            
+            emb = np.array(emb_data["embeddings"], dtype=np.float32)
+        except Exception as e:
+            print(f"Error loading embeddings for interpolation: {e}")
+            return None
+        
         i, j = sel[:2]
         p1, p2 = emb[i], emb[j]
         traversal_path = _interpolate_hyperbolic(p1, p2, emb, model='tmp', steps=t)
@@ -1566,8 +1612,9 @@ def register_callbacks(app: dash.Dash) -> None:
         State("data-store", "data"),
         State("points-store", "data"),
         Input("comparison-mode", "data"),
+        State("proj", "value"),
     )
-    def _scatter_plot_2(dataset_name, sel, mode, k_neighbors, traversal_path, labels_data, target_names, data_store, points, comparison_mode):
+    def _scatter_plot_2(dataset_name, sel, mode, k_neighbors, traversal_path, labels_data, target_names, data_store, points, comparison_mode, selected_proj):
         if not comparison_mode or labels_data is None or not dataset_name:
             return {}
         
@@ -1588,11 +1635,28 @@ def register_callbacks(app: dash.Dash) -> None:
         
         labels = np.asarray(labels_data, dtype=int)
         sel = sel or []
-        interp_point = (
-            np.asarray(traversal_path, dtype=np.float32)
-            if traversal_path is not None
-            else None
-        )
+        
+        # Handle interpolated points - they are calculated in the space of selected_proj
+        # traversal_path contains indices into the dataset, not coordinates
+        interp_point = None
+        if traversal_path is not None and isinstance(traversal_path, list):
+            if selected_proj == "cosne":
+                # Path was calculated in CO-SNE space, get the coordinates for these indices
+                interp_coords = []
+                for idx in traversal_path:
+                    if idx < len(emb):
+                        interp_coords.append(emb[idx])
+                if interp_coords:
+                    interp_point = np.array(interp_coords)
+            else:
+                # Path was calculated in HoroPCA space, but we're showing CO-SNE
+                # Show the same indices but in CO-SNE coordinates
+                interp_coords = []
+                for idx in traversal_path:
+                    if idx < len(emb):
+                        interp_coords.append(emb[idx])
+                if interp_coords:
+                    interp_point = np.array(interp_coords)
         
         # Handle 2D embeddings for disk projection (same as main scatter)
         xh, yh = emb[:, 0], emb[:, 1]
@@ -1602,12 +1666,28 @@ def register_callbacks(app: dash.Dash) -> None:
             zh = np.zeros(emb.shape[0])
         dx, dy = xh / (1.0 + zh), yh / (1.0 + zh)
         
-        # Transform interpolated point if exists
+        # Transform interpolated path if exists
         interp_transformed = None
         if interp_point is not None:
-            interp_dx = interp_point[0] / (1.0 + interp_point[2])
-            interp_dy = interp_point[1] / (1.0 + interp_point[2])
-            interp_transformed = np.array([interp_dx, interp_dy])
+            if len(interp_point.shape) == 2 and interp_point.shape[0] > 1:
+                # Multiple points forming a path - transform each point
+                interp_coords = []
+                for pt in interp_point:
+                    if len(pt) > 2:
+                        interp_dx = pt[0] / (1.0 + pt[2])
+                        interp_dy = pt[1] / (1.0 + pt[2])
+                    else:
+                        interp_dx, interp_dy = pt[0], pt[1]
+                    interp_coords.append([interp_dx, interp_dy])
+                interp_transformed = np.array(interp_coords)
+            else:
+                # Single point
+                if len(interp_point) > 2:
+                    interp_dx = interp_point[0] / (1.0 + interp_point[2])
+                    interp_dy = interp_point[1] / (1.0 + interp_point[2])
+                else:
+                    interp_dx, interp_dy = interp_point[0], interp_point[1]
+                interp_transformed = np.array([interp_dx, interp_dy])
         
         # Calculate neighbors and tree connections based on mode
         neighbor_indices = []
@@ -1687,8 +1767,9 @@ def register_callbacks(app: dash.Dash) -> None:
         State("data-store", "data"),
         State("points-store", "data"),
         Input("comparison-mode", "data"),
+        State("proj", "value"),
     )
-    def _scatter_plot_1(dataset_name, sel, mode, k_neighbors, traversal_path, labels_data, target_names, data_store, points, comparison_mode):
+    def _scatter_plot_1(dataset_name, sel, mode, k_neighbors, traversal_path, labels_data, target_names, data_store, points, comparison_mode, selected_proj):
         if not comparison_mode or labels_data is None or not dataset_name:
             return {}
         
@@ -1709,11 +1790,28 @@ def register_callbacks(app: dash.Dash) -> None:
         
         labels = np.asarray(labels_data, dtype=int)
         sel = sel or []
-        interp_point = (
-            np.asarray(traversal_path, dtype=np.float32)
-            if traversal_path is not None
-            else None
-        )
+        
+        # Handle interpolated points - they are calculated in the space of selected_proj
+        # traversal_path contains indices into the dataset, not coordinates
+        interp_point = None
+        if traversal_path is not None and isinstance(traversal_path, list):
+            if selected_proj == "horopca":
+                # Path was calculated in HoroPCA space, get the coordinates for these indices
+                interp_coords = []
+                for idx in traversal_path:
+                    if idx < len(emb):
+                        interp_coords.append(emb[idx])
+                if interp_coords:
+                    interp_point = np.array(interp_coords)
+            else:
+                # Path was calculated in CO-SNE space, but we're showing HoroPCA
+                # Show the same indices but in HoroPCA coordinates
+                interp_coords = []
+                for idx in traversal_path:
+                    if idx < len(emb):
+                        interp_coords.append(emb[idx])
+                if interp_coords:
+                    interp_point = np.array(interp_coords)
         
         # Handle 2D embeddings for disk projection (same as main scatter)
         xh, yh = emb[:, 0], emb[:, 1]
@@ -1723,12 +1821,28 @@ def register_callbacks(app: dash.Dash) -> None:
             zh = np.zeros(emb.shape[0])
         dx, dy = xh / (1.0 + zh), yh / (1.0 + zh)
         
-        # Transform interpolated point if exists
+        # Transform interpolated path if exists
         interp_transformed = None
         if interp_point is not None:
-            interp_dx = interp_point[0] / (1.0 + interp_point[2])
-            interp_dy = interp_point[1] / (1.0 + interp_point[2])
-            interp_transformed = np.array([interp_dx, interp_dy])
+            if len(interp_point.shape) == 2 and interp_point.shape[0] > 1:
+                # Multiple points forming a path - transform each point
+                interp_coords = []
+                for pt in interp_point:
+                    if len(pt) > 2:
+                        interp_dx = pt[0] / (1.0 + pt[2])
+                        interp_dy = pt[1] / (1.0 + pt[2])
+                    else:
+                        interp_dx, interp_dy = pt[0], pt[1]
+                    interp_coords.append([interp_dx, interp_dy])
+                interp_transformed = np.array(interp_coords)
+            else:
+                # Single point
+                if len(interp_point) > 2:
+                    interp_dx = interp_point[0] / (1.0 + interp_point[2])
+                    interp_dy = interp_point[1] / (1.0 + interp_point[2])
+                else:
+                    interp_dx, interp_dy = interp_point[0], interp_point[1]
+                interp_transformed = np.array([interp_dx, interp_dy])
         
         # Calculate neighbors and tree connections based on mode
         neighbor_indices = []
