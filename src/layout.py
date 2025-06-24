@@ -242,13 +242,19 @@ def _centre_panel() -> html.Div:
                             "displayModeBar": True,
                             "displaylogo": False,
                             "modeBarButtonsToRemove": ["lasso2d", "select2d"],
+                            "modeBarButtonsToAdd": [],
+                            "showTips": True,
                             "toImageButtonOptions": {
                                 "format": "png",
                                 "filename": "scatter_plot",
                                 "height": 600,
                                 "width": 800,
                                 "scale": 2
-                            }
+                            },
+                            "modeBarButtons": [
+                                ["pan2d", "zoom2d", "zoomIn2d", "zoomOut2d", "autoScale2d", "resetScale2d"],
+                                ["toImage"]
+                            ]
                         },
                     ),
                 ],
@@ -269,38 +275,50 @@ def _centre_panel() -> html.Div:
                         dcc.Graph(
                             id="scatter-disk-1",
                             figure=None,
-                            style={"width": "100%", "height": "100%"},
+                            style={"width": "100%", "height": "100%", "minWidth": "400px"},
                             config={
                                 "displayModeBar": True,
                                 "displaylogo": False,
                                 "modeBarButtonsToRemove": ["lasso2d", "select2d"],
+                                "modeBarButtonsToAdd": [],
+                                "showTips": True,
                                 "toImageButtonOptions": {
                                     "format": "png",
                                     "filename": "horopca_plot",
                                     "height": 600,
                                     "width": 800,
                                     "scale": 2
-                                }
+                                },
+                                "modeBarButtons": [
+                                    ["pan2d", "zoom2d", "zoomIn2d", "zoomOut2d", "autoScale2d", "resetScale2d"],
+                                    ["toImage"]
+                                ]
                             },
                         ),
-                    ], style={"flex": "1", "display": "flex", "flexDirection": "column"}),
+                    ], style={"flex": "1", "display": "flex", "flexDirection": "column", "minWidth": "0", "overflow": "visible"}),
                     html.Div([
                         html.H5("CO-SNE", style={"textAlign": "center", "margin": "0 0 1rem 0", "color": "#333"}),
                         dcc.Graph(
                             id="scatter-disk-2",
                             figure=None,
-                            style={"width": "100%", "height": "100%"},
+                            style={"width": "100%", "height": "100%", "minWidth": "400px"},
                             config={
                                 "displayModeBar": True,
                                 "displaylogo": False,
                                 "modeBarButtonsToRemove": ["lasso2d", "select2d"],
+                                "modeBarButtonsToAdd": [],
+                                "showTips": True,
                                 "toImageButtonOptions": {
                                     "format": "png",
                                     "filename": "cosne_plot",
                                     "height": 600,
                                     "width": 800,
                                     "scale": 2
-                                }
+                                },
+                                "modeBarButtons": [
+                                    ["pan2d", "zoom2d", "zoomIn2d", "zoomOut2d", "autoScale2d", "resetScale2d"],
+                                    ["toImage"]
+                                ]
                             },
                         ),
                     ], style={"flex": "1", "display": "flex", "flexDirection": "column"}),
@@ -309,11 +327,12 @@ def _centre_panel() -> html.Div:
                     "display": "none",
                     "width": "100%",
                     "height": "100%",
-                    "maxWidth": "1200px",
-                    "maxHeight": "600px",
+                    "maxWidth": "1400px",
+                    "maxHeight": "700px",
                     "margin": "auto",
                     "gap": "1rem",
                     "flexDirection": "row",
+                    "overflow": "visible",
                 },
             ),
         ],
@@ -328,7 +347,7 @@ def _centre_panel() -> html.Div:
             "justifyContent": "center",
             "alignItems": "center",
             "minHeight": 0,
-            "overflow": "hidden",
+            "overflow": "visible",
         },
     )
 
