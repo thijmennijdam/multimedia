@@ -87,6 +87,7 @@ def _create_simple_scatter(x, y, labels, target_names, emb_labels, title):
             xanchor="center",
             x=0.5
         ),
+        dragmode='pan',
     )
     return fig
 
@@ -185,6 +186,7 @@ def _create_interactive_scatter(x, y, labels, target_names, emb_labels, title, s
             xanchor="center",
             x=0.5
         ),
+        dragmode='pan',
     )
     return fig
 
@@ -439,6 +441,7 @@ def _create_full_interactive_scatter(x, y, labels, target_names, emb_labels, tit
             xanchor="center",
             x=0.5
         ),
+        dragmode='pan',
     )
     return fig
 
@@ -1038,6 +1041,7 @@ def register_callbacks(app: dash.Dash) -> None:
                     x=0.5
                 ),
                 annotations=annotations,
+                dragmode='pan',
             )
             return fig
 

@@ -238,7 +238,18 @@ def _centre_panel() -> html.Div:
                         id="scatter-disk",
                         figure=None,  # Will be set by callback
                         style={"width": "100%", "height": "100%"},
-                        config={"displayModeBar": False},
+                        config={
+                            "displayModeBar": True,
+                            "displaylogo": False,
+                            "modeBarButtonsToRemove": ["lasso2d", "select2d"],
+                            "toImageButtonOptions": {
+                                "format": "png",
+                                "filename": "scatter_plot",
+                                "height": 600,
+                                "width": 800,
+                                "scale": 2
+                            }
+                        },
                     ),
                 ],
                 style={
@@ -259,7 +270,18 @@ def _centre_panel() -> html.Div:
                             id="scatter-disk-1",
                             figure=None,
                             style={"width": "100%", "height": "100%"},
-                            config={"displayModeBar": False},
+                            config={
+                                "displayModeBar": True,
+                                "displaylogo": False,
+                                "modeBarButtonsToRemove": ["lasso2d", "select2d"],
+                                "toImageButtonOptions": {
+                                    "format": "png",
+                                    "filename": "horopca_plot",
+                                    "height": 600,
+                                    "width": 800,
+                                    "scale": 2
+                                }
+                            },
                         ),
                     ], style={"flex": "1", "display": "flex", "flexDirection": "column"}),
                     html.Div([
@@ -268,7 +290,18 @@ def _centre_panel() -> html.Div:
                             id="scatter-disk-2",
                             figure=None,
                             style={"width": "100%", "height": "100%"},
-                            config={"displayModeBar": False},
+                            config={
+                                "displayModeBar": True,
+                                "displaylogo": False,
+                                "modeBarButtonsToRemove": ["lasso2d", "select2d"],
+                                "toImageButtonOptions": {
+                                    "format": "png",
+                                    "filename": "cosne_plot",
+                                    "height": 600,
+                                    "width": 800,
+                                    "scale": 2
+                                }
+                            },
                         ),
                     ], style={"flex": "1", "display": "flex", "flexDirection": "column"}),
                 ],
