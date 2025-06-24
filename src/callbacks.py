@@ -261,7 +261,7 @@ def _create_full_interactive_scatter(x, y, labels, target_names, emb_labels, tit
                             size=12,  # Larger size for neighbors
                             opacity=1.0,  # Full opacity for neighbors
                             color=colors.get(label_type, 'gray'),
-                            line=dict(width=2, color='white')  # White border to make them stand out
+                            line=dict(width=2, color='purple')  # Purple border to make them stand out
                         ),
                         name=f"{label_type.replace('_', ' ').title()} (Neighbors)",
                         showlegend=False,  # Don't show in legend to avoid clutter
@@ -309,7 +309,7 @@ def _create_full_interactive_scatter(x, y, labels, target_names, emb_labels, tit
                     opacity=1.0,  # Full opacity for neighbors
                     color=[labels[i] for i in neighbor_indices_list], 
                     colorscale="Viridis",
-                    line=dict(width=2, color='white')  # White border to make them stand out
+                    line=dict(width=2, color='purple')  # Purple border to make them stand out
                 ),
                 name="Neighbors",
                 showlegend=False,
@@ -798,7 +798,7 @@ def register_callbacks(app: dash.Dash) -> None:
                                     size=12,  # Larger size for neighbors
                                     opacity=1.0,  # Full opacity for neighbors
                                     color=colors.get(label_type, 'gray'),
-                                    line=dict(width=2, color='white')  # White border to make them stand out
+                                    line=dict(width=2, color='purple')  # Purple border to make them stand out
                                 ),
                                 name=f"{label_type.replace('_', ' ').title()} (Neighbors)",
                                 showlegend=False,  # Don't show in legend to avoid clutter
@@ -850,7 +850,7 @@ def register_callbacks(app: dash.Dash) -> None:
                             opacity=1.0,  # Full opacity for neighbors
                             color=[labels[i] for i in neighbor_indices_list], 
                             colorscale="Viridis",
-                            line=dict(width=2, color='white')  # White border to make them stand out
+                            line=dict(width=2, color='purple')  # Purple border to make them stand out
                         ),
                         name="Neighbors",
                         showlegend=False,
