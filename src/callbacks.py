@@ -398,6 +398,30 @@ def _create_full_interactive_scatter(x, y, labels, target_names, emb_labels, tit
             )
             traces.append(selected_trace)
     
+    # Calculate the maximum distance from origin to any point for boundary circle
+    max_distance = 0
+    for trace in traces:
+        if hasattr(trace, 'x') and hasattr(trace, 'y') and len(trace.x) > 0 and len(trace.y) > 0:
+            distances = np.sqrt(np.array(trace.x)**2 + np.array(trace.y)**2)
+            max_distance = max(max_distance, np.max(distances))
+    
+    # Add boundary circle if we have data points
+    if max_distance > 0:
+        circle_radius = 1.1 * max_distance
+        theta = np.linspace(0, 2*np.pi, 100)
+        circle_x = circle_radius * np.cos(theta)
+        circle_y = circle_radius * np.sin(theta)
+        
+        # Add circle trace (make sure it's first so it renders behind other traces)
+        circle_trace = go.Scatter(
+            x=circle_x,
+            y=circle_y,
+            mode='lines',
+            line=dict(color='lightgray', width=1),
+            showlegend=False,
+            hoverinfo='skip'
+        )
+        traces.insert(0, circle_trace)
 
     
     fig = go.Figure(data=traces)
@@ -969,6 +993,31 @@ def register_callbacks(app: dash.Dash) -> None:
                         name="Selected point",
                     )
                 )
+            
+            # Calculate the maximum distance from origin to any point for boundary circle
+            max_distance = 0
+            for trace in traces:
+                if hasattr(trace, 'x') and hasattr(trace, 'y') and len(trace.x) > 0 and len(trace.y) > 0:
+                    distances = np.sqrt(np.array(trace.x)**2 + np.array(trace.y)**2)
+                    max_distance = max(max_distance, np.max(distances))
+            
+            # Add boundary circle if we have data points
+            if max_distance > 0:
+                circle_radius = 1.1 * max_distance
+                theta = np.linspace(0, 2*np.pi, 100)
+                circle_x = circle_radius * np.cos(theta)
+                circle_y = circle_radius * np.sin(theta)
+                
+                # Add circle trace (make sure it's first so it renders behind other traces)
+                circle_trace = go.Scatter(
+                    x=circle_x,
+                    y=circle_y,
+                    mode='lines',
+                    line=dict(color='lightgray', width=1),
+                    showlegend=False,
+                    hoverinfo='skip'
+                )
+                traces.insert(0, circle_trace)
 
             fig = go.Figure(data=traces)
             
