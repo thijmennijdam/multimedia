@@ -1552,7 +1552,6 @@ def register_callbacks(app: dash.Dash) -> None:
     @app.callback(
         Output("comparison-mode", "data"),
         Output("compare-projections-btn", "style"),
-        Output("proj2-container", "style"),
         Output("single-plot-container", "style"),
         Output("comparison-plot-container", "style"),
         Input("compare-projections-btn", "n_clicks"),
@@ -1587,7 +1586,6 @@ def register_callbacks(app: dash.Dash) -> None:
             return (
                 True,
                 btn_style_active,
-                {"display": "block"},  # Show second projection dropdown
                 {"display": "none"},   # Hide single plot
                 {"display": "flex"}    # Show comparison plots
             )
@@ -1596,7 +1594,6 @@ def register_callbacks(app: dash.Dash) -> None:
             return (
                 False,
                 btn_style_inactive,
-                {"display": "none"},   # Hide second projection dropdown
                 {                      # Show single plot
                     "width": "100%",
                     "height": "100%",
@@ -1609,41 +1606,9 @@ def register_callbacks(app: dash.Dash) -> None:
             )
 
     @app.callback(
-        Output("emb2", "data"),
-        Input("dataset-dropdown", "value"),
-        Input("proj2", "value"),
-        Input("comparison-mode", "data"),
-        prevent_initial_call=False,
-    )
-    def _load_second_projection(dataset_name, projection_method, comparison_mode):
-        if not comparison_mode or not dataset_name or not projection_method:
-            return None
-        
-        try:
-            import pickle
-            # Map dataset names to correct directory names
-            dataset_dir = {"imagenet": "ImageNet", "grit": "GRIT"}.get(dataset_name, dataset_name)
-            emb_file = f"hierchical_datasets/{dataset_dir}/{projection_method}_embeddings.pkl"
-            
-            with open(emb_file, "rb") as f_emb:
-                emb_data = pickle.load(f_emb)
-            
-            embeddings = np.array(emb_data["embeddings"], dtype=np.float32)
-            print(f"Loaded second projection {dataset_name} with {projection_method}: {embeddings.shape} embeddings")
-            
-            return embeddings.tolist()
-            
-        except FileNotFoundError as e:
-            print(f"Error loading second projection files: {e}")
-            return None
-        except Exception as e:
-            print(f"ERROR: Second projection loading failed: {e}")
-            return None
-
-    @app.callback(
         Output("scatter-disk-2", "figure"),
         Input("emb2", "data"),
-        Input("proj2", "value"),
+        Input("proj", "value"),
         Input("sel", "data"),
         Input("mode", "data"),
         Input("neighbors-slider", "value"),
@@ -1655,9 +1620,12 @@ def register_callbacks(app: dash.Dash) -> None:
         State("points-store", "data"),
         Input("comparison-mode", "data"),
     )
-    def _scatter_plot_2(edata, proj, sel, mode, k_neighbors, interpolated_point, labels_data, target_names, dataset_name, data_store, points, comparison_mode):
+    def _scatter_plot_2(edata, main_proj, sel, mode, k_neighbors, interpolated_point, labels_data, target_names, dataset_name, data_store, points, comparison_mode):
         if not comparison_mode or edata is None or labels_data is None:
             return {}
+        
+        # Use the opposite projection method for the title
+        opposite_proj = "cosne" if main_proj == "horopca" else "horopca"
         
         emb = np.asarray(edata, dtype=np.float32)
         labels = np.asarray(labels_data, dtype=int)
@@ -1742,13 +1710,13 @@ def register_callbacks(app: dash.Dash) -> None:
                 neighbor_indices = []
                 tree_connections = []
         
-        # Load the original label types for color coding
+        # Load the original label types for color coding (for the opposite projection)
         emb_labels = []
-        if dataset_name and proj:
+        if dataset_name and opposite_proj:
             try:
                 import pickle
                 dataset_dir = {"imagenet": "ImageNet", "grit": "GRIT"}.get(dataset_name, dataset_name)
-                emb_file = f"hierchical_datasets/{dataset_dir}/{proj}_embeddings.pkl"
+                emb_file = f"hierchical_datasets/{dataset_dir}/{opposite_proj}_embeddings.pkl"
                 with open(emb_file, "rb") as f:
                     emb_data_loaded = pickle.load(f)
                 emb_labels = emb_data_loaded.get("labels", [])
@@ -1756,7 +1724,7 @@ def register_callbacks(app: dash.Dash) -> None:
                 emb_labels = []
         
         # Create the figure with all mode features
-        fig = _create_full_interactive_scatter(dx, dy, labels, target_names, emb_labels, f"{proj.upper()}", sel, neighbor_indices, tree_connections, interp_transformed, mode)
+        fig = _create_full_interactive_scatter(dx, dy, labels, target_names, emb_labels, f"{opposite_proj.upper()}", sel, neighbor_indices, tree_connections, interp_transformed, mode)
         return fig
 
     @app.callback(
@@ -1878,4 +1846,39 @@ def register_callbacks(app: dash.Dash) -> None:
         fig = _create_full_interactive_scatter(dx, dy, labels, target_names, emb_labels, f"{proj.upper()}", sel, neighbor_indices, tree_connections, interp_transformed, mode)
         return fig
 
-    # ... (other callbacks: _compute, _select, _update_button_state, _interpolate, _update_tree_view, _update_mode, _compare, _cmp_header) ...
+    @app.callback(
+        Output("emb2", "data"),
+        Input("dataset-dropdown", "value"),
+        Input("proj", "value"),
+        Input("comparison-mode", "data"),
+        prevent_initial_call=False,
+    )
+    def _load_opposite_projection(dataset_name, projection_method, comparison_mode):
+        if not comparison_mode or not dataset_name or not projection_method:
+            return None
+        
+        # Use the opposite projection method
+        opposite_projection = "cosne" if projection_method == "horopca" else "horopca"
+        
+        try:
+            import pickle
+            # Map dataset names to correct directory names
+            dataset_dir = {"imagenet": "ImageNet", "grit": "GRIT"}.get(dataset_name, dataset_name)
+            emb_file = f"hierchical_datasets/{dataset_dir}/{opposite_projection}_embeddings.pkl"
+            
+            with open(emb_file, "rb") as f_emb:
+                emb_data = pickle.load(f_emb)
+            
+            embeddings = np.array(emb_data["embeddings"], dtype=np.float32)
+            print(f"Loaded opposite projection {dataset_name} with {opposite_projection}: {embeddings.shape} embeddings")
+            
+            return embeddings.tolist()
+            
+        except FileNotFoundError as e:
+            print(f"Error loading opposite projection files: {e}")
+            return None
+        except Exception as e:
+            print(f"ERROR: Opposite projection loading failed: {e}")
+            return None
+
+    # End of callbacks

@@ -55,24 +55,6 @@ def _config_panel() -> html.Div:
                         "transition": "background-color 0.2s",
                     },
                 ),
-                html.Div([
-                    html.Label("Second Projection", style={"fontSize": "0.9rem"}),
-                    dcc.Dropdown(
-                        id="proj2",
-                        options=[
-                            {"label": "HoroPCA", "value": "horopca"},
-                            {"label": "CO-SNE", "value": "cosne"}
-                        ],
-                        value="cosne",
-                        clearable=False,
-                        style={
-                            "backgroundColor": "white",
-                            "border": "1px solid #ccc",
-                            "borderRadius": "6px",
-                            "color": "black",
-                        },
-                    ),
-                ], id="proj2-container", style={"display": "none"}),
             ]),
             html.Br(),
             html.Label("Mode"),
