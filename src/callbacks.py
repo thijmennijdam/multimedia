@@ -1881,4 +1881,73 @@ def register_callbacks(app: dash.Dash) -> None:
             print(f"ERROR: Opposite projection loading failed: {e}")
             return None
 
+    @app.callback(
+        Output("hyperparams-table", "children"),
+        Input("proj", "value"),
+    )
+    def _update_hyperparams_display(projection_method):
+        """Update hyperparameters display based on selected projection method."""
+        if not projection_method:
+            return html.Div()
+        
+        if projection_method == "horopca":
+            # HoroPCA hyperparameters from create_projections.py
+            params = [
+                {"param": "Components", "value": "2", "description": "Output dimensions"},
+                {"param": "Learning Rate", "value": "0.05", "description": "Optimization step size"},
+                {"param": "Max Steps", "value": "500", "description": "Maximum iterations"},
+            ]
+        elif projection_method == "cosne":
+            # CO-SNE hyperparameters from create_projections.py
+            params = [
+                {"param": "Learning Rate", "value": "0.5", "description": "Main learning rate"},
+                {"param": "Hyperbolic LR", "value": "0.01", "description": "Hyperbolic learning rate"},
+                {"param": "Perplexity", "value": "30", "description": "Local neighborhood size"},
+                {"param": "Exaggeration", "value": "12.0", "description": "Early exaggeration factor"},
+                {"param": "Gamma", "value": "0.1", "description": "Student-t distribution parameter"},
+            ]
+        else:
+            return html.Div("Unknown projection method")
+        
+        # Create table rows
+        table_rows = []
+        for param in params:
+            table_rows.append(
+                html.Tr([
+                    html.Td(param["param"], style={
+                        "fontWeight": "600", 
+                        "color": "#495057",
+                        "fontSize": "0.8rem",
+                        "padding": "0.25rem 0.5rem 0.25rem 0",
+                        "borderBottom": "1px solid #e9ecef",
+                        "width": "35%"
+                    }),
+                    html.Td(param["value"], style={
+                        "color": "#007bff", 
+                        "fontFamily": "monospace",
+                        "fontSize": "0.8rem",
+                        "padding": "0.25rem 0.5rem",
+                        "borderBottom": "1px solid #e9ecef",
+                        "width": "25%",
+                        "textAlign": "center"
+                    }),
+                    html.Td(param["description"], style={
+                        "color": "#6c757d", 
+                        "fontSize": "0.75rem",
+                        "padding": "0.25rem 0 0.25rem 0.5rem",
+                        "borderBottom": "1px solid #e9ecef",
+                        "width": "40%"
+                    }),
+                ])
+            )
+        
+        return html.Table(
+            [html.Tbody(table_rows)],
+            style={
+                "width": "100%",
+                "borderCollapse": "collapse",
+                "fontSize": "0.8rem"
+            }
+        )
+
     # End of callbacks
