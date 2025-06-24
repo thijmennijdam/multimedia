@@ -71,8 +71,6 @@ def register_callbacks(app: dash.Dash) -> None:
                     embeddings_by_type[label] = []
                 embeddings_by_type[label].append(i)
             
-            print(f"DEBUG ImageNet: Embeddings by type: {[(k, len(v)) for k, v in embeddings_by_type.items()]}")
-            
             # Distribute each type across trees to create mixed trees
             num_trees = min(len(trees_list), 50)  # Use first 50 trees
             
@@ -179,8 +177,6 @@ def register_callbacks(app: dash.Dash) -> None:
                 if label not in embeddings_by_type:
                     embeddings_by_type[label] = []
                 embeddings_by_type[label].append(i)
-            
-            print(f"DEBUG GRIT: Embeddings by type: {[(k, len(v)) for k, v in embeddings_by_type.items()]}")
             
             # Distribute each type across trees to create mixed trees
             num_trees = min(len(trees_list), 50)  # Use first 50 trees
@@ -309,7 +305,6 @@ def register_callbacks(app: dash.Dash) -> None:
                 # Get the selected point's tree
                 selected_pt = points[sel[0]]
                 selected_tree_id = selected_pt.get("tree_id", "?")
-                print(f"DEBUG TREE: Selected point {sel[0]}, tree_id: {selected_tree_id}")
                 
                 # Find all points that belong to the same tree (excluding the selected point)
                 tree_point_indices = []
@@ -344,8 +339,6 @@ def register_callbacks(app: dash.Dash) -> None:
                 
                 # Use tree points as neighbor_indices for highlighting
                 neighbor_indices = tree_point_indices
-                print(f"DEBUG TREE: Found {len(neighbor_indices)} other points in same tree: {neighbor_indices}")
-                print(f"DEBUG TREE: Created {len(tree_connections)} connections: {tree_connections}")
                 
             except Exception as e:
                 print(f"Error finding tree points: {e}")
