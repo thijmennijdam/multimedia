@@ -353,20 +353,20 @@ def _create_full_interactive_scatter(x, y, labels, target_names, emb_labels, tit
             )
             traces.append(selected_trace)
     
-    # Add interpolated point
-    if interp_point is not None:
-        traces.append(
-            go.Scatter(
-                x=[interp_point[0]],
-                y=[interp_point[1]],
-                mode="markers",
-                marker=dict(size=12, color="orange", symbol="diamond"),
-                name="Interpolated point",
-                text=["Interpolated point"],
-                hoverinfo="text",
-                showlegend=False,
-            )
-        )
+    # # Add interpolated point
+    # if interp_point is not None:
+    #     traces.append(
+    #         go.Scatter(
+    #             x=[interp_point[0]],
+    #             y=[interp_point[1]],
+    #             mode="markers",
+    #             marker=dict(size=12, color="orange", symbol="diamond"),
+    #             name="Interpolated point",
+    #             text=["Interpolated point"],
+    #             hoverinfo="text",
+    #             showlegend=False,
+    #         )
+    #     )
     
     fig = go.Figure(data=traces)
     fig.update_layout(
@@ -648,23 +648,26 @@ def register_callbacks(app: dash.Dash) -> None:
         Input("dataset-dropdown", "value"),
         State("points-store", "data"),
     )
-    def _scatter(edata, sel, proj, interpolated_point, labels_data, target_names, mode, k_neighbors, data_store, dataset_name, points):
+    def _scatter(edata, sel, proj, traversal_path, labels_data, target_names, mode, k_neighbors, data_store, dataset_name, points):
         if edata is None or labels_data is None:
             print("Warning: No embedding or label data available for plotting")
             return {}
         emb = np.asarray(edata, dtype=np.float32)
         labels = np.asarray(labels_data, dtype=int)
         sel = sel or []
-        interp_point = (
-            np.asarray(interpolated_point, dtype=np.float32)
-            if interpolated_point is not None
-            else None
-        )
         highlight = sel
         neighbor_indices = []
         selected_idx = sel
         tree_connections = []
-        
+        interpolation_lines = []
+        interpolation_highlight = []
+        traversal_points = None
+
+
+        if mode == "interpolate" and traversal_path is not None and len(traversal_path) > 0:
+            # traversal_path is a list of indices; convert to actual points
+            traversal_points = np.asarray([emb[idx] for idx in traversal_path if idx < len(emb)])
+
         if mode == "neighbors" and sel and len(sel) == 1:
             selected_idx = sel[:1]
             if data_store is not None:
@@ -675,48 +678,32 @@ def register_callbacks(app: dash.Dash) -> None:
             else:
                 neighbor_indices = []
         elif mode == "tree" and sel and len(sel) == 1:
-            # Find all points in the same tree and create connections between adjacent levels
             selected_idx = sel[:1]
             tree_connections = []
             try:
-                # Get the selected point's tree
                 selected_pt = points[sel[0]]
                 selected_tree_id = selected_pt.get("tree_id", "?")
-                
-                # Find all points that belong to the same tree
                 tree_point_indices = []
                 tree_points_by_type = {}
-                
                 for i, pt in enumerate(points):
                     if pt.get("tree_id") == selected_tree_id:
-                        # Include all tree points in highlighting (including selected)
                         tree_point_indices.append(i)
-                        
-                        # Group by embedding type for creating connections
                         emb_type = pt.get("embedding_type", "unknown")
                         if emb_type not in tree_points_by_type:
                             tree_points_by_type[emb_type] = []
                         tree_points_by_type[emb_type].append(i)
-                
-                # Create connections between adjacent hierarchical levels
                 if dataset_name == "imagenet":
                     level_order = ['parent_text', 'child_text', 'child_image']
-                else:  # GRIT
+                else:
                     level_order = ['parent_text', 'child_text', 'parent_image', 'child_image']
-                
-                # Connect consecutive levels
                 for i in range(len(level_order) - 1):
                     current_level = level_order[i]
                     next_level = level_order[i + 1]
-                    
                     if current_level in tree_points_by_type and next_level in tree_points_by_type:
                         for curr_pt in tree_points_by_type[current_level]:
                             for next_pt in tree_points_by_type[next_level]:
                                 tree_connections.append((curr_pt, next_pt))
-                
-                # Use tree points as neighbor_indices for highlighting
                 neighbor_indices = tree_point_indices
-                
             except Exception as e:
                 print(f"Error finding tree points: {e}")
                 neighbor_indices = []
@@ -724,20 +711,53 @@ def register_callbacks(app: dash.Dash) -> None:
         else:
             neighbor_indices = []
 
-        # 2D disk plot with proper color coding and legend
-        def _fig_disk(x, y, sel, labels, target_names, interpolated_point=None, neighbor_indices=None, emb_labels=None, tree_connections=None, points=None):
-            # Define colors matching plotting_utils.py
+        def _fig_disk(x, y, sel, labels, target_names, traversal_points=None, neighbor_indices=None, emb_labels=None, tree_connections=None, points=None):
             colors = {
                 'child_image': '#1f77b4',    # tab:blue
                 'parent_image': '#ff7f0e',   # tab:orange
                 'child_text': '#2ca02c',     # tab:green  
                 'parent_text': '#d62728'     # tab:red
             }
-            
             traces = []
             neighbor_set = set(neighbor_indices) if neighbor_indices is not None else set()
             tree_arrow_annotations = []
-            
+
+            # Highlight traversal_points in interpolation mode
+            if traversal_points is not None and len(traversal_points) > 0:
+                # Project traversal_points to disk coordinates
+                traversal_points = np.asarray(traversal_points)
+                if traversal_points.shape[1] > 2:
+                    traversal_x = traversal_points[:, 0] / (1.0 + traversal_points[:, 2])
+                    traversal_y = traversal_points[:, 1] / (1.0 + traversal_points[:, 2])
+                else:
+                    traversal_x = traversal_points[:, 0]
+                    traversal_y = traversal_points[:, 1]
+                # Plot orange diamond markers for all traversal points
+                traces.append(
+                    go.Scatter(
+                        x=traversal_x,
+                        y=traversal_y,
+                        mode="markers",
+                        marker=dict(size=12, color="orange", symbol="diamond"),
+                        name="Traversal Path Points",
+                        text=[f"Traversal {i}" for i in range(len(traversal_points))],
+                        hoverinfo="text",
+                        showlegend=True,
+                    )
+                )
+                # Plot a dashed orange line between every two adjacent points
+                for i in range(len(traversal_x) - 1):
+                    traces.append(
+                        go.Scatter(
+                            x=[traversal_x[i], traversal_x[i+1]],
+                            y=[traversal_y[i], traversal_y[i+1]],
+                            mode="lines",
+                            line=dict(color="orange", width=2, dash="dash"),
+                            name="Traversal Segment" if i == 0 else None,
+                            showlegend=(i == 0),
+                        )
+                    )
+
             # If we have emb_labels, create separate traces for each label type
             if emb_labels and len(emb_labels) == len(x):
                 unique_label_types = sorted(set(emb_labels))
@@ -894,6 +914,19 @@ def register_callbacks(app: dash.Dash) -> None:
                             'text': '',
                         })
 
+            # if traversal_points is not None:
+            #     traces.append(
+            #         go.Scatter(
+            #             x=traversal_points[:, 0],
+            #             y=traversal_points[:, 1],
+            #             mode="markers",
+            #             marker=dict(size=12, color="orange", symbol="diamond"),
+            #             name="Interpolated point",
+            #             text=["Interpolated point"],
+            #             hoverinfo="text",
+            #         )
+            #     )
+
             if sel:
                 traces.append(
                     go.Scatter(
@@ -904,18 +937,7 @@ def register_callbacks(app: dash.Dash) -> None:
                         name="Selected point",
                     )
                 )
-            if interpolated_point is not None:
-                traces.append(
-                    go.Scatter(
-                        x=[interpolated_point[0]],
-                        y=[interpolated_point[1]],
-                        mode="markers",
-                        marker=dict(size=12, color="orange", symbol="diamond"),
-                        name="Interpolated point",
-                        text=["Interpolated point"],
-                        hoverinfo="text",
-                    )
-                )
+
             fig = go.Figure(data=traces)
             
             # Add arrow annotations for tree connections
@@ -937,6 +959,7 @@ def register_callbacks(app: dash.Dash) -> None:
                 annotations=annotations,
             )
             return fig
+
         # Handle 2D embeddings for disk projection
         xh, yh = emb[:, 0], emb[:, 1]
         if emb.shape[1] > 2:
@@ -944,17 +967,10 @@ def register_callbacks(app: dash.Dash) -> None:
         else:
             zh = np.zeros(emb.shape[0])  # For 2D embeddings, use z=0
         dx, dy = xh / (1.0 + zh), yh / (1.0 + zh)
-        interp_transformed = None
-        if interp_point is not None:
-            interp_dx = interp_point[0] / (1.0 + interp_point[2])
-            interp_dy = interp_point[1] / (1.0 + interp_point[2])
-            interp_transformed = np.array([interp_dx, interp_dy])
-        # Load the original label types for color coding
         emb_labels = None
         if dataset_name and proj:
             try:
                 import pickle
-                # Map dataset names to correct directory names
                 dataset_dir = {"imagenet": "ImageNet", "grit": "GRIT"}.get(dataset_name, dataset_name)
                 emb_file = f"hierchical_datasets/{dataset_dir}/{proj}_embeddings.pkl"
                 with open(emb_file, "rb") as f:
@@ -962,11 +978,8 @@ def register_callbacks(app: dash.Dash) -> None:
                 emb_labels = emb_data_loaded.get("labels", [])
             except Exception as e:
                 emb_labels = []
-            
-        fig_disk = _fig_disk(dx, dy, selected_idx if mode == "neighbors" else highlight, labels, target_names, interp_transformed, neighbor_indices, emb_labels, tree_connections, points)
+        fig_disk = _fig_disk(dx, dy, selected_idx if mode == "neighbors" else highlight, labels, target_names, traversal_points=traversal_points, neighbor_indices=neighbor_indices, emb_labels=emb_labels, tree_connections=tree_connections, points=points)
         return fig_disk
-
-
 
     @app.callback(
         Output("sel", "data"),
@@ -1049,20 +1062,21 @@ def register_callbacks(app: dash.Dash) -> None:
     @app.callback(
         Output("interpolated-point", "data"),
         Input("run-interpolate-btn", "n_clicks"),
+        Input("interpolation-slider", "value"),
         State("sel", "data"),
-        State("interpolation-slider", "value"),
         State("emb", "data"),
         State("proj", "value"),
         prevent_initial_call=True,
     )
-    def _interpolate(n_clicks, sel, t, edata, proj):
+    def _interpolate(n_clicks, t, sel, edata, proj):
         if not (n_clicks and sel and len(sel) == 2 and edata):
             return None
         emb = np.asarray(edata, dtype=np.float32)
         i, j = sel[:2]
         p1, p2 = emb[i], emb[j]
-        interpolated = _interpolate_hyperbolic(p1, p2, t)
-        return interpolated.tolist()
+        traversal_path = _interpolate_hyperbolic(p1, p2, emb, model='tmp', steps=t)
+        return traversal_path
+        
 
     @app.callback(
         [Output("tree-levels-above", "children"), Output("tree-selected-level", "children"), Output("tree-levels-below", "children")],
@@ -1348,7 +1362,7 @@ def register_callbacks(app: dash.Dash) -> None:
         State("points-store", "data"),
         State("meta-store", "data"),
     )
-    def _compare(sel, interpolated_point, t_value, mode, comparison_mode, labels_data, target_names, images, emb_data, k_neighbors, points, meta):
+    def _compare(sel, traversal_path, t_value, mode, comparison_mode, labels_data, target_names, images, emb_data, k_neighbors, points, meta):
         if labels_data is None:
             return html.Div(), html.P("Select a dataset to begin.")
         labels = np.asarray(labels_data)
@@ -1398,82 +1412,15 @@ def register_callbacks(app: dash.Dash) -> None:
             return html.Div(components), instructions
         if mode == "interpolate":
             instructions = html.P("Select two distinct points to interpolate.")
-            if sel:
-                i, j = (sel[0], sel[1]) if len(sel) > 1 else (sel[0], None)
-                
-                # Get the content to display based on embedding type
-                content_element_i = _create_content_element(i, images, points, meta)
-                
-                components.append(
-                    html.Div([
-                        html.Button(
-                            "×",
-                            id={"type": "close-button", "index": i},
-                            style={
-                                "position": "absolute",
-                                "top": "0.25rem",
-                                "right": "0.25rem",
-                                "width": "1.5rem",
-                                "height": "1.5rem",
-                                "borderRadius": "50%",
-                                "border": "none",
-                                "backgroundColor": "#ff4444",
-                                "color": "white",
-                                "fontSize": "1rem",
-                                "lineHeight": "1",
-                                "cursor": "pointer",
-                                "display": "flex",
-                                "alignItems": "center",
-                                "justifyContent": "center",
-                                "padding": "0",
-                                "transition": "background-color 0.2s",
-                                "hover": {"backgroundColor": "#cc0000"}
-                            }
-                        ),
-                        content_element_i
-                    ], style={"display": "flex", "alignItems": "center", "padding": "0.5rem", "borderRadius": "4px", "position": "relative", "backgroundColor": "#f8f9fa", "marginBottom": "0.5rem"})
-                )
-                if j is not None:
+            if traversal_path is not None and len(traversal_path) > 0:
+                for idx in traversal_path:
                     # Get the content to display based on embedding type
-                    content_element_j = _create_content_element(j, images, points, meta)
-                    
+                    content_element = _create_content_element(idx, images, points, meta)
                     components.append(
                         html.Div([
-                            html.Button(
-                                "×",
-                                id={"type": "close-button", "index": j},
-                                style={
-                                    "position": "absolute",
-                                    "top": "0.25rem",
-                                    "right": "0.25rem",
-                                    "width": "1.5rem",
-                                    "height": "1.5rem",
-                                    "borderRadius": "50%",
-                                    "border": "none",
-                                    "backgroundColor": "#ff4444",
-                                    "color": "white",
-                                    "fontSize": "1rem",
-                                    "lineHeight": "1",
-                                    "cursor": "pointer",
-                                    "display": "flex",
-                                    "alignItems": "center",
-                                    "justifyContent": "center",
-                                    "padding": "0",
-                                    "transition": "background-color 0.2s",
-                                    "hover": {"backgroundColor": "#cc0000"}
-                                }
-                            ),
-                            content_element_j
+                            content_element
                         ], style={"display": "flex", "alignItems": "center", "padding": "0.5rem", "borderRadius": "4px", "position": "relative", "backgroundColor": "#f8f9fa", "marginBottom": "0.5rem"})
                     )
-            if interpolated_point is not None and len(sel) == 2:
-                interpolated_img = _create_interpolated_img_tag(sel[0], sel[1], t_value, images)
-                components.append(
-                    html.Div([
-                        interpolated_img,
-                        html.P(f"Interpolated point (t={t_value:.1f})"),
-                    ], style={"display": "flex", "alignItems": "center", "marginTop": "0.5rem"})
-                )
             return html.Div(components), instructions
         if mode == "neighbors":
             instructions = html.P("Select one point to view its neighbors.")
@@ -1622,7 +1569,7 @@ def register_callbacks(app: dash.Dash) -> None:
         State("points-store", "data"),
         Input("comparison-mode", "data"),
     )
-    def _scatter_plot_2(edata, main_proj, sel, mode, k_neighbors, interpolated_point, labels_data, target_names, dataset_name, data_store, points, comparison_mode):
+    def _scatter_plot_2(edata, main_proj, sel, mode, k_neighbors, traversal_path, labels_data, target_names, dataset_name, data_store, points, comparison_mode):
         if not comparison_mode or edata is None or labels_data is None:
             return {}
         
@@ -1633,8 +1580,8 @@ def register_callbacks(app: dash.Dash) -> None:
         labels = np.asarray(labels_data, dtype=int)
         sel = sel or []
         interp_point = (
-            np.asarray(interpolated_point, dtype=np.float32)
-            if interpolated_point is not None
+            np.asarray(traversal_path, dtype=np.float32)
+            if traversal_path is not None
             else None
         )
         
@@ -1744,7 +1691,7 @@ def register_callbacks(app: dash.Dash) -> None:
         State("points-store", "data"),
         Input("comparison-mode", "data"),
     )
-    def _scatter_plot_1(edata, proj, sel, mode, k_neighbors, interpolated_point, labels_data, target_names, dataset_name, data_store, points, comparison_mode):
+    def _scatter_plot_1(edata, proj, sel, mode, k_neighbors, traversal_path, labels_data, target_names, dataset_name, data_store, points, comparison_mode):
         if not comparison_mode or edata is None or labels_data is None:
             return {}
         
@@ -1752,8 +1699,8 @@ def register_callbacks(app: dash.Dash) -> None:
         labels = np.asarray(labels_data, dtype=int)
         sel = sel or []
         interp_point = (
-            np.asarray(interpolated_point, dtype=np.float32)
-            if interpolated_point is not None
+            np.asarray(traversal_path, dtype=np.float32)
+            if traversal_path is not None
             else None
         )
         
@@ -1951,5 +1898,15 @@ def register_callbacks(app: dash.Dash) -> None:
                 "fontSize": "0.8rem"
             }
         )
+
+    @app.callback(
+        Output("interpolated-point", "data", allow_duplicate=True),
+        Input("clear-path-btn", "n_clicks"),
+        prevent_initial_call=True,
+    )
+    def _clear_interpolated_point(n_clicks):
+        if n_clicks:
+            return None
+        return dash.no_update
 
     # End of callbacks
