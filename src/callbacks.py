@@ -447,7 +447,8 @@ def register_callbacks(app: dash.Dash) -> None:
                 embeddings_by_type[label].append(i)
             
             # Distribute each type across trees to create mixed trees
-            num_trees = min(len(trees_list), 50)  # Use first 50 trees
+            # Use the number of parent_text embeddings to determine how many trees we need
+            num_trees = len(embeddings_by_type.get('parent_text', []))
             
             for i, (embedding_label) in enumerate(embedding_labels):
                 # For each embedding type, distribute across trees
@@ -554,7 +555,8 @@ def register_callbacks(app: dash.Dash) -> None:
                 embeddings_by_type[label].append(i)
             
             # Distribute each type across trees to create mixed trees
-            num_trees = min(len(trees_list), 50)  # Use first 50 trees
+            # Use the number of parent_text embeddings to determine how many trees we need
+            num_trees = len(embeddings_by_type.get('parent_text', []))
             
             for i, (embedding_label) in enumerate(embedding_labels):
                 # For each embedding type, distribute across trees
@@ -681,14 +683,14 @@ def register_callbacks(app: dash.Dash) -> None:
                 selected_pt = points[sel[0]]
                 selected_tree_id = selected_pt.get("tree_id", "?")
                 
-                # Find all points that belong to the same tree (excluding the selected point)
+                # Find all points that belong to the same tree
                 tree_point_indices = []
                 tree_points_by_type = {}
                 
                 for i, pt in enumerate(points):
                     if pt.get("tree_id") == selected_tree_id:
-                        if i != sel[0]:
-                            tree_point_indices.append(i)
+                        # Include all tree points in highlighting (including selected)
+                        tree_point_indices.append(i)
                         
                         # Group by embedding type for creating connections
                         emb_type = pt.get("embedding_type", "unknown")
@@ -1671,14 +1673,14 @@ def register_callbacks(app: dash.Dash) -> None:
                 selected_pt = points[sel[0]]
                 selected_tree_id = selected_pt.get("tree_id", "?")
                 
-                # Find all points that belong to the same tree (excluding the selected point)
+                # Find all points that belong to the same tree
                 tree_point_indices = []
                 tree_points_by_type = {}
                 
                 for i, pt in enumerate(points):
                     if pt.get("tree_id") == selected_tree_id:
-                        if i != sel[0]:
-                            tree_point_indices.append(i)
+                        # Include all tree points in highlighting (including selected)
+                        tree_point_indices.append(i)
                         
                         # Group by embedding type for creating connections
                         emb_type = pt.get("embedding_type", "unknown")
@@ -1790,14 +1792,14 @@ def register_callbacks(app: dash.Dash) -> None:
                 selected_pt = points[sel[0]]
                 selected_tree_id = selected_pt.get("tree_id", "?")
                 
-                # Find all points that belong to the same tree (excluding the selected point)
+                # Find all points that belong to the same tree
                 tree_point_indices = []
                 tree_points_by_type = {}
                 
                 for i, pt in enumerate(points):
                     if pt.get("tree_id") == selected_tree_id:
-                        if i != sel[0]:
-                            tree_point_indices.append(i)
+                        # Include all tree points in highlighting (including selected)
+                        tree_point_indices.append(i)
                         
                         # Group by embedding type for creating connections
                         emb_type = pt.get("embedding_type", "unknown")
