@@ -77,13 +77,13 @@ def _create_simple_scatter(x, y, labels, target_names, emb_labels, title):
         title=title,
         xaxis=dict(scaleanchor="y", scaleratio=1),
         yaxis=dict(scaleanchor="x", scaleratio=1),
-        margin=dict(l=0, r=0, b=0, t=40),
+        margin=dict(l=0, r=0, b=60, t=40),
         uirevision="embedding",
         showlegend=True,
         legend=dict(
             orientation="h",
-            yanchor="bottom",
-            y=1.02,
+            yanchor="top",
+            y=-0.1,
             xanchor="center",
             x=0.5
         ),
@@ -176,13 +176,13 @@ def _create_interactive_scatter(x, y, labels, target_names, emb_labels, title, s
         title=title,
         xaxis=dict(scaleanchor="y", scaleratio=1),
         yaxis=dict(scaleanchor="x", scaleratio=1),
-        margin=dict(l=0, r=0, b=0, t=40),
+        margin=dict(l=0, r=0, b=60, t=40),
         uirevision="embedding",
         showlegend=True,
         legend=dict(
             orientation="h",
-            yanchor="bottom",
-            y=1.02,
+            yanchor="top",
+            y=-0.1,
             xanchor="center",
             x=0.5
         ),
@@ -431,13 +431,13 @@ def _create_full_interactive_scatter(x, y, labels, target_names, emb_labels, tit
         title=title,
         xaxis=dict(scaleanchor="y", scaleratio=1),
         yaxis=dict(scaleanchor="x", scaleratio=1),
-        margin=dict(l=0, r=0, b=0, t=40),
+        margin=dict(l=0, r=0, b=60, t=40),
         uirevision="embedding",
         showlegend=True,
         legend=dict(
             orientation="h",
-            yanchor="bottom",
-            y=1.02,
+            yanchor="top",
+            y=-0.1,
             xanchor="center",
             x=0.5
         ),
@@ -1030,13 +1030,13 @@ def register_callbacks(app: dash.Dash) -> None:
             fig.update_layout(
                 xaxis=dict(scaleanchor="y", scaleratio=1),
                 yaxis=dict(scaleanchor="x", scaleratio=1),
-                margin=dict(l=0, r=0, b=0, t=30),
+                margin=dict(l=0, r=0, b=60, t=30),
                 uirevision="embedding",
                 showlegend=True,
                 legend=dict(
                     orientation="h",
-                    yanchor="bottom",
-                    y=1.02,
+                    yanchor="top",
+                    y=-0.1,
                     xanchor="center",
                     x=0.5
                 ),
