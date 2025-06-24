@@ -215,7 +215,7 @@ def _create_full_interactive_scatter(x, y, labels, target_names, emb_labels, tit
                     name="Traversal Path Points",
                     text=[f"Traversal {i}" for i in range(len(interp_point))],
                     hoverinfo="text",
-                    showlegend=True,
+                    showlegend=False,
                 )
             )
             # Plot a dashed orange line between every two adjacent points
@@ -227,7 +227,7 @@ def _create_full_interactive_scatter(x, y, labels, target_names, emb_labels, tit
                         mode="lines",
                         line=dict(color="orange", width=2, dash="dash"),
                         name="Traversal Segment" if i == 0 else None,
-                        showlegend=(i == 0),
+                        showlegend=False,
                         hoverinfo="skip",
                     )
                 )
@@ -774,7 +774,7 @@ def register_callbacks(app: dash.Dash) -> None:
                         name="Traversal Path Points",
                         text=[f"Traversal {i}" for i in range(len(traversal_points))],
                         hoverinfo="text",
-                        showlegend=True,
+                        showlegend=False,
                     )
                 )
                 # Plot a dashed orange line between every two adjacent points
@@ -786,7 +786,7 @@ def register_callbacks(app: dash.Dash) -> None:
                             mode="lines",
                             line=dict(color="orange", width=2, dash="dash"),
                             name="Traversal Segment" if i == 0 else None,
-                            showlegend=(i == 0),
+                            showlegend=False,
                         )
                     )
 
