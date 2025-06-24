@@ -1125,9 +1125,9 @@ def register_callbacks(app: dash.Dash) -> None:
                 'child_image': 3,
             }
             level_names = {
-                1: "Level 1: Parent Text",
-                2: "Level 2: Child Text", 
-                3: "Level 3: Child Image",
+                1: "Level 1",
+                2: "Level 2", 
+                3: "Level 3",
             }
             max_level = 3
         else:  # GRIT
@@ -1138,10 +1138,10 @@ def register_callbacks(app: dash.Dash) -> None:
                 'child_image': 4
             }
             level_names = {
-                1: "Level 1: Parent Text",
-                2: "Level 2: Child Text", 
-                3: "Level 3: Parent Image",
-                4: "Level 4: Child Image"
+                1: "Level 1",
+                2: "Level 2", 
+                3: "Level 3",
+                4: "Level 4"
             }
             max_level = 4
         

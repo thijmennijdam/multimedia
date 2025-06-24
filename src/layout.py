@@ -329,27 +329,27 @@ def _cmp_panel() -> html.Div:
                         [
                             html.Div(
                                 [
-                                    _tree_node("Levels Above", html.Div(id="tree-levels-above")),
+                                    html.Div(id="tree-levels-above"),
                                     html.Div(
                                         style={
-                                            "height": "2rem",
+                                            "height": "1rem",
                                             "width": "2px",
                                             "backgroundColor": "#007bff",
                                             "margin": "0 auto",
                                             "position": "relative",
                                         }
                                     ),
-                                    _tree_node("Selected Level", html.Div(id="tree-selected-level"), is_current=True),
+                                    html.Div(id="tree-selected-level"),
                                     html.Div(
                                         style={
-                                            "height": "2rem",
+                                            "height": "1rem",
                                             "width": "2px",
                                             "backgroundColor": "#007bff",
                                             "margin": "0 auto",
                                             "position": "relative",
                                         }
                                     ),
-                                    _tree_node("Levels Below", html.Div(id="tree-levels-below")),
+                                    html.Div(id="tree-levels-below"),
                                 ],
                                 id="tree-traversal",
                             ),
