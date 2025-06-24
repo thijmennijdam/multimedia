@@ -1207,7 +1207,7 @@ def register_callbacks(app: dash.Dash) -> None:
             img_rel = meta_row.get("first_image_path")
             img_src = _encode_image(img_rel) if img_rel else ""
             img_component = html.Div([
-                html.Img(src=img_src, style={"maxWidth": "200px", "border": "1px solid #ccc"}) if img_src else html.P("No image available", style={"color": "#6c757d", "fontStyle": "italic"}),
+                html.Img(src=img_src, style={"maxWidth": "120px", "maxHeight": "120px", "objectFit": "contain", "border": "1px solid #ccc"}) if img_src else html.P("No image available", style={"color": "#6c757d", "fontStyle": "italic"}),
             ], style={"margin": 0})
             
             if selected_level == 3:
@@ -1223,7 +1223,7 @@ def register_callbacks(app: dash.Dash) -> None:
             
             parent_img_src = _encode_image(parent_img_rel) if parent_img_rel else ""
             parent_img_component = html.Div([
-                html.Img(src=parent_img_src, style={"maxWidth": "200px", "border": "1px solid #ccc"}) if parent_img_src else html.P("No image available", style={"color": "#6c757d", "fontStyle": "italic"}),
+                html.Img(src=parent_img_src, style={"maxWidth": "120px", "maxHeight": "120px", "objectFit": "contain", "border": "1px solid #ccc"}) if parent_img_src else html.P("No image available", style={"color": "#6c757d", "fontStyle": "italic"}),
             ], style={"margin": 0})
             
             if selected_level == 3:
@@ -1242,7 +1242,7 @@ def register_callbacks(app: dash.Dash) -> None:
             
             child_img_src = _encode_image(child_img_rel) if child_img_rel else ""
             child_img_component = html.Div([
-                html.Img(src=child_img_src, style={"maxWidth": "200px", "border": "1px solid #ccc"}) if child_img_src else html.P("No image available", style={"color": "#6c757d", "fontStyle": "italic"}),
+                html.Img(src=child_img_src, style={"maxWidth": "120px", "maxHeight": "120px", "objectFit": "contain", "border": "1px solid #ccc"}) if child_img_src else html.P("No image available", style={"color": "#6c757d", "fontStyle": "italic"}),
             ], style={"margin": 0})
             
             if selected_level == 4:
