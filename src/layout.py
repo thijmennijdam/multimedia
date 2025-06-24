@@ -38,6 +38,43 @@ def _config_panel() -> html.Div:
                 },
             ),
             html.Br(),
+            # Projection comparison section
+            html.Div([
+                html.Button(
+                    "Compare Projections",
+                    id="compare-projections-btn",
+                    style={
+                        "backgroundColor": "#6c757d",
+                        "color": "white",
+                        "border": "none",
+                        "padding": "0.5rem 1rem",
+                        "borderRadius": "6px",
+                        "cursor": "pointer",
+                        "width": "100%",
+                        "marginBottom": "0.5rem",
+                        "transition": "background-color 0.2s",
+                    },
+                ),
+                html.Div([
+                    html.Label("Second Projection", style={"fontSize": "0.9rem"}),
+                    dcc.Dropdown(
+                        id="proj2",
+                        options=[
+                            {"label": "HoroPCA", "value": "horopca"},
+                            {"label": "CO-SNE", "value": "cosne"}
+                        ],
+                        value="cosne",
+                        clearable=False,
+                        style={
+                            "backgroundColor": "white",
+                            "border": "1px solid #ccc",
+                            "borderRadius": "6px",
+                            "color": "black",
+                        },
+                    ),
+                ], id="proj2-container", style={"display": "none"}),
+            ]),
+            html.Br(),
             html.Label("Mode"),
             html.Div(
                 [
@@ -184,12 +221,15 @@ def _centre_panel() -> html.Div:
     return html.Div(
         [
             html.Div(
-                dcc.Graph(
-                    id="scatter-disk",
-                    figure=None,  # Will be set by callback
-                    style={"width": "100%", "height": "100%"},
-                    config={"displayModeBar": False},
-                ),
+                id="single-plot-container",
+                children=[
+                    dcc.Graph(
+                        id="scatter-disk",
+                        figure=None,  # Will be set by callback
+                        style={"width": "100%", "height": "100%"},
+                        config={"displayModeBar": False},
+                    ),
+                ],
                 style={
                     "width": "100%",
                     "height": "100%",
@@ -197,6 +237,39 @@ def _centre_panel() -> html.Div:
                     "maxHeight": "800px",
                     "aspectRatio": "1 / 1",
                     "margin": "auto",
+                },
+            ),
+            html.Div(
+                id="comparison-plot-container",
+                children=[
+                    html.Div([
+                        html.H5("Projection 1", style={"textAlign": "center", "margin": "0 0 1rem 0", "color": "#333"}),
+                        dcc.Graph(
+                            id="scatter-disk-1",
+                            figure=None,
+                            style={"width": "100%", "height": "100%"},
+                            config={"displayModeBar": False},
+                        ),
+                    ], style={"flex": "1", "display": "flex", "flexDirection": "column"}),
+                    html.Div([
+                        html.H5("Projection 2", style={"textAlign": "center", "margin": "0 0 1rem 0", "color": "#333"}),
+                        dcc.Graph(
+                            id="scatter-disk-2",
+                            figure=None,
+                            style={"width": "100%", "height": "100%"},
+                            config={"displayModeBar": False},
+                        ),
+                    ], style={"flex": "1", "display": "flex", "flexDirection": "column"}),
+                ],
+                style={
+                    "display": "none",
+                    "width": "100%",
+                    "height": "100%",
+                    "maxWidth": "1200px",
+                    "maxHeight": "600px",
+                    "margin": "auto",
+                    "gap": "1rem",
+                    "flexDirection": "row",
                 },
             ),
         ],
@@ -330,6 +403,8 @@ def make_layout() -> html.Div:
             dcc.Store(id="sel", data=[]),
             dcc.Store(id="mode", data="compare"),
             dcc.Store(id="interpolated-point"),
+            dcc.Store(id="comparison-mode", data=False),
+            dcc.Store(id="emb2"),  # Store for second projection embeddings
             html.Div(
                 [_config_panel(), _centre_panel(), _cmp_panel()],
                 style={

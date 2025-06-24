@@ -11,6 +11,381 @@ import json
 # All callback functions and register_callbacks go here
 # ... (move all @app.callback functions and register_callbacks from main.py) ... 
 
+def _create_simple_scatter(x, y, labels, target_names, emb_labels, title):
+    """Create a simple scatter plot without interactions for comparison views"""
+    # Define colors matching plotting_utils.py
+    colors = {
+        'child_image': '#1f77b4',    # tab:blue
+        'parent_image': '#ff7f0e',   # tab:orange
+        'child_text': '#2ca02c',     # tab:green  
+        'parent_text': '#d62728'     # tab:red
+    }
+    
+    traces = []
+    
+    # If we have emb_labels, create separate traces for each label type
+    if emb_labels and len(emb_labels) == len(x):
+        unique_label_types = sorted(set(emb_labels))
+        
+        for label_type in unique_label_types:
+            # Find indices for this label type
+            indices = [i for i, lbl in enumerate(emb_labels) if lbl == label_type]
+            
+            if indices:
+                x_coords = [x[i] for i in indices]
+                y_coords = [y[i] for i in indices]
+                hover_text = [
+                    f"{i}: {target_names[labels[i]] if target_names is not None else labels[i]}"
+                    for i in indices
+                ]
+                
+                trace = go.Scatter(
+                    x=x_coords,
+                    y=y_coords,
+                    mode="markers",
+                    text=hover_text,
+                    hoverinfo="text",
+                    marker=dict(
+                        size=6, 
+                        opacity=0.7, 
+                        color=colors.get(label_type, 'gray'),
+                        line=dict(width=0.5, color='black')
+                    ),
+                    name=label_type.replace('_', ' ').title(),
+                    showlegend=True,
+                )
+                traces.append(trace)
+    else:
+        # Fallback to single trace with colorscale
+        trace = go.Scatter(
+            x=x,
+            y=y,
+            mode="markers",
+            text=[
+                f"{i}: {target_names[labels[i]] if target_names is not None else labels[i]}"
+                for i in range(len(x))
+            ],
+            hoverinfo="text",
+            marker=dict(size=6, opacity=0.7, color=labels, colorscale="Viridis"),
+            name="Data points",
+            showlegend=False,
+        )
+        traces = [trace]
+    
+    fig = go.Figure(data=traces)
+    fig.update_layout(
+        title=title,
+        xaxis=dict(scaleanchor="y", scaleratio=1),
+        yaxis=dict(scaleanchor="x", scaleratio=1),
+        margin=dict(l=0, r=0, b=0, t=40),
+        uirevision="embedding",
+        showlegend=True,
+        legend=dict(
+            orientation="h",
+            yanchor="bottom",
+            y=1.02,
+            xanchor="center",
+            x=0.5
+        ),
+    )
+    return fig
+
+def _create_interactive_scatter(x, y, labels, target_names, emb_labels, title, sel):
+    """Create an interactive scatter plot with selection highlighting for comparison views"""
+    # Define colors matching plotting_utils.py
+    colors = {
+        'child_image': '#1f77b4',    # tab:blue
+        'parent_image': '#ff7f0e',   # tab:orange
+        'child_text': '#2ca02c',     # tab:green  
+        'parent_text': '#d62728'     # tab:red
+    }
+    
+    traces = []
+    
+    # If we have emb_labels, create separate traces for each label type
+    if emb_labels and len(emb_labels) == len(x):
+        unique_label_types = sorted(set(emb_labels))
+        
+        for label_type in unique_label_types:
+            # Find indices for this label type
+            indices = [i for i, lbl in enumerate(emb_labels) if lbl == label_type]
+            
+            if indices:
+                x_coords = [x[i] for i in indices]
+                y_coords = [y[i] for i in indices]
+                hover_text = [
+                    f"{i}: {target_names[labels[i]] if target_names is not None else labels[i]}"
+                    for i in indices
+                ]
+                
+                trace = go.Scatter(
+                    x=x_coords,
+                    y=y_coords,
+                    mode="markers",
+                    text=hover_text,
+                    hoverinfo="text",
+                    customdata=indices,  # Store original indices for clicking
+                    marker=dict(
+                        size=8, 
+                        opacity=0.7, 
+                        color=colors.get(label_type, 'gray'),
+                        line=dict(width=0.5, color='black')
+                    ),
+                    name=label_type.replace('_', ' ').title(),
+                    showlegend=True,
+                )
+                traces.append(trace)
+    else:
+        # Fallback to single trace with colorscale
+        trace = go.Scatter(
+            x=x,
+            y=y,
+            mode="markers",
+            text=[
+                f"{i}: {target_names[labels[i]] if target_names is not None else labels[i]}"
+                for i in range(len(x))
+            ],
+            hoverinfo="text",
+            customdata=list(range(len(x))),  # Store original indices for clicking
+            marker=dict(size=8, opacity=0.7, color=labels, colorscale="Viridis"),
+            name="Data points",
+            showlegend=False,
+        )
+        traces = [trace]
+    
+    # Add selected points as a separate trace
+    if sel:
+        selected_x = [x[i] for i in sel if i < len(x)]
+        selected_y = [y[i] for i in sel if i < len(x)]
+        
+        if selected_x:
+            selected_trace = go.Scatter(
+                x=selected_x,
+                y=selected_y,
+                mode="markers",
+                marker=dict(size=12, color="red", symbol="circle-open", line=dict(width=3)),
+                name="Selected points",
+                showlegend=False,
+                hoverinfo="skip",
+            )
+            traces.append(selected_trace)
+    
+    fig = go.Figure(data=traces)
+    fig.update_layout(
+        title=title,
+        xaxis=dict(scaleanchor="y", scaleratio=1),
+        yaxis=dict(scaleanchor="x", scaleratio=1),
+        margin=dict(l=0, r=0, b=0, t=40),
+        uirevision="embedding",
+        showlegend=True,
+        legend=dict(
+            orientation="h",
+            yanchor="bottom",
+            y=1.02,
+            xanchor="center",
+            x=0.5
+        ),
+    )
+    return fig
+
+def _create_full_interactive_scatter(x, y, labels, target_names, emb_labels, title, sel, neighbor_indices, tree_connections, interp_point, mode):
+    """Create a full interactive scatter plot with all mode features for comparison views"""
+    # Define colors matching plotting_utils.py
+    colors = {
+        'child_image': '#1f77b4',    # tab:blue
+        'parent_image': '#ff7f0e',   # tab:orange
+        'child_text': '#2ca02c',     # tab:green  
+        'parent_text': '#d62728'     # tab:red
+    }
+    
+    traces = []
+    neighbor_set = set(neighbor_indices) if neighbor_indices is not None else set()
+    
+    # If we have emb_labels, create separate traces for each label type
+    if emb_labels and len(emb_labels) == len(x):
+        unique_label_types = sorted(set(emb_labels))
+        
+        for label_type in unique_label_types:
+            # Find indices for this label type
+            indices = [i for i, lbl in enumerate(emb_labels) if lbl == label_type]
+            
+            if indices:
+                # Separate regular points and neighbor points
+                regular_indices = [i for i in indices if i not in neighbor_set]
+                neighbor_indices_for_type = [i for i in indices if i in neighbor_set]
+                
+                # Regular points trace
+                if regular_indices:
+                    x_coords = [x[i] for i in regular_indices]
+                    y_coords = [y[i] for i in regular_indices]
+                    hover_text = [
+                        f"{i}: {target_names[labels[i]] if target_names is not None else labels[i]}"
+                        for i in regular_indices
+                    ]
+                    
+                    trace = go.Scatter(
+                        x=x_coords,
+                        y=y_coords,
+                        mode="markers",
+                        text=hover_text,
+                        hoverinfo="text",
+                        customdata=regular_indices,  # Store original indices for clicking
+                        marker=dict(
+                            size=8, 
+                            opacity=0.7, 
+                            color=colors.get(label_type, 'gray'),
+                            line=dict(width=0.5, color='black')
+                        ),
+                        name=label_type.replace('_', ' ').title(),
+                        showlegend=True,
+                    )
+                    traces.append(trace)
+                
+                # Neighbor points trace (larger and brighter)
+                if neighbor_indices_for_type:
+                    x_coords_neighbors = [x[i] for i in neighbor_indices_for_type]
+                    y_coords_neighbors = [y[i] for i in neighbor_indices_for_type]
+                    hover_text_neighbors = [
+                        f"{i}: {target_names[labels[i]] if target_names is not None else labels[i]} (neighbor)"
+                        for i in neighbor_indices_for_type
+                    ]
+                    
+                    neighbor_trace = go.Scatter(
+                        x=x_coords_neighbors,
+                        y=y_coords_neighbors,
+                        mode="markers",
+                        text=hover_text_neighbors,
+                        hoverinfo="text",
+                        customdata=neighbor_indices_for_type,
+                        marker=dict(
+                            size=12,  # Larger size for neighbors
+                            opacity=1.0,  # Full opacity for neighbors
+                            color=colors.get(label_type, 'gray'),
+                            line=dict(width=2, color='white')  # White border to make them stand out
+                        ),
+                        name=f"{label_type.replace('_', ' ').title()} (Neighbors)",
+                        showlegend=False,  # Don't show in legend to avoid clutter
+                    )
+                    traces.append(neighbor_trace)
+    else:
+        # Fallback to single trace with colorscale
+        regular_indices = [i for i in range(len(x)) if i not in neighbor_set]
+        neighbor_indices_list = [i for i in range(len(x)) if i in neighbor_set]
+        
+        # Regular points trace
+        if regular_indices:
+            base = go.Scatter(
+                x=[x[i] for i in regular_indices],
+                y=[y[i] for i in regular_indices],
+                mode="markers",
+                text=[
+                    f"{i}: {target_names[labels[i]] if target_names is not None else labels[i]}"
+                    for i in regular_indices
+                ],
+                hoverinfo="text",
+                customdata=regular_indices,
+                marker=dict(size=8, opacity=0.7, color=[labels[i] for i in regular_indices], colorscale="Viridis"),
+                name="Data points",
+                showlegend=False,
+            )
+            traces = [base]
+        else:
+            traces = []
+        
+        # Neighbor points trace (larger and brighter)
+        if neighbor_indices_list:
+            neighbor_trace = go.Scatter(
+                x=[x[i] for i in neighbor_indices_list],
+                y=[y[i] for i in neighbor_indices_list],
+                mode="markers",
+                text=[
+                    f"{i}: {target_names[labels[i]] if target_names is not None else labels[i]} (neighbor)"
+                    for i in neighbor_indices_list
+                ],
+                hoverinfo="text",
+                customdata=neighbor_indices_list,
+                marker=dict(
+                    size=12,  # Larger size for neighbors
+                    opacity=1.0,  # Full opacity for neighbors
+                    color=[labels[i] for i in neighbor_indices_list], 
+                    colorscale="Viridis",
+                    line=dict(width=2, color='white')  # White border to make them stand out
+                ),
+                name="Neighbors",
+                showlegend=False,
+            )
+            traces.append(neighbor_trace)
+
+    # Add tree connections
+    if tree_connections:
+        for conn in tree_connections:
+            idx1, idx2 = conn
+            if idx1 < len(x) and idx2 < len(x):
+                # Create line trace
+                x1, y1 = x[idx1], y[idx1]
+                x2, y2 = x[idx2], y[idx2]
+                
+                line_trace = go.Scatter(
+                    x=[x1, x2],
+                    y=[y1, y2],
+                    mode="lines",
+                    line=dict(color="gold", width=2),
+                    hoverinfo="skip",
+                    showlegend=False,
+                    name="Tree connections"
+                )
+                traces.append(line_trace)
+
+    # Add selected points as a separate trace
+    if sel:
+        selected_x = [x[i] for i in sel if i < len(x)]
+        selected_y = [y[i] for i in sel if i < len(x)]
+        
+        if selected_x:
+            selected_trace = go.Scatter(
+                x=selected_x,
+                y=selected_y,
+                mode="markers",
+                marker=dict(size=12, color="red", symbol="circle-open", line=dict(width=3)),
+                name="Selected points",
+                showlegend=False,
+                hoverinfo="skip",
+            )
+            traces.append(selected_trace)
+    
+    # Add interpolated point
+    if interp_point is not None:
+        traces.append(
+            go.Scatter(
+                x=[interp_point[0]],
+                y=[interp_point[1]],
+                mode="markers",
+                marker=dict(size=12, color="orange", symbol="diamond"),
+                name="Interpolated point",
+                text=["Interpolated point"],
+                hoverinfo="text",
+                showlegend=False,
+            )
+        )
+    
+    fig = go.Figure(data=traces)
+    fig.update_layout(
+        title=title,
+        xaxis=dict(scaleanchor="y", scaleratio=1),
+        yaxis=dict(scaleanchor="x", scaleratio=1),
+        margin=dict(l=0, r=0, b=0, t=40),
+        uirevision="embedding",
+        showlegend=True,
+        legend=dict(
+            orientation="h",
+            yanchor="bottom",
+            y=1.02,
+            xanchor="center",
+            x=0.5
+        ),
+    )
+    return fig
+
 def register_callbacks(app: dash.Dash) -> None:
     # Dataset loading callback
     @app.callback(
@@ -595,18 +970,21 @@ def register_callbacks(app: dash.Dash) -> None:
         Output("sel", "data"),
         [
             Input("scatter-disk", "clickData"),
+            Input("scatter-disk-1", "clickData"),
+            Input("scatter-disk-2", "clickData"),
             Input({"type": "close-button", "index": dash.ALL}, "n_clicks")
         ],
         State("sel", "data"),
         State("mode", "data"),
         prevent_initial_call=True,
     )
-    def _select(click_disk, close_clicks, sel, mode):
+    def _select(click_disk, click_disk_1, click_disk_2, close_clicks, sel, mode):
         ctx = callback_context
         if not ctx.triggered or not ctx.triggered_id:
             return dash.no_update
         triggered_id = ctx.triggered_id
         current_sel = sel or []
+        
         def _clicked(click):
             try:
                 pt = click["points"][0]
@@ -623,8 +1001,16 @@ def register_callbacks(app: dash.Dash) -> None:
                 return point_index
             except (TypeError, KeyError, IndexError):
                 return None
-        if triggered_id == "scatter-disk":
-            click_data = ctx.inputs["scatter-disk.clickData"]
+        
+        if triggered_id in ["scatter-disk", "scatter-disk-1", "scatter-disk-2"]:
+            # Handle clicks from any of the scatter plots
+            if triggered_id == "scatter-disk":
+                click_data = ctx.inputs["scatter-disk.clickData"]
+            elif triggered_id == "scatter-disk-1":
+                click_data = ctx.inputs["scatter-disk-1.clickData"]
+            else:  # scatter-disk-2
+                click_data = ctx.inputs["scatter-disk-2.clickData"]
+            
             idx = _clicked(click_data)
             if idx is None:
                 return dash.no_update
@@ -951,6 +1337,7 @@ def register_callbacks(app: dash.Dash) -> None:
         Input("interpolated-point", "data"),
         Input("interpolation-slider", "value"),
         Input("mode", "data"),
+        Input("comparison-mode", "data"),
         State("labels-store", "data"),
         State("target-names-store", "data"),
         State("images-store", "data"),
@@ -959,7 +1346,7 @@ def register_callbacks(app: dash.Dash) -> None:
         State("points-store", "data"),
         State("meta-store", "data"),
     )
-    def _compare(sel, interpolated_point, t_value, mode, labels_data, target_names, images, emb_data, k_neighbors, points, meta):
+    def _compare(sel, interpolated_point, t_value, mode, comparison_mode, labels_data, target_names, images, emb_data, k_neighbors, points, meta):
         if labels_data is None:
             return html.Div(), html.P("Select a dataset to begin.")
         labels = np.asarray(labels_data)
@@ -1161,5 +1548,334 @@ def register_callbacks(app: dash.Dash) -> None:
             return html.H4("Neighbors")
         else:
             return html.H4("Point comparison")
+
+    @app.callback(
+        Output("comparison-mode", "data"),
+        Output("compare-projections-btn", "style"),
+        Output("proj2-container", "style"),
+        Output("single-plot-container", "style"),
+        Output("comparison-plot-container", "style"),
+        Input("compare-projections-btn", "n_clicks"),
+        State("comparison-mode", "data"),
+        prevent_initial_call=True,
+    )
+    def _toggle_comparison_mode(n_clicks, current_mode):
+        if not n_clicks:
+            return dash.no_update
+        
+        new_mode = not current_mode
+        
+        # Button styles
+        btn_style_inactive = {
+            "backgroundColor": "#6c757d",
+            "color": "white",
+            "border": "none",
+            "padding": "0.5rem 1rem",
+            "borderRadius": "6px",
+            "cursor": "pointer",
+            "width": "100%",
+            "marginBottom": "0.5rem",
+            "transition": "background-color 0.2s",
+        }
+        btn_style_active = {
+            **btn_style_inactive,
+            "backgroundColor": "#28a745"
+        }
+        
+        if new_mode:
+            # Comparison mode ON
+            return (
+                True,
+                btn_style_active,
+                {"display": "block"},  # Show second projection dropdown
+                {"display": "none"},   # Hide single plot
+                {"display": "flex"}    # Show comparison plots
+            )
+        else:
+            # Comparison mode OFF
+            return (
+                False,
+                btn_style_inactive,
+                {"display": "none"},   # Hide second projection dropdown
+                {                      # Show single plot
+                    "width": "100%",
+                    "height": "100%",
+                    "maxWidth": "800px",
+                    "maxHeight": "800px",
+                    "aspectRatio": "1 / 1",
+                    "margin": "auto",
+                },
+                {"display": "none"}    # Hide comparison plots
+            )
+
+    @app.callback(
+        Output("emb2", "data"),
+        Input("dataset-dropdown", "value"),
+        Input("proj2", "value"),
+        Input("comparison-mode", "data"),
+        prevent_initial_call=False,
+    )
+    def _load_second_projection(dataset_name, projection_method, comparison_mode):
+        if not comparison_mode or not dataset_name or not projection_method:
+            return None
+        
+        try:
+            import pickle
+            # Map dataset names to correct directory names
+            dataset_dir = {"imagenet": "ImageNet", "grit": "GRIT"}.get(dataset_name, dataset_name)
+            emb_file = f"hierchical_datasets/{dataset_dir}/{projection_method}_embeddings.pkl"
+            
+            with open(emb_file, "rb") as f_emb:
+                emb_data = pickle.load(f_emb)
+            
+            embeddings = np.array(emb_data["embeddings"], dtype=np.float32)
+            print(f"Loaded second projection {dataset_name} with {projection_method}: {embeddings.shape} embeddings")
+            
+            return embeddings.tolist()
+            
+        except FileNotFoundError as e:
+            print(f"Error loading second projection files: {e}")
+            return None
+        except Exception as e:
+            print(f"ERROR: Second projection loading failed: {e}")
+            return None
+
+    @app.callback(
+        Output("scatter-disk-2", "figure"),
+        Input("emb2", "data"),
+        Input("proj2", "value"),
+        Input("sel", "data"),
+        Input("mode", "data"),
+        Input("neighbors-slider", "value"),
+        Input("interpolated-point", "data"),
+        State("labels-store", "data"),
+        State("target-names-store", "data"),
+        State("dataset-dropdown", "value"),
+        State("data-store", "data"),
+        State("points-store", "data"),
+        Input("comparison-mode", "data"),
+    )
+    def _scatter_plot_2(edata, proj, sel, mode, k_neighbors, interpolated_point, labels_data, target_names, dataset_name, data_store, points, comparison_mode):
+        if not comparison_mode or edata is None or labels_data is None:
+            return {}
+        
+        emb = np.asarray(edata, dtype=np.float32)
+        labels = np.asarray(labels_data, dtype=int)
+        sel = sel or []
+        interp_point = (
+            np.asarray(interpolated_point, dtype=np.float32)
+            if interpolated_point is not None
+            else None
+        )
+        
+        # Handle 2D embeddings for disk projection (same as main scatter)
+        xh, yh = emb[:, 0], emb[:, 1]
+        if emb.shape[1] > 2:
+            zh = emb[:, 2]
+        else:
+            zh = np.zeros(emb.shape[0])
+        dx, dy = xh / (1.0 + zh), yh / (1.0 + zh)
+        
+        # Transform interpolated point if exists
+        interp_transformed = None
+        if interp_point is not None:
+            interp_dx = interp_point[0] / (1.0 + interp_point[2])
+            interp_dy = interp_point[1] / (1.0 + interp_point[2])
+            interp_transformed = np.array([interp_dx, interp_dy])
+        
+        # Calculate neighbors and tree connections based on mode
+        neighbor_indices = []
+        tree_connections = []
+        
+        if mode == "neighbors" and sel and len(sel) == 1:
+            if data_store is not None:
+                data_np = np.asarray(data_store, dtype=np.float32)
+                dists = np.linalg.norm(data_np - data_np[sel[0]], axis=1)
+                neighbor_indices = np.argsort(dists)
+                neighbor_indices = neighbor_indices[neighbor_indices != sel[0]][:k_neighbors]
+            else:
+                neighbor_indices = []
+        elif mode == "tree" and sel and len(sel) == 1:
+            # Find all points in the same tree and create connections between adjacent levels
+            tree_connections = []
+            try:
+                # Get the selected point's tree
+                selected_pt = points[sel[0]]
+                selected_tree_id = selected_pt.get("tree_id", "?")
+                
+                # Find all points that belong to the same tree (excluding the selected point)
+                tree_point_indices = []
+                tree_points_by_type = {}
+                
+                for i, pt in enumerate(points):
+                    if pt.get("tree_id") == selected_tree_id:
+                        if i != sel[0]:
+                            tree_point_indices.append(i)
+                        
+                        # Group by embedding type for creating connections
+                        emb_type = pt.get("embedding_type", "unknown")
+                        if emb_type not in tree_points_by_type:
+                            tree_points_by_type[emb_type] = []
+                        tree_points_by_type[emb_type].append(i)
+                
+                # Create connections between adjacent hierarchical levels
+                if dataset_name == "imagenet":
+                    level_order = ['parent_text', 'child_text', 'child_image']
+                else:  # GRIT
+                    level_order = ['parent_text', 'child_text', 'parent_image', 'child_image']
+                
+                # Connect consecutive levels
+                for i in range(len(level_order) - 1):
+                    current_level = level_order[i]
+                    next_level = level_order[i + 1]
+                    
+                    if current_level in tree_points_by_type and next_level in tree_points_by_type:
+                        for curr_pt in tree_points_by_type[current_level]:
+                            for next_pt in tree_points_by_type[next_level]:
+                                tree_connections.append((curr_pt, next_pt))
+                
+                # Use tree points as neighbor_indices for highlighting
+                neighbor_indices = tree_point_indices
+                
+            except Exception as e:
+                print(f"Error finding tree points: {e}")
+                neighbor_indices = []
+                tree_connections = []
+        
+        # Load the original label types for color coding
+        emb_labels = []
+        if dataset_name and proj:
+            try:
+                import pickle
+                dataset_dir = {"imagenet": "ImageNet", "grit": "GRIT"}.get(dataset_name, dataset_name)
+                emb_file = f"hierchical_datasets/{dataset_dir}/{proj}_embeddings.pkl"
+                with open(emb_file, "rb") as f:
+                    emb_data_loaded = pickle.load(f)
+                emb_labels = emb_data_loaded.get("labels", [])
+            except Exception as e:
+                emb_labels = []
+        
+        # Create the figure with all mode features
+        fig = _create_full_interactive_scatter(dx, dy, labels, target_names, emb_labels, f"{proj.upper()}", sel, neighbor_indices, tree_connections, interp_transformed, mode)
+        return fig
+
+    @app.callback(
+        Output("scatter-disk-1", "figure"),
+        Input("emb", "data"),
+        Input("proj", "value"),
+        Input("sel", "data"),
+        Input("mode", "data"),
+        Input("neighbors-slider", "value"),
+        Input("interpolated-point", "data"),
+        State("labels-store", "data"),
+        State("target-names-store", "data"),
+        State("dataset-dropdown", "value"),
+        State("data-store", "data"),
+        State("points-store", "data"),
+        Input("comparison-mode", "data"),
+    )
+    def _scatter_plot_1(edata, proj, sel, mode, k_neighbors, interpolated_point, labels_data, target_names, dataset_name, data_store, points, comparison_mode):
+        if not comparison_mode or edata is None or labels_data is None:
+            return {}
+        
+        emb = np.asarray(edata, dtype=np.float32)
+        labels = np.asarray(labels_data, dtype=int)
+        sel = sel or []
+        interp_point = (
+            np.asarray(interpolated_point, dtype=np.float32)
+            if interpolated_point is not None
+            else None
+        )
+        
+        # Handle 2D embeddings for disk projection (same as main scatter)
+        xh, yh = emb[:, 0], emb[:, 1]
+        if emb.shape[1] > 2:
+            zh = emb[:, 2]
+        else:
+            zh = np.zeros(emb.shape[0])
+        dx, dy = xh / (1.0 + zh), yh / (1.0 + zh)
+        
+        # Transform interpolated point if exists
+        interp_transformed = None
+        if interp_point is not None:
+            interp_dx = interp_point[0] / (1.0 + interp_point[2])
+            interp_dy = interp_point[1] / (1.0 + interp_point[2])
+            interp_transformed = np.array([interp_dx, interp_dy])
+        
+        # Calculate neighbors and tree connections based on mode
+        neighbor_indices = []
+        tree_connections = []
+        
+        if mode == "neighbors" and sel and len(sel) == 1:
+            if data_store is not None:
+                data_np = np.asarray(data_store, dtype=np.float32)
+                dists = np.linalg.norm(data_np - data_np[sel[0]], axis=1)
+                neighbor_indices = np.argsort(dists)
+                neighbor_indices = neighbor_indices[neighbor_indices != sel[0]][:k_neighbors]
+            else:
+                neighbor_indices = []
+        elif mode == "tree" and sel and len(sel) == 1:
+            # Find all points in the same tree and create connections between adjacent levels
+            tree_connections = []
+            try:
+                # Get the selected point's tree
+                selected_pt = points[sel[0]]
+                selected_tree_id = selected_pt.get("tree_id", "?")
+                
+                # Find all points that belong to the same tree (excluding the selected point)
+                tree_point_indices = []
+                tree_points_by_type = {}
+                
+                for i, pt in enumerate(points):
+                    if pt.get("tree_id") == selected_tree_id:
+                        if i != sel[0]:
+                            tree_point_indices.append(i)
+                        
+                        # Group by embedding type for creating connections
+                        emb_type = pt.get("embedding_type", "unknown")
+                        if emb_type not in tree_points_by_type:
+                            tree_points_by_type[emb_type] = []
+                        tree_points_by_type[emb_type].append(i)
+                
+                # Create connections between adjacent hierarchical levels
+                if dataset_name == "imagenet":
+                    level_order = ['parent_text', 'child_text', 'child_image']
+                else:  # GRIT
+                    level_order = ['parent_text', 'child_text', 'parent_image', 'child_image']
+                
+                # Connect consecutive levels
+                for i in range(len(level_order) - 1):
+                    current_level = level_order[i]
+                    next_level = level_order[i + 1]
+                    
+                    if current_level in tree_points_by_type and next_level in tree_points_by_type:
+                        for curr_pt in tree_points_by_type[current_level]:
+                            for next_pt in tree_points_by_type[next_level]:
+                                tree_connections.append((curr_pt, next_pt))
+                
+                # Use tree points as neighbor_indices for highlighting
+                neighbor_indices = tree_point_indices
+                
+            except Exception as e:
+                print(f"Error finding tree points: {e}")
+                neighbor_indices = []
+                tree_connections = []
+        
+        # Load the original label types for color coding
+        emb_labels = []
+        if dataset_name and proj:
+            try:
+                import pickle
+                dataset_dir = {"imagenet": "ImageNet", "grit": "GRIT"}.get(dataset_name, dataset_name)
+                emb_file = f"hierchical_datasets/{dataset_dir}/{proj}_embeddings.pkl"
+                with open(emb_file, "rb") as f:
+                    emb_data_loaded = pickle.load(f)
+                emb_labels = emb_data_loaded.get("labels", [])
+            except Exception as e:
+                emb_labels = []
+        
+        # Create the figure with all mode features
+        fig = _create_full_interactive_scatter(dx, dy, labels, target_names, emb_labels, f"{proj.upper()}", sel, neighbor_indices, tree_connections, interp_transformed, mode)
+        return fig
 
     # ... (other callbacks: _compute, _select, _update_button_state, _interpolate, _update_tree_view, _update_mode, _compare, _cmp_header) ...
