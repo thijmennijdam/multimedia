@@ -35,7 +35,7 @@ def _create_simple_scatter(x, y, labels, target_names, emb_labels, title):
                 x_coords = [x[i] for i in indices]
                 y_coords = [y[i] for i in indices]
                 hover_text = [
-                    f"{i}: {target_names[labels[i]] if target_names is not None else labels[i]}"
+                    f"{i}"
                     for i in indices
                 ]
                 
@@ -62,7 +62,7 @@ def _create_simple_scatter(x, y, labels, target_names, emb_labels, title):
             y=y,
             mode="markers",
             text=[
-                f"{i}: {target_names[labels[i]] if target_names is not None else labels[i]}"
+                f"{i}"
                 for i in range(len(x))
             ],
             hoverinfo="text",
@@ -114,7 +114,7 @@ def _create_interactive_scatter(x, y, labels, target_names, emb_labels, title, s
                 x_coords = [x[i] for i in indices]
                 y_coords = [y[i] for i in indices]
                 hover_text = [
-                    f"{i}: {target_names[labels[i]] if target_names is not None else labels[i]}"
+                    f"{i}"
                     for i in indices
                 ]
                 
@@ -142,7 +142,7 @@ def _create_interactive_scatter(x, y, labels, target_names, emb_labels, title, s
             y=y,
             mode="markers",
             text=[
-                f"{i}: {target_names[labels[i]] if target_names is not None else labels[i]}"
+                f"{i}"
                 for i in range(len(x))
             ],
             hoverinfo="text",
@@ -219,7 +219,7 @@ def _create_full_interactive_scatter(x, y, labels, target_names, emb_labels, tit
                     x_coords = [x[i] for i in regular_indices]
                     y_coords = [y[i] for i in regular_indices]
                     hover_text = [
-                        f"{i}: {target_names[labels[i]] if target_names is not None else labels[i]}"
+                        f"{i}"
                         for i in regular_indices
                     ]
                     
@@ -246,7 +246,7 @@ def _create_full_interactive_scatter(x, y, labels, target_names, emb_labels, tit
                     x_coords_neighbors = [x[i] for i in neighbor_indices_for_type]
                     y_coords_neighbors = [y[i] for i in neighbor_indices_for_type]
                     hover_text_neighbors = [
-                        f"{i}: {target_names[labels[i]] if target_names is not None else labels[i]} (neighbor)"
+                        f"{i} (neighbor)"
                         for i in neighbor_indices_for_type
                     ]
                     
@@ -279,7 +279,7 @@ def _create_full_interactive_scatter(x, y, labels, target_names, emb_labels, tit
                 y=[y[i] for i in regular_indices],
                 mode="markers",
                 text=[
-                    f"{i}: {target_names[labels[i]] if target_names is not None else labels[i]}"
+                    f"{i}"
                     for i in regular_indices
                 ],
                 hoverinfo="text",
@@ -299,7 +299,7 @@ def _create_full_interactive_scatter(x, y, labels, target_names, emb_labels, tit
                 y=[y[i] for i in neighbor_indices_list],
                 mode="markers",
                 text=[
-                    f"{i}: {target_names[labels[i]] if target_names is not None else labels[i]} (neighbor)"
+                    f"{i} (neighbor)"
                     for i in neighbor_indices_list
                 ],
                 hoverinfo="text",
@@ -756,7 +756,7 @@ def register_callbacks(app: dash.Dash) -> None:
                             x_coords = [x[i] for i in regular_indices]
                             y_coords = [y[i] for i in regular_indices]
                             hover_text = [
-                                f"{i}: {target_names[labels[i]] if target_names is not None else labels[i]}"
+                                f"{i}"
                                 for i in regular_indices
                             ]
                             
@@ -785,7 +785,7 @@ def register_callbacks(app: dash.Dash) -> None:
                             x_coords_neighbors = [x[i] for i in neighbor_indices_for_type]
                             y_coords_neighbors = [y[i] for i in neighbor_indices_for_type]
                             hover_text_neighbors = [
-                                f"{i}: {target_names[labels[i]] if target_names is not None else labels[i]} (neighbor)"
+                                f"{i} (neighbor)"
                                 for i in neighbor_indices_for_type
                             ]
                             
@@ -820,7 +820,7 @@ def register_callbacks(app: dash.Dash) -> None:
                         y=[y[i] for i in regular_indices],
                         mode="markers",
                         text=[
-                            f"{i}: {target_names[labels[i]] if target_names is not None else labels[i]}"
+                            f"{i}"
                             for i in regular_indices
                         ],
                         hoverinfo="text",
@@ -842,7 +842,7 @@ def register_callbacks(app: dash.Dash) -> None:
                         y=[y[i] for i in neighbor_indices_list],
                         mode="markers",
                         text=[
-                            f"{i}: {target_names[labels[i]] if target_names is not None else labels[i]} (neighbor)"
+                            f"{i} (neighbor)"
                             for i in neighbor_indices_list
                         ],
                         hoverinfo="text",
