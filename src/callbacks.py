@@ -1066,6 +1066,52 @@ def register_callbacks(app: dash.Dash) -> None:
         fig_disk = _fig_disk(dx, dy, selected_idx if mode == "neighbors" else highlight, labels, target_names, traversal_points=traversal_points, neighbor_indices=neighbor_indices, emb_labels=emb_labels, tree_connections=tree_connections, points=points)
         return fig_disk
 
+    # Auto-switch projection method when clicking in dual view (visual feedback only)
+    @app.callback(
+        Output("proj-horopca-btn", "style", allow_duplicate=True),
+        Output("proj-cosne-btn", "style", allow_duplicate=True),
+        [
+            Input("scatter-disk-1", "clickData"),
+            Input("scatter-disk-2", "clickData"),
+        ],
+        State("comparison-mode", "data"),
+        prevent_initial_call=True,
+    )
+    def _auto_switch_projection_visual(click_disk_1, click_disk_2, comparison_mode):
+        ctx = callback_context
+        if not ctx.triggered or not comparison_mode:
+            return dash.no_update, dash.no_update
+        
+        triggered_id = ctx.triggered_id
+        
+        # Button styles
+        active_style = {
+            "backgroundColor": "#28a745",
+            "color": "white",
+            "border": "none",
+            "padding": "0.5rem 1rem",
+            "borderRadius": "6px",
+            "cursor": "pointer",
+            "width": "100%",
+            "minWidth": "0",
+            "flex": "1 1 0",
+            "boxSizing": "border-box",
+            "transition": "background-color 0.2s",
+        }
+        inactive_style = {
+            **active_style,
+            "backgroundColor": "#6c757d"
+        }
+        
+        if triggered_id == "scatter-disk-1":
+            # Clicked on HoroPCA plot (left) - show HoroPCA as active
+            return active_style, inactive_style
+        elif triggered_id == "scatter-disk-2":
+            # Clicked on CO-SNE plot (right) - show CO-SNE as active
+            return inactive_style, active_style
+        
+        return dash.no_update, dash.no_update
+
     @app.callback(
         Output("sel", "data"),
         [
