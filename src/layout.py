@@ -54,24 +54,7 @@ def _config_panel() -> html.Div:
                         "transition": "background-color 0.2s",
                     },
                 ),
-            ], style={"display": "flex", "gap": "0.5rem", "marginBottom": "1rem"}),
-            dcc.Store(id="proj", data="horopca"),  # Hidden store for compatibility
-            # Hyperparameters display
-            html.Div(
-                id="hyperparams-display",
-                style={
-                    "marginTop": "0.5rem",
-                    "marginBottom": "1rem",
-                    "padding": "0.75rem",
-                    "backgroundColor": "#f8f9fa",
-                    "borderRadius": "6px",
-                    "border": "1px solid #e9ecef",
-                },
-                children=[
-                    html.H6("Hyperparameters", style={"margin": "0 0 0.5rem 0", "color": "#495057", "fontSize": "0.9rem"}),
-                    html.Div(id="hyperparams-table")
-                ]
-            ),
+            ], style={"display": "flex", "gap": "0.5rem", "marginBottom": "0.5rem"}),
             # Projection comparison section
             html.Div([
                 html.Button(
@@ -90,6 +73,23 @@ def _config_panel() -> html.Div:
                     },
                 ),
             ]),
+            dcc.Store(id="proj", data="horopca"),  # Hidden store for compatibility
+            # Hyperparameters display
+            html.Div(
+                id="hyperparams-display",
+                style={
+                    "marginTop": "0.5rem",
+                    "marginBottom": "1rem",
+                    "padding": "0.75rem",
+                    "backgroundColor": "#f8f9fa",
+                    "borderRadius": "6px",
+                    "border": "1px solid #e9ecef",
+                },
+                children=[
+                    html.H6("Hyperparameters", style={"margin": "0 0 0.5rem 0", "color": "#495057", "fontSize": "0.9rem"}),
+                    html.Div(id="hyperparams-table")
+                ]
+            ),
             html.Br(),
             html.Label("Mode"),
             html.Div(
