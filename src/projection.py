@@ -108,7 +108,7 @@ def _interpolate_hyperbolic(feat1, feat2, all_feats, model, steps=10):
     """
     # Interpolate between feat1 and feat2
     feat1, feat2, all_feats = torch.tensor(feat1), torch.tensor(feat2), torch.tensor(all_feats)
-    interp_feats = interpolate(model, feat1, feat2, steps=steps+2)
+    interp_feats = interpolate(model, feat1, feat2, steps=steps)
     
     # Calculate scores for the interpolated features
     nn_scores = calc_scores(model, interp_feats, all_feats, has_root=True)

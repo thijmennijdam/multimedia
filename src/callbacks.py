@@ -1552,7 +1552,7 @@ def register_callbacks(app: dash.Dash) -> None:
             mode = "interpolate"
             interpolate_style = selected_style
             interpolate_controls_style = {"display": "block"}
-            instructions = "Select 2 points to interpolate."
+            instructions = "Select 2 points to traverse between."
         elif triggered_id == "tree-mode-btn":
             mode = "tree"
             tree_style = selected_style
@@ -1635,7 +1635,7 @@ def register_callbacks(app: dash.Dash) -> None:
                 )
             return html.Div(components), instructions
         if mode == "interpolate":
-            instructions = html.P("Select two distinct points to interpolate.")
+            instructions = html.P("Select two distinct points to traverse between.")
             if traversal_path is not None and len(traversal_path) > 0:
                 for idx in traversal_path:
                     # Get the content to display based on embedding type
@@ -1714,7 +1714,7 @@ def register_callbacks(app: dash.Dash) -> None:
         if mode == "compare":
             return html.H4("Point comparison")
         elif mode == "interpolate":
-            return html.H4("Interpolation")
+            return html.H4("Traverse Path")
         elif mode == "tree":
             return html.H4("Tree Traversal")
         elif mode == "neighbors":

@@ -113,7 +113,7 @@ def _config_panel() -> html.Div:
                             },
                         ),
                         html.Button(
-                            "Interpolate",
+                            "Traverse",
                             id="interpolate-mode-btn",
                             style={
                                 "backgroundColor": "#007bff",
@@ -176,7 +176,7 @@ def _config_panel() -> html.Div:
                 children=[
                     html.Div(
                         [
-                            html.Label("Number of interpolated points:", style={"marginBottom": "0.5rem", "display": "block", "fontWeight": "500"}),
+                            html.Label("Choose traverse path length:", style={"marginBottom": "0.5rem", "display": "block", "fontWeight": "500"}),
                             html.Div([
                                 html.Button(
                                     "−",
