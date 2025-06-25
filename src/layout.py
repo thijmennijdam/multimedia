@@ -275,7 +275,14 @@ def _centre_panel() -> html.Div:
                         dcc.Graph(
                             id="scatter-disk-1",
                             figure=None,
-                            style={"width": "700px", "height": "1050px"},
+                            style={
+                                "width": "100%", 
+                                "height": "75vh", 
+                                "maxWidth": "700px", 
+                                "maxHeight": "1050px",
+                                "minWidth": "400px",
+                                "minHeight": "600px"
+                            },
                             config={
                                 "displayModeBar": True,
                                 "displaylogo": False,
@@ -295,13 +302,20 @@ def _centre_panel() -> html.Div:
                                 ]
                             },
                         ),
-                    ], style={"flex": "1", "display": "flex", "flexDirection": "column", "minWidth": "0", "overflow": "visible"}),
+                    ], style={"flex": "1", "display": "flex", "flexDirection": "column", "minWidth": "0", "overflow": "visible", "maxWidth": "700px"}),
                     html.Div([
                         html.H5("CO-SNE", style={"textAlign": "center", "margin": "0 0 1rem 0", "color": "#333"}),
                         dcc.Graph(
                             id="scatter-disk-2",
                             figure=None,
-                            style={"width": "700px", "height": "1050px"},
+                            style={
+                                "width": "100%", 
+                                "height": "75vh", 
+                                "maxWidth": "700px", 
+                                "maxHeight": "1050px",
+                                "minWidth": "400px",
+                                "minHeight": "600px"
+                            },
                             config={
                                 "displayModeBar": True,
                                 "displaylogo": False,
