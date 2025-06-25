@@ -1643,12 +1643,15 @@ def register_callbacks(app: dash.Dash) -> None:
                 False,
                 btn_style_inactive,
                 {                      # Show single plot
-                    "width": "100%",
-                    "height": "100%",
-                    "maxWidth": "800px",
-                    "maxHeight": "800px",
+                    "display": "flex",
+                    "width": "min(85vh, 50vw)",
+                    "height": "min(85vh, 50vw)",
                     "aspectRatio": "1 / 1",
                     "margin": "auto",
+                    "maxWidth": "100%",
+                    "maxHeight": "100%",
+                    "flexShrink": 0,
+                    "flexGrow": 0,
                 },
                 {"display": "none"}    # Hide comparison plots
             )
