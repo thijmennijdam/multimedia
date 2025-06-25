@@ -2367,13 +2367,14 @@ def register_callbacks(app: dash.Dash) -> None:
 
     @app.callback(
         Output("interpolated-point", "data", allow_duplicate=True),
+        Output("sel", "data", allow_duplicate=True),
         Input("clear-path-btn", "n_clicks"),
         prevent_initial_call=True,
     )
     def _clear_interpolated_point(n_clicks):
         if n_clicks:
-            return None
-        return dash.no_update
+            return None, []  # Clear both interpolated path and selected points
+        return dash.no_update, dash.no_update
 
 
     # Projection button selection callbacks
