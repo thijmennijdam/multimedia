@@ -1637,14 +1637,65 @@ def register_callbacks(app: dash.Dash) -> None:
         if mode == "interpolate":
             instructions = html.P("Select two distinct points to traverse between.")
             if traversal_path is not None and len(traversal_path) > 0:
-                for idx in traversal_path:
-                    # Get the content to display based on embedding type
+                # Create a hierarchical traversal path visualization similar to tree
+                def create_traversal_step(step_idx, content, is_endpoint=False):
+                    # Calculate size based on position (start/end slightly bigger, middle all same smaller size)
+                    if is_endpoint:
+                        # Start and end points are slightly bigger
+                        size_factor = 0.95
+                        border_color = "#007bff"
+                        bg_color = "#e3f2fd"
+                        step_label = "Start Point" if step_idx == 0 else "End Point"
+                    else:
+                        # All middle points are the same smaller size
+                        size_factor = 0.8
+                        border_color = "#6c757d"
+                        bg_color = "#f8f9fa"
+                        step_label = f"Step {step_idx}"
+                    
+                    # Calculate padding and margin based on size
+                    base_padding = 0.75
+                    padding = f"{base_padding * size_factor}rem"
+                    margin_left = f"{(1.0 - size_factor) * 2}rem"
+                    
+                    return html.Div([
+                        html.H6(step_label, style={
+                            "margin": "0 0 0.5rem 0", 
+                            "color": border_color,
+                            "fontWeight": "bold" if is_endpoint else "normal",
+                            "fontSize": f"{0.8 + 0.2 * size_factor}rem"
+                        }),
+                        content
+                    ], style={
+                        "padding": padding, 
+                        "backgroundColor": bg_color,
+                        "border": f"2px solid {border_color}",
+                        "borderRadius": "6px", 
+                        "marginBottom": "0.5rem",
+                        "marginLeft": margin_left,
+                        "transform": f"scale({size_factor})",
+                        "transformOrigin": "left center",
+                        "transition": "all 0.3s ease"
+                    })
+                
+                # Create traversal steps
+                for i, idx in enumerate(traversal_path):
                     content_element = _create_content_element(idx, images, points, meta)
-                    components.append(
-                        html.Div([
-                            content_element
-                        ], style={"display": "flex", "alignItems": "center", "padding": "0.5rem", "borderRadius": "4px", "position": "relative", "backgroundColor": "#f8f9fa", "marginBottom": "0.5rem"})
-                    )
+                    is_endpoint = (i == 0 or i == len(traversal_path) - 1)
+                    step_component = create_traversal_step(i, content_element, is_endpoint)
+                    components.append(step_component)
+                    
+                    # Add connecting line between steps (except after the last one)
+                    if i < len(traversal_path) - 1:
+                        components.append(
+                            html.Div(style={
+                                "height": "1rem",
+                                "width": "2px",
+                                "backgroundColor": "#007bff",
+                                "margin": "0 auto",
+                                "position": "relative",
+                            })
+                        )
             return html.Div(components), instructions
         if mode == "neighbors":
             instructions = html.P("Select one point to view its neighbors.")
