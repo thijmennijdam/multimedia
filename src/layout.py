@@ -9,34 +9,87 @@ def _config_panel() -> html.Div:
             dcc.Dropdown(
                 id="dataset-dropdown",
                 options=[
-                    {"label": "ImageNet subset", "value": "imagenet"},
+                    {"label": "ImageNet", "value": "imagenet"},
                     {"label": "GRIT", "value": "grit"},
                 ],
                 value="imagenet",  # Default, can be overridden
                 clearable=False,
                 style={
-                    "backgroundColor": "white",
-                    "border": "1px solid #ccc",
-                    "borderRadius": "6px",
-                    "color": "black",
+                    "marginBottom": "1rem",
                 },
             ),
-            html.Label("Projection"),
-            dcc.Dropdown(
-                id="proj",
-                options=[
-                    {"label": "HoroPCA", "value": "horopca"},
-                    {"label": "CO-SNE", "value": "cosne"}
-                ],
-                value="horopca",
-                clearable=False,
+            html.Label("Choose projection:"),
+            html.Div([
+                html.Button(
+                    "HoroPCA",
+                    id="proj-horopca-btn",
+                    style={
+                        "backgroundColor": "#28a745",
+                        "color": "white",
+                        "border": "none",
+                        "padding": "0.5rem 1rem",
+                        "borderRadius": "6px",
+                        "cursor": "pointer",
+                        "width": "100%",
+                        "minWidth": "0",
+                        "flex": "1 1 0",
+                        "boxSizing": "border-box",
+                        "transition": "background-color 0.2s",
+                    },
+                ),
+                html.Button(
+                    "CO-SNE",
+                    id="proj-cosne-btn",
+                    style={
+                        "backgroundColor": "#6c757d",
+                        "color": "white",
+                        "border": "none",
+                        "padding": "0.5rem 1rem",
+                        "borderRadius": "6px",
+                        "cursor": "pointer",
+                        "width": "100%",
+                        "minWidth": "0",
+                        "flex": "1 1 0",
+                        "boxSizing": "border-box",
+                        "transition": "background-color 0.2s",
+                    },
+                ),
+            ], style={"display": "flex", "gap": "0.5rem", "marginBottom": "1rem"}),
+            dcc.Store(id="proj", data="horopca"),  # Hidden store for compatibility
+            # Hyperparameters display
+            html.Div(
+                id="hyperparams-display",
                 style={
-                    "backgroundColor": "white",
-                    "border": "1px solid #ccc",
+                    "marginTop": "0.5rem",
+                    "marginBottom": "1rem",
+                    "padding": "0.75rem",
+                    "backgroundColor": "#f8f9fa",
                     "borderRadius": "6px",
-                    "color": "black",
+                    "border": "1px solid #e9ecef",
                 },
+                children=[
+                    html.H6("Hyperparameters", style={"margin": "0 0 0.5rem 0", "color": "#495057", "fontSize": "0.9rem"}),
+                    html.Div(id="hyperparams-table")
+                ]
             ),
+            # Projection comparison section
+            html.Div([
+                html.Button(
+                    "Compare Projections",
+                    id="compare-projections-btn",
+                    style={
+                        "backgroundColor": "#6c757d",
+                        "color": "white",
+                        "border": "none",
+                        "padding": "0.5rem 1rem",
+                        "borderRadius": "6px",
+                        "cursor": "pointer",
+                        "width": "100%",
+                        "marginBottom": "0.5rem",
+                        "transition": "background-color 0.2s",
+                    },
+                ),
+            ]),
             html.Br(),
             html.Label("Mode"),
             html.Div(
@@ -60,7 +113,7 @@ def _config_panel() -> html.Div:
                             },
                         ),
                         html.Button(
-                            "Interpolate",
+                            "Traverse",
                             id="interpolate-mode-btn",
                             style={
                                 "backgroundColor": "#007bff",
@@ -121,8 +174,81 @@ def _config_panel() -> html.Div:
                 id="interpolate-controls",
                 style={"display": "none"},
                 children=[
+                    html.Div(
+                        [
+                            html.Label("Choose traverse path length:", style={"marginBottom": "0.5rem", "display": "block", "fontWeight": "500"}),
+                            html.Div([
+                                html.Button(
+                                    "−",
+                                    id="interpolation-decrease-btn",
+                                    style={
+                                        "backgroundColor": "#f8f9fa",
+                                        "border": "1px solid #ccc",
+                                        "borderRadius": "6px 0 0 6px",
+                                        "padding": "0.5rem",
+                                        "cursor": "pointer",
+                                        "fontSize": "1.2rem",
+                                        "fontWeight": "bold",
+                                        "width": "40px",
+                                        "height": "40px",
+                                        "display": "flex",
+                                        "alignItems": "center",
+                                        "justifyContent": "center",
+                                        "color": "#495057",
+                                        "transition": "background-color 0.2s",
+                                    },
+                                ),
+                                dcc.Input(
+                                    id="interpolation-slider",
+                                    type="number",
+                                    min=1,
+                                    step=1,
+                                    value=5,
+                                    debounce=False,
+                                    style={
+                                        "width": "80px",
+                                        "padding": "0.5rem",
+                                        "border": "1px solid #ccc",
+                                        "borderLeft": "none",
+                                        "borderRight": "none",
+                                        "fontSize": "0.9rem",
+                                        "textAlign": "center",
+                                        "height": "40px",
+                                        "boxSizing": "border-box",
+                                    },
+                                ),
+                                html.Button(
+                                    "+",
+                                    id="interpolation-increase-btn",
+                                    style={
+                                        "backgroundColor": "#f8f9fa",
+                                        "border": "1px solid #ccc",
+                                        "borderRadius": "0 6px 6px 0",
+                                        "padding": "0.5rem",
+                                        "cursor": "pointer",
+                                        "fontSize": "1.2rem",
+                                        "fontWeight": "bold",
+                                        "width": "40px",
+                                        "height": "40px",
+                                        "display": "flex",
+                                        "alignItems": "center",
+                                        "justifyContent": "center",
+                                        "color": "#495057",
+                                        "transition": "background-color 0.2s",
+                                    },
+                                ),
+                            ], style={
+                                "display": "flex",
+                                "alignItems": "center",
+                                "justifyContent": "center",
+                                "width": "fit-content",
+                                "margin": "0 auto",
+                            }),
+                        ],
+                        style={"marginBottom": "1rem"},
+                    ),
                     html.Button(
-                        "Interpolate Points",
+                        "Create Path",
                         id="run-interpolate-btn",
                         disabled=True,
                         style={
@@ -132,24 +258,22 @@ def _config_panel() -> html.Div:
                             "padding": "0.5rem 1rem",
                             "borderRadius": "6px",
                             "cursor": "pointer",
-                            "marginTop": "0.5rem",
                             "width": "100%",
+                            "marginBottom": "0.5rem",
                         },
                     ),
-                    html.Div(
-                        [
-                            html.Label("Interpolation factor (t):"),
-                            dcc.Slider(
-                                id="interpolation-slider",
-                                min=0,
-                                max=1,
-                                step=0.1,
-                                value=0.5,
-                                marks={i / 10: str(i / 10) for i in range(11)},
-                                tooltip={"placement": "bottom", "always_visible": True},
-                            ),
-                        ],
-                        style={"marginTop": "1rem"},
+                    html.Button(
+                        "Clear Path",
+                        id="clear-path-btn",
+                        style={
+                            "backgroundColor": "#dc3545",
+                            "color": "white",
+                            "border": "none",
+                            "padding": "0.5rem 1rem",
+                            "borderRadius": "6px",
+                            "cursor": "pointer",
+                            "width": "100%",
+                        },
                     ),
                 ],
             ),
@@ -171,12 +295,15 @@ def _config_panel() -> html.Div:
             ),
         ],
         style={
-            "width": "240px",
+            "width": "20vw",
+            "minWidth": "240px",
+            "maxWidth": "300px",
             "padding": "1rem",
             "backgroundColor": "white",
             "borderRadius": "8px",
             "boxShadow": "0 1px 3px rgba(0,0,0,0.1)",
             "flexShrink": 0,
+            "overflowY": "auto",
         },
     )
 
@@ -184,24 +311,132 @@ def _centre_panel() -> html.Div:
     return html.Div(
         [
             html.Div(
-                dcc.Graph(
-                    id="scatter-disk",
-                    figure=None,  # Will be set by callback
-                    style={"width": "100%", "height": "100%"},
-                    config={"displayModeBar": False},
-                ),
+                id="single-plot-container",
+                children=[
+                    dcc.Graph(
+                        id="scatter-disk",
+                        figure=None,  # Will be set by callback
+                        style={"width": "100%", "height": "100%"},
+                        config={
+                            "displayModeBar": True,
+                            "displaylogo": False,
+                            "modeBarButtonsToRemove": ["lasso2d", "select2d"],
+                            "modeBarButtonsToAdd": [],
+                            "showTips": True,
+                            "toImageButtonOptions": {
+                                "format": "png",
+                                "filename": "scatter_plot",
+                                "height": 600,
+                                "width": 800,
+                                "scale": 2
+                            },
+                            "modeBarButtons": [
+                                ["pan2d", "zoom2d", "zoomIn2d", "zoomOut2d", "autoScale2d", "resetScale2d"],
+                                ["toImage"]
+                            ]
+                        },
+                    ),
+                ],
                 style={
-                    "width": "100%",
-                    "height": "100%",
-                    "maxWidth": "800px",
-                    "maxHeight": "800px",
+                    "display": "flex",
+                    "width": "min(85vh, 50vw)",
+                    "height": "min(85vh, 50vw)",
                     "aspectRatio": "1 / 1",
                     "margin": "auto",
+                    "maxWidth": "100%",
+                    "maxHeight": "100%",
+                    "flexShrink": 0,
+                    "flexGrow": 0,
+                },
+            ),
+            html.Div(
+                id="comparison-plot-container",
+                children=[
+                    html.Div([
+                        html.H5("HoroPCA", style={"textAlign": "center", "margin": "0 0 1rem 0", "color": "#333"}),
+                        dcc.Graph(
+                            id="scatter-disk-1",
+                            figure=None,
+                            style={
+                                "width": "100%", 
+                                "height": "100%",
+                                "aspectRatio": "2 / 3",
+                                "maxWidth": "50vh",
+                                "maxHeight": "75vh",
+                                "minWidth": "300px",
+                                "minHeight": "450px"
+                            },
+                            config={
+                                "displayModeBar": True,
+                                "displaylogo": False,
+                                "modeBarButtonsToRemove": ["lasso2d", "select2d"],
+                                "modeBarButtonsToAdd": [],
+                                "showTips": True,
+                                "toImageButtonOptions": {
+                                    "format": "png",
+                                    "filename": "horopca_plot",
+                                    "height": 600,
+                                    "width": 800,
+                                    "scale": 2
+                                },
+                                "modeBarButtons": [
+                                    ["pan2d", "zoom2d", "zoomIn2d", "zoomOut2d", "autoScale2d", "resetScale2d"],
+                                    ["toImage"]
+                                ]
+                            },
+                        ),
+                    ], style={"flex": "1", "display": "flex", "flexDirection": "column", "minWidth": "0", "overflow": "visible", "alignItems": "center", "justifyContent": "center"}),
+                    html.Div([
+                        html.H5("CO-SNE", style={"textAlign": "center", "margin": "0 0 1rem 0", "color": "#333"}),
+                        dcc.Graph(
+                            id="scatter-disk-2",
+                            figure=None,
+                            style={
+                                "width": "100%", 
+                                "height": "100%",
+                                "aspectRatio": "2 / 3",
+                                "maxWidth": "50vh",
+                                "maxHeight": "75vh",
+                                "minWidth": "300px",
+                                "minHeight": "450px"
+                            },
+                            config={
+                                "displayModeBar": True,
+                                "displaylogo": False,
+                                "modeBarButtonsToRemove": ["lasso2d", "select2d"],
+                                "modeBarButtonsToAdd": [],
+                                "showTips": True,
+                                "toImageButtonOptions": {
+                                    "format": "png",
+                                    "filename": "cosne_plot",
+                                    "height": 600,
+                                    "width": 800,
+                                    "scale": 2
+                                },
+                                "modeBarButtons": [
+                                    ["pan2d", "zoom2d", "zoomIn2d", "zoomOut2d", "autoScale2d", "resetScale2d"],
+                                    ["toImage"]
+                                ]
+                            },
+                        ),
+                    ], style={"flex": "1", "display": "flex", "flexDirection": "column", "alignItems": "center", "justifyContent": "center"}),
+                ],
+                style={
+                    "display": "none",
+                    "width": "100%",
+                    "height": "100%",
+                    "margin": "auto",
+                    "gap": "2rem",
+                    "flexDirection": "row",
+                    "overflow": "visible",
+                    "alignItems": "center",
+                    "justifyContent": "center",
                 },
             ),
         ],
         style={
             "flex": 1,
+            "width": "60vw",
             "padding": "1rem",
             "backgroundColor": "white",
             "borderRadius": "8px",
@@ -211,7 +446,7 @@ def _centre_panel() -> html.Div:
             "justifyContent": "center",
             "alignItems": "center",
             "minHeight": 0,
-            "overflow": "hidden",
+            "overflow": "visible",
         },
     )
 
@@ -259,27 +494,27 @@ def _cmp_panel() -> html.Div:
                         [
                             html.Div(
                                 [
-                                    _tree_node("Levels Above", html.Div(id="tree-levels-above")),
+                                    html.Div(id="tree-levels-above"),
                                     html.Div(
                                         style={
-                                            "height": "2rem",
+                                            "height": "1rem",
                                             "width": "2px",
                                             "backgroundColor": "#007bff",
                                             "margin": "0 auto",
                                             "position": "relative",
                                         }
                                     ),
-                                    _tree_node("Selected Level", html.Div(id="tree-selected-level"), is_current=True),
+                                    html.Div(id="tree-selected-level"),
                                     html.Div(
                                         style={
-                                            "height": "2rem",
+                                            "height": "1rem",
                                             "width": "2px",
                                             "backgroundColor": "#007bff",
                                             "margin": "0 auto",
                                             "position": "relative",
                                         }
                                     ),
-                                    _tree_node("Levels Below", html.Div(id="tree-levels-below")),
+                                    html.Div(id="tree-levels-below"),
                                 ],
                                 id="tree-traversal",
                             ),
@@ -292,7 +527,9 @@ def _cmp_panel() -> html.Div:
             html.Div(id="cmp")
         ],
         style={
-            "width": "320px",
+            "width": "18vw",
+            "minWidth": "300px",
+            "maxWidth": "350px",
             "padding": "1rem",
             "backgroundColor": "white",
             "borderRadius": "8px",
@@ -330,6 +567,7 @@ def make_layout() -> html.Div:
             dcc.Store(id="sel", data=[]),
             dcc.Store(id="mode", data="compare"),
             dcc.Store(id="interpolated-point"),
+            dcc.Store(id="comparison-mode", data=False),
             html.Div(
                 [_config_panel(), _centre_panel(), _cmp_panel()],
                 style={

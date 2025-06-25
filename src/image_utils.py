@@ -46,14 +46,14 @@ def _create_img_tag(idx: int, images: np.ndarray | None) -> html.Img | html.Span
         pil.save(buf, format="PNG")
         uri = "data:image/png;base64," + base64.b64encode(buf.getvalue()).decode()
         return html.Img(
-            src=uri, style={"marginRight": "0.5rem", "border": "1px solid #bbb"}
+            src=uri, style={"marginRight": "0.5rem", "border": "1px solid #bbb", "maxWidth": "300px", "maxHeight": "300px", "objectFit": "contain"}
         )
 
     try:
         img_rel = images[idx]
         uri = _encode_image(str(img_rel))  # type: ignore[arg-type]
         return html.Img(
-            src=uri, style={"marginRight": "0.5rem", "border": "1px solid #bbb"}
+            src=uri, style={"marginRight": "0.5rem", "border": "1px solid #bbb", "maxWidth": "300px", "maxHeight": "300px", "objectFit": "contain"}
         )
     except Exception:
         return html.Span()
@@ -75,7 +75,7 @@ def _create_interpolated_img_tag(i: int, j: int, t_value: float, images: np.ndar
     uri = "data:image/png;base64," + base64.b64encode(buf.getvalue()).decode()
     return html.Img(
         src=uri,
-        style={"marginRight": "0.5rem", "border": "2px solid orange"},
+        style={"marginRight": "0.5rem", "border": "2px solid orange", "maxWidth": "300px", "maxHeight": "300px", "objectFit": "contain"},
     )
 
 
