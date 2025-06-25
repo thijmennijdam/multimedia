@@ -1122,9 +1122,10 @@ def register_callbacks(app: dash.Dash) -> None:
         ],
         State("sel", "data"),
         State("mode", "data"),
+        State("interpolated-point", "data"),
         prevent_initial_call=True,
     )
-    def _select(click_disk, click_disk_1, click_disk_2, close_clicks, sel, mode):
+    def _select(click_disk, click_disk_1, click_disk_2, close_clicks, sel, mode, traversal_path):
         ctx = callback_context
         if not ctx.triggered or not ctx.triggered_id:
             return dash.no_update
@@ -1149,6 +1150,10 @@ def register_callbacks(app: dash.Dash) -> None:
                 return None
         
         if triggered_id in ["scatter-disk", "scatter-disk-1", "scatter-disk-2"]:
+            # In interpolate mode, prevent new selections if there's already a traversal path
+            if mode == "interpolate" and traversal_path is not None and len(traversal_path) > 0:
+                return dash.no_update
+            
             # Handle clicks from any of the scatter plots
             if triggered_id == "scatter-disk":
                 click_data = ctx.inputs["scatter-disk.clickData"]
@@ -1254,6 +1259,22 @@ def register_callbacks(app: dash.Dash) -> None:
         i, j = sel[:2]
         p1, p2 = emb[i], emb[j]
         traversal_path = _interpolate_hyperbolic(p1, p2, emb, model='tmp', steps=t)
+        
+        # Ensure the path always starts and ends with the originally selected points
+        if traversal_path and len(traversal_path) > 0:
+            # Remove the original start/end points if they appear in the middle
+            # and ensure they're at the correct positions
+            if i in traversal_path:
+                traversal_path.remove(i)
+            if j in traversal_path:
+                traversal_path.remove(j)
+            
+            # Add the original start and end points
+            traversal_path = [i] + traversal_path + [j]
+        else:
+            # Fallback if interpolation fails
+            traversal_path = [i, j]
+            
         return traversal_path
         
 
@@ -1682,6 +1703,60 @@ def register_callbacks(app: dash.Dash) -> None:
             return html.Div(components), instructions
         if mode == "interpolate":
             instructions = html.P("Select two distinct points to traverse between.")
+            
+            # Show selected points immediately as start/end points (only if no path created yet)
+            if (traversal_path is None or len(traversal_path) == 0) and sel and len(sel) >= 1:
+                def create_endpoint_display(idx, label, border_color, bg_color):
+                    content_element = _create_content_element(idx, images, points, meta)
+                    return html.Div([
+                        html.H6(label, style={
+                            "margin": "0 0 0.5rem 0", 
+                            "color": border_color,
+                            "fontWeight": "bold",
+                            "fontSize": "1rem"
+                        }),
+                        html.Button(
+                            "×",
+                            id={"type": "close-button", "index": idx},
+                            style={
+                                "position": "absolute",
+                                "top": "0.25rem",
+                                "right": "0.25rem",
+                                "width": "1.5rem",
+                                "height": "1.5rem",
+                                "borderRadius": "50%",
+                                "border": "none",
+                                "backgroundColor": "#ff4444",
+                                "color": "white",
+                                "fontSize": "1rem",
+                                "lineHeight": "1",
+                                "cursor": "pointer",
+                                "display": "flex",
+                                "alignItems": "center",
+                                "justifyContent": "center",
+                                "padding": "0",
+                                "transition": "background-color 0.2s",
+                                "hover": {"backgroundColor": "#cc0000"}
+                            }
+                        ),
+                        content_element
+                    ], style={
+                        "padding": "0.75rem", 
+                        "backgroundColor": bg_color,
+                        "border": f"2px solid {border_color}",
+                        "borderRadius": "6px", 
+                        "marginBottom": "0.5rem",
+                        "position": "relative"
+                    })
+                
+                # Show starting point
+                components.append(create_endpoint_display(sel[0], "Starting Point", "#007bff", "#e3f2fd"))
+                
+                # Show end point if selected
+                if len(sel) >= 2:
+                    components.append(create_endpoint_display(sel[1], "End Point", "#007bff", "#e3f2fd"))
+            
+            # Show full traversal path if it exists (after clicking Create Path)
             if traversal_path is not None and len(traversal_path) > 0:
                 # Create a hierarchical traversal path visualization similar to tree
                 def create_traversal_step(step_idx, content, is_endpoint=False):
