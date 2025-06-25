@@ -487,9 +487,10 @@ def register_callbacks(app: dash.Dash) -> None:
         Output("emb", "data", allow_duplicate=True),
         Input("dataset-dropdown", "value"),
         Input("proj", "data"),
+        State("sel", "data"),
         prevent_initial_call=False,
     )
-    def _update_dataset_stores(dataset_name, projection_method):
+    def _update_dataset_stores(dataset_name, projection_method, current_sel):
         if not dataset_name or not projection_method:
             return dash.no_update
         if dataset_name == "imagenet":
@@ -596,7 +597,7 @@ def register_callbacks(app: dash.Dash) -> None:
                 images_list,
                 meta,
                 points,
-                [],
+                current_sel or [],  # Preserve current selection
                 None,
                 embeddings.tolist(),  # emb store - this is what the scatter callback needs!
             )
@@ -714,7 +715,7 @@ def register_callbacks(app: dash.Dash) -> None:
                 images_list,
                 meta,
                 points,
-                [],
+                current_sel or [],  # Preserve current selection
                 None,
                 embeddings.tolist(),  # emb store - this is what the scatter callback needs!
             )
@@ -1096,6 +1097,7 @@ def register_callbacks(app: dash.Dash) -> None:
 
     # Auto-switch projection method when clicking in dual view (visual feedback only)
     @app.callback(
+        Output("proj", "data", allow_duplicate=True),
         Output("proj-horopca-btn", "style", allow_duplicate=True),
         Output("proj-cosne-btn", "style", allow_duplicate=True),
         [
@@ -1108,7 +1110,7 @@ def register_callbacks(app: dash.Dash) -> None:
     def _auto_switch_projection_visual(click_disk_1, click_disk_2, comparison_mode):
         ctx = callback_context
         if not ctx.triggered or not comparison_mode:
-            return dash.no_update, dash.no_update
+            return dash.no_update, dash.no_update, dash.no_update
         
         triggered_id = ctx.triggered_id
         
@@ -1132,13 +1134,13 @@ def register_callbacks(app: dash.Dash) -> None:
         }
         
         if triggered_id == "scatter-disk-1":
-            # Clicked on HoroPCA plot (left) - show HoroPCA as active
-            return active_style, inactive_style
+            # Clicked on HoroPCA plot (left) - switch to HoroPCA
+            return "horopca", active_style, inactive_style
         elif triggered_id == "scatter-disk-2":
-            # Clicked on CO-SNE plot (right) - show CO-SNE as active
-            return inactive_style, active_style
+            # Clicked on CO-SNE plot (right) - switch to CO-SNE
+            return "cosne", inactive_style, active_style
         
-        return dash.no_update, dash.no_update
+        return dash.no_update, dash.no_update, dash.no_update
 
     @app.callback(
         Output("sel", "data"),
