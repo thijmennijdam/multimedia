@@ -1136,13 +1136,47 @@ def register_callbacks(app: dash.Dash) -> None:
 
     @app.callback(
         Output("run-interpolate-btn", "disabled"),
+        Output("run-interpolate-btn", "style"),
         Input("sel", "data"),
         Input("mode", "data"),
     )
     def _update_button_state(sel, mode):
+        base_style = {
+            "border": "none",
+            "padding": "0.5rem 1rem",
+            "borderRadius": "6px",
+            "width": "100%",
+            "marginBottom": "0.5rem",
+        }
+        
         if mode == "interpolate":
-            return not (sel and len(sel) == 2)
-        return True
+            is_disabled = not (sel and len(sel) == 2)
+            if is_disabled:
+                # Grayed out style
+                style = {
+                    **base_style,
+                    "backgroundColor": "#6c757d",
+                    "color": "white",
+                    "cursor": "not-allowed",
+                }
+            else:
+                # Active style
+                style = {
+                    **base_style,  
+                    "backgroundColor": "#007bff",
+                    "color": "white",
+                    "cursor": "pointer",
+                }
+            return is_disabled, style
+        else:
+            # Disabled when not in interpolate mode
+            style = {
+                **base_style,
+                "backgroundColor": "#6c757d", 
+                "color": "white",
+                "cursor": "not-allowed",
+            }
+            return True, style
 
     @app.callback(
         Output("interpolated-point", "data"),
