@@ -2182,4 +2182,26 @@ def register_callbacks(app: dash.Dash) -> None:
         
         return dash.no_update, dash.no_update, dash.no_update
 
+    # Interpolation number input callbacks
+    @app.callback(
+        Output("interpolation-slider", "value"),
+        Input("interpolation-increase-btn", "n_clicks"),
+        Input("interpolation-decrease-btn", "n_clicks"),
+        State("interpolation-slider", "value"),
+        prevent_initial_call=True,
+    )
+    def _update_interpolation_value(increase_clicks, decrease_clicks, current_value):
+        ctx = callback_context
+        if not ctx.triggered:
+            return dash.no_update
+        
+        triggered_id = ctx.triggered[0]["prop_id"].split(".")[0]
+        
+        if triggered_id == "interpolation-increase-btn":
+            return current_value + 1
+        elif triggered_id == "interpolation-decrease-btn":
+            return max(1, current_value - 1)  # Don't go below 1
+        
+        return dash.no_update
+
     # End of callbacks
