@@ -8,10 +8,37 @@ from .image_utils import _encode_image, _create_img_tag, _create_interpolated_im
 from .layout import _tree_node
 import json
 
+def _create_hover_text(idx, points=None, meta=None):
+    """Create meaningful hover text for a point based on its content."""
+    # If we have points data, use the embedding type to show relevant content
+    if points and idx < len(points):
+        point = points[idx]
+        embedding_type = point.get("embedding_type", "")
+        synset_id = point.get("synset_id", "")
+        
+        # For text embeddings, show the actual text content
+        if embedding_type in ["parent_text", "child_text"]:
+            if meta and synset_id in meta:
+                if embedding_type == "parent_text":
+                    text_content = meta[synset_id].get("name", "No parent text available")
+                    return f"Parent Text: {text_content[:100]}{'...' if len(text_content) > 100 else ''}"
+                else:  # child_text
+                    text_content = meta[synset_id].get("description", "No child text available")
+                    return f"Child Text: {text_content[:100]}{'...' if len(text_content) > 100 else ''}"
+        
+        # For image embeddings, show image type and synset info
+        elif embedding_type in ["parent_image", "child_image"]:
+            if meta and synset_id in meta:
+                synset_name = meta[synset_id].get("name", "Unknown")
+                return f"{embedding_type.replace('_', ' ').title()}: {synset_name}"
+    
+    # Fallback - just show the index
+    return f"Point {idx}"
+
 # All callback functions and register_callbacks go here
 # ... (move all @app.callback functions and register_callbacks from main.py) ... 
 
-def _create_simple_scatter(x, y, labels, target_names, emb_labels, title):
+def _create_simple_scatter(x, y, labels, target_names, emb_labels, title, points=None, meta=None):
     """Create a simple scatter plot without interactions for comparison views"""
     # Define colors matching plotting_utils.py
     colors = {
@@ -35,7 +62,7 @@ def _create_simple_scatter(x, y, labels, target_names, emb_labels, title):
                 x_coords = [x[i] for i in indices]
                 y_coords = [y[i] for i in indices]
                 hover_text = [
-                    f"{i}"
+                    _create_hover_text(i, points, meta)
                     for i in indices
                 ]
                 
@@ -62,7 +89,7 @@ def _create_simple_scatter(x, y, labels, target_names, emb_labels, title):
             y=y,
             mode="markers",
             text=[
-                f"{i}"
+                _create_hover_text(i, points, meta)
                 for i in range(len(x))
             ],
             hoverinfo="text",
@@ -91,7 +118,7 @@ def _create_simple_scatter(x, y, labels, target_names, emb_labels, title):
     )
     return fig
 
-def _create_interactive_scatter(x, y, labels, target_names, emb_labels, title, sel):
+def _create_interactive_scatter(x, y, labels, target_names, emb_labels, title, sel, points=None, meta=None):
     """Create an interactive scatter plot with selection highlighting for comparison views"""
     # Define colors matching plotting_utils.py
     colors = {
@@ -115,7 +142,7 @@ def _create_interactive_scatter(x, y, labels, target_names, emb_labels, title, s
                 x_coords = [x[i] for i in indices]
                 y_coords = [y[i] for i in indices]
                 hover_text = [
-                    f"{i}"
+                    _create_hover_text(i, points, meta)
                     for i in indices
                 ]
                 
@@ -143,7 +170,7 @@ def _create_interactive_scatter(x, y, labels, target_names, emb_labels, title, s
             y=y,
             mode="markers",
             text=[
-                f"{i}"
+                _create_hover_text(i, points, meta)
                 for i in range(len(x))
             ],
             hoverinfo="text",
@@ -190,7 +217,7 @@ def _create_interactive_scatter(x, y, labels, target_names, emb_labels, title, s
     )
     return fig
 
-def _create_full_interactive_scatter(x, y, labels, target_names, emb_labels, title, sel, neighbor_indices, tree_connections, interp_point, mode):
+def _create_full_interactive_scatter(x, y, labels, target_names, emb_labels, title, sel, neighbor_indices, tree_connections, interp_point, mode, points=None, meta=None):
     """Create a full interactive scatter plot with all mode features for comparison views"""
     # Define colors matching plotting_utils.py
     colors = {
@@ -706,8 +733,9 @@ def register_callbacks(app: dash.Dash) -> None:
         State("data-store", "data"),
         Input("dataset-dropdown", "value"),
         State("points-store", "data"),
+        State("meta-store", "data"),
     )
-    def _scatter(edata, sel, proj, traversal_path, labels_data, target_names, mode, k_neighbors, data_store, dataset_name, points):
+    def _scatter(edata, sel, proj, traversal_path, labels_data, target_names, mode, k_neighbors, data_store, dataset_name, points, meta):
         if edata is None or labels_data is None:
             print("Warning: No embedding or label data available for plotting")
             return {}
@@ -770,7 +798,7 @@ def register_callbacks(app: dash.Dash) -> None:
         else:
             neighbor_indices = []
 
-        def _fig_disk(x, y, sel, labels, target_names, traversal_points=None, neighbor_indices=None, emb_labels=None, tree_connections=None, points=None):
+        def _fig_disk(x, y, sel, labels, target_names, traversal_points=None, neighbor_indices=None, emb_labels=None, tree_connections=None, points=None, meta=None):
             colors = {
                 'child_image': '#1f77b4',    # tab:blue
                 'parent_image': '#ff7f0e',   # tab:orange
@@ -835,7 +863,7 @@ def register_callbacks(app: dash.Dash) -> None:
                             x_coords = [x[i] for i in regular_indices]
                             y_coords = [y[i] for i in regular_indices]
                             hover_text = [
-                                f"{i}"
+                                _create_hover_text(i, points, meta)
                                 for i in regular_indices
                             ]
                             
@@ -864,7 +892,7 @@ def register_callbacks(app: dash.Dash) -> None:
                             x_coords_neighbors = [x[i] for i in neighbor_indices_for_type]
                             y_coords_neighbors = [y[i] for i in neighbor_indices_for_type]
                             hover_text_neighbors = [
-                                f"{i} (neighbor)"
+                                f"{_create_hover_text(i, points, meta)} (neighbor)"
                                 for i in neighbor_indices_for_type
                             ]
                             
@@ -899,7 +927,7 @@ def register_callbacks(app: dash.Dash) -> None:
                         y=[y[i] for i in regular_indices],
                         mode="markers",
                         text=[
-                            f"{i}"
+                            _create_hover_text(i, points, meta)
                             for i in regular_indices
                         ],
                         hoverinfo="text",
@@ -921,7 +949,7 @@ def register_callbacks(app: dash.Dash) -> None:
                         y=[y[i] for i in neighbor_indices_list],
                         mode="markers",
                         text=[
-                            f"{i} (neighbor)"
+                            f"{_create_hover_text(i, points, meta)} (neighbor)"
                             for i in neighbor_indices_list
                         ],
                         hoverinfo="text",
@@ -1063,7 +1091,7 @@ def register_callbacks(app: dash.Dash) -> None:
                 emb_labels = emb_data_loaded.get("labels", [])
             except Exception as e:
                 emb_labels = []
-        fig_disk = _fig_disk(dx, dy, selected_idx if mode == "neighbors" else highlight, labels, target_names, traversal_points=traversal_points, neighbor_indices=neighbor_indices, emb_labels=emb_labels, tree_connections=tree_connections, points=points)
+        fig_disk = _fig_disk(dx, dy, selected_idx if mode == "neighbors" else highlight, labels, target_names, traversal_points=traversal_points, neighbor_indices=neighbor_indices, emb_labels=emb_labels, tree_connections=tree_connections, points=points, meta=meta)
         return fig_disk
 
     # Auto-switch projection method when clicking in dual view (visual feedback only)
