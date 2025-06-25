@@ -9,34 +9,53 @@ def _config_panel() -> html.Div:
             dcc.Dropdown(
                 id="dataset-dropdown",
                 options=[
-                    {"label": "ImageNet subset", "value": "imagenet"},
+                    {"label": "ImageNet", "value": "imagenet"},
                     {"label": "GRIT", "value": "grit"},
                 ],
                 value="imagenet",  # Default, can be overridden
                 clearable=False,
                 style={
-                    "backgroundColor": "white",
-                    "border": "1px solid #ccc",
-                    "borderRadius": "6px",
-                    "color": "black",
+                    "marginBottom": "1rem",
                 },
             ),
-            html.Label("Projection"),
-            dcc.Dropdown(
-                id="proj",
-                options=[
-                    {"label": "HoroPCA", "value": "horopca"},
-                    {"label": "CO-SNE", "value": "cosne"}
-                ],
-                value="horopca",
-                clearable=False,
-                style={
-                    "backgroundColor": "white",
-                    "border": "1px solid #ccc",
-                    "borderRadius": "6px",
-                    "color": "black",
-                },
-            ),
+            html.Label("Choose projection:"),
+            html.Div([
+                html.Button(
+                    "HoroPCA",
+                    id="proj-horopca-btn",
+                    style={
+                        "backgroundColor": "#28a745",
+                        "color": "white",
+                        "border": "none",
+                        "padding": "0.5rem 1rem",
+                        "borderRadius": "6px",
+                        "cursor": "pointer",
+                        "width": "100%",
+                        "minWidth": "0",
+                        "flex": "1 1 0",
+                        "boxSizing": "border-box",
+                        "transition": "background-color 0.2s",
+                    },
+                ),
+                html.Button(
+                    "CO-SNE",
+                    id="proj-cosne-btn",
+                    style={
+                        "backgroundColor": "#6c757d",
+                        "color": "white",
+                        "border": "none",
+                        "padding": "0.5rem 1rem",
+                        "borderRadius": "6px",
+                        "cursor": "pointer",
+                        "width": "100%",
+                        "minWidth": "0",
+                        "flex": "1 1 0",
+                        "boxSizing": "border-box",
+                        "transition": "background-color 0.2s",
+                    },
+                ),
+            ], style={"display": "flex", "gap": "0.5rem", "marginBottom": "1rem"}),
+            dcc.Store(id="proj", data="horopca"),  # Hidden store for compatibility
             # Hyperparameters display
             html.Div(
                 id="hyperparams-display",

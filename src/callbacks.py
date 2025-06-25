@@ -459,7 +459,7 @@ def register_callbacks(app: dash.Dash) -> None:
         Output("interpolated-point", "data", allow_duplicate=True),
         Output("emb", "data", allow_duplicate=True),
         Input("dataset-dropdown", "value"),
-        Input("proj", "value"),
+        Input("proj", "data"),
         prevent_initial_call=False,
     )
     def _update_dataset_stores(dataset_name, projection_method):
@@ -697,7 +697,7 @@ def register_callbacks(app: dash.Dash) -> None:
         Output("scatter-disk", "figure"),
         Input("emb", "data"),
         Input("sel", "data"),
-        Input("proj", "value"),
+        Input("proj", "data"),
         Input("interpolated-point", "data"),
         State("labels-store", "data"),
         State("target-names-store", "data"),
@@ -1149,7 +1149,7 @@ def register_callbacks(app: dash.Dash) -> None:
         Input("run-interpolate-btn", "n_clicks"),
         Input("interpolation-slider", "value"),
         State("sel", "data"),
-        State("proj", "value"),
+        State("proj", "data"),
         State("dataset-dropdown", "value"),
         prevent_initial_call=True,
     )
@@ -1184,7 +1184,7 @@ def register_callbacks(app: dash.Dash) -> None:
         State("meta-store", "data"),
         State("points-store", "data"),
         Input("dataset-dropdown", "value"),
-        Input("proj", "value"),
+        Input("proj", "data"),
     )
     def _update_tree_view(sel, mode, meta, points, dataset_name, proj):
         if mode != "tree" or not sel or len(sel) != 1 or meta is None or points is None:
@@ -1668,7 +1668,7 @@ def register_callbacks(app: dash.Dash) -> None:
         State("data-store", "data"),
         State("points-store", "data"),
         Input("comparison-mode", "data"),
-        State("proj", "value"),
+        State("proj", "data"),
     )
     def _scatter_plot_2(dataset_name, sel, mode, k_neighbors, traversal_path, labels_data, target_names, data_store, points, comparison_mode, selected_proj):
         if not comparison_mode or labels_data is None or not dataset_name:
@@ -1823,7 +1823,7 @@ def register_callbacks(app: dash.Dash) -> None:
         State("data-store", "data"),
         State("points-store", "data"),
         Input("comparison-mode", "data"),
-        State("proj", "value"),
+        State("proj", "data"),
     )
     def _scatter_plot_1(dataset_name, sel, mode, k_neighbors, traversal_path, labels_data, target_names, data_store, points, comparison_mode, selected_proj):
         if not comparison_mode or labels_data is None or not dataset_name:
@@ -1970,7 +1970,7 @@ def register_callbacks(app: dash.Dash) -> None:
 
     @app.callback(
         Output("hyperparams-table", "children"),
-        Input("proj", "value"),
+        Input("proj", "data"),
     )
     def _update_hyperparams_display(projection_method):
         """Update hyperparameters display based on selected projection method."""
@@ -2046,5 +2046,49 @@ def register_callbacks(app: dash.Dash) -> None:
         if n_clicks:
             return None
         return dash.no_update
+
+
+    # Projection button selection callbacks
+    @app.callback(
+        Output("proj", "data"),
+        Output("proj-horopca-btn", "style"),
+        Output("proj-cosne-btn", "style"),
+        Input("proj-horopca-btn", "n_clicks"),
+        Input("proj-cosne-btn", "n_clicks"),
+        State("proj", "data"),
+        prevent_initial_call=True,
+    )
+    def _update_projection_selection(horopca_clicks, cosne_clicks, current_proj):
+        ctx = callback_context
+        if not ctx.triggered:
+            return dash.no_update, dash.no_update, dash.no_update
+        
+        triggered_id = ctx.triggered[0]["prop_id"].split(".")[0]
+        
+        # Button styles
+        active_style = {
+            "backgroundColor": "#28a745",
+            "color": "white",
+            "border": "none",
+            "padding": "0.5rem 1rem",
+            "borderRadius": "6px",
+            "cursor": "pointer",
+            "width": "100%",
+            "minWidth": "0",
+            "flex": "1 1 0",
+            "boxSizing": "border-box",
+            "transition": "background-color 0.2s",
+        }
+        inactive_style = {
+            **active_style,
+            "backgroundColor": "#6c757d"
+        }
+        
+        if triggered_id == "proj-horopca-btn":
+            return "horopca", active_style, inactive_style
+        elif triggered_id == "proj-cosne-btn":
+            return "cosne", inactive_style, active_style
+        
+        return dash.no_update, dash.no_update, dash.no_update
 
     # End of callbacks
