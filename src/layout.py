@@ -75,7 +75,7 @@ def _config_panel() -> html.Div:
             # Projection comparison section
             html.Div([
                 html.Button(
-                    "Compare Projections",
+                    "Dual View",
                     id="compare-projections-btn",
                     style={
                         "backgroundColor": "#6c757d",

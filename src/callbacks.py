@@ -1775,6 +1775,7 @@ def register_callbacks(app: dash.Dash) -> None:
 
     @app.callback(
         Output("comparison-mode", "data"),
+        Output("compare-projections-btn", "children"),
         Output("compare-projections-btn", "style"),
         Output("single-plot-container", "style"),
         Output("comparison-plot-container", "style"),
@@ -1806,17 +1807,19 @@ def register_callbacks(app: dash.Dash) -> None:
         }
         
         if new_mode:
-            # Comparison mode ON
+            # Comparison mode ON - show "Single View" button to switch back
             return (
                 True,
+                "Single View",
                 btn_style_active,
                 {"display": "none"},   # Hide single plot
                 {"display": "flex"}    # Show comparison plots
             )
         else:
-            # Comparison mode OFF
+            # Comparison mode OFF - show "Dual View" button to switch to comparison
             return (
                 False,
+                "Dual View",
                 btn_style_inactive,
                 {                      # Show single plot
                     "display": "flex",
