@@ -215,9 +215,6 @@ def _config_panel() -> html.Div:
                                         "textAlign": "center",
                                         "height": "40px",
                                         "boxSizing": "border-box",
-                                        # Remove default spinners
-                                        "-moz-appearance": "textfield",
-                                        "-webkit-appearance": "none",
                                     },
                                 ),
                                 html.Button(
