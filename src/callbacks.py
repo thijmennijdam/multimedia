@@ -1274,6 +1274,35 @@ def register_callbacks(app: dash.Dash) -> None:
         except (IndexError, TypeError):
             return html.Span(), html.Span(), html.Span()
         
+        # Find all points in the same tree that are actually plotted
+        tree_point_indices = []
+        tree_points_by_level = {}
+        
+        for i, point in enumerate(points):
+            if i < len(emb_labels):
+                # For ImageNet: points in same tree share same synset_id
+                # For GRIT: points in same tree might have different sample_key but same tree structure
+                point_synset = point.get("synset_id", "?")
+                
+                # Check if this point belongs to the same tree
+                is_same_tree = False
+                if dataset_name == "imagenet":
+                    is_same_tree = (point_synset == synset_id)
+                else:  # GRIT
+                    is_same_tree = (point_synset == synset_id)
+                
+                if is_same_tree:
+                    # This point is in the same tree and is plotted
+                    tree_point_indices.append(i)
+                    
+                    # Group by level
+                    point_level_label = emb_labels[i]
+                    point_level = level_mapping.get(point_level_label, 0)
+                    if point_level > 0:
+                        if point_level not in tree_points_by_level:
+                            tree_points_by_level[point_level] = []
+                        tree_points_by_level[point_level].append(i)
+        
         # Create level components
         def create_level_component(level, content, is_selected=False):
             border_color = "#28a745" if is_selected else "#6c757d"
@@ -1316,52 +1345,114 @@ def register_callbacks(app: dash.Dash) -> None:
         
         # Level 3: Parent Image (GRIT) or Child Image (ImageNet)
         if dataset_name == "imagenet":
-            # For ImageNet, level 3 is child image
-            img_rel = meta_row.get("first_image_path")
-            img_src = _encode_image(img_rel) if img_rel else ""
-            img_component = html.Div([
-                html.Img(src=img_src, style={"maxWidth": "120px", "maxHeight": "120px", "objectFit": "contain", "border": "1px solid #ccc"}) if img_src else html.P("No image available", style={"color": "#6c757d", "fontStyle": "italic"}),
-            ], style={"margin": 0})
+            # For ImageNet, level 3 is child image - show only child images that are actually plotted
+            child_img_components = []
+            
+            # Get the plotted points at level 3 (child_image)
+            level_3_points = tree_points_by_level.get(3, [])
+            
+            # Instead of complex path matching, just use the point indices directly
+            # Show the first N images from tree data where N = number of plotted points
+            if tree_data and tree_data.get("child_images") and len(level_3_points) > 0:
+                # Take the first len(level_3_points) images from the tree data
+                num_images_to_show = min(len(level_3_points), len(tree_data["child_images"]))
+                
+                for i in range(num_images_to_show):
+                    child_img = tree_data["child_images"][i]
+                    child_img_path = child_img["path"]
+                    child_img_rel = child_img_path.replace("/data/", "/trees/")
+                    child_img_src = _encode_image(child_img_rel)
+                    
+                    if child_img_src:
+                        child_img_components.append(
+                            html.Div([
+                                html.Img(src=child_img_src, style={"maxWidth": "160px", "maxHeight": "160px", "objectFit": "contain", "border": "1px solid #ccc"}),
+                                html.P(f"Image {i+1}/{num_images_to_show}", style={"fontSize": "0.7rem", "color": "#666", "margin": "0.2rem 0 0 0", "textAlign": "center"})
+                            ], style={"margin": "0.5rem 0"})
+                        )
+            
+            if not child_img_components:
+                child_img_components = [html.P("No images available", style={"color": "#6c757d", "fontStyle": "italic"})]
+            
+            child_img_container = html.Div(child_img_components, style={"margin": 0, "display": "flex", "flexDirection": "column", "alignItems": "center"})
             
             if selected_level == 3:
-                current_level = create_level_component(3, img_component, True)
+                current_level = create_level_component(3, child_img_container, True)
             elif selected_level < 3:
-                levels_below.append(create_level_component(3, img_component))
+                levels_below.append(create_level_component(3, child_img_container))
         else:
-            # For GRIT, level 3 is parent image
-            parent_img_rel = None
-            if tree_data and tree_data.get("parent_images"):
-                parent_img_path = tree_data["parent_images"][0]["path"]
-                parent_img_rel = parent_img_path.replace("/data/", "/trees/")
+            # For GRIT, level 3 is parent image - show only parent images that are actually plotted
+            parent_img_components = []
             
-            parent_img_src = _encode_image(parent_img_rel) if parent_img_rel else ""
-            parent_img_component = html.Div([
-                html.Img(src=parent_img_src, style={"maxWidth": "120px", "maxHeight": "120px", "objectFit": "contain", "border": "1px solid #ccc"}) if parent_img_src else html.P("No image available", style={"color": "#6c757d", "fontStyle": "italic"}),
-            ], style={"margin": 0})
+            # Get the plotted points at level 3 (parent_image)
+            level_3_points = tree_points_by_level.get(3, [])
+            
+            # Show the first N images from tree data where N = number of plotted points
+            if tree_data and tree_data.get("parent_images") and len(level_3_points) > 0:
+                # Take the first len(level_3_points) images from the tree data
+                num_images_to_show = min(len(level_3_points), len(tree_data["parent_images"]))
+                
+                for i in range(num_images_to_show):
+                    parent_img = tree_data["parent_images"][i]
+                    parent_img_path = parent_img["path"]
+                    parent_img_rel = parent_img_path.replace("/data/", "/trees/")
+                    parent_img_src = _encode_image(parent_img_rel)
+                    
+                    if parent_img_src:
+                        parent_img_components.append(
+                            html.Div([
+                                html.Img(src=parent_img_src, style={"maxWidth": "160px", "maxHeight": "160px", "objectFit": "contain", "border": "1px solid #ccc"}),
+                                html.P(f"Image {i+1}/{num_images_to_show}", style={"fontSize": "0.7rem", "color": "#666", "margin": "0.2rem 0 0 0", "textAlign": "center"})
+                            ], style={"margin": "0.5rem 0"})
+                        )
+            
+            if not parent_img_components:
+                parent_img_components = [html.P("No images available", style={"color": "#6c757d", "fontStyle": "italic"})]
+            
+            parent_img_container = html.Div(parent_img_components, style={"margin": 0, "display": "flex", "flexDirection": "column", "alignItems": "center"})
             
             if selected_level == 3:
-                current_level = create_level_component(3, parent_img_component, True)
+                current_level = create_level_component(3, parent_img_container, True)
             elif selected_level > 3:
-                levels_above.append(create_level_component(3, parent_img_component))
+                levels_above.append(create_level_component(3, parent_img_container))
             elif selected_level < 3:
-                levels_below.append(create_level_component(3, parent_img_component))
+                levels_below.append(create_level_component(3, parent_img_container))
         
-        # Level 4: Child Image (GRIT only)
+        # Level 4: Child Image (GRIT only) - show only child images that are actually plotted
         if dataset_name == "grit" and max_level >= 4:
-            child_img_rel = None
-            if tree_data and tree_data.get("child_images"):
-                child_img_path = tree_data["child_images"][0]["path"]
-                child_img_rel = child_img_path.replace("/data/", "/trees/")
+            child_img_components = []
             
-            child_img_src = _encode_image(child_img_rel) if child_img_rel else ""
-            child_img_component = html.Div([
-                html.Img(src=child_img_src, style={"maxWidth": "120px", "maxHeight": "120px", "objectFit": "contain", "border": "1px solid #ccc"}) if child_img_src else html.P("No image available", style={"color": "#6c757d", "fontStyle": "italic"}),
-            ], style={"margin": 0})
+            # Get the plotted points at level 4 (child_image)
+            level_4_points = tree_points_by_level.get(4, [])
+            
+            # Show the first N images from tree data where N = number of plotted points
+            if tree_data and tree_data.get("child_images") and len(level_4_points) > 0:
+                # Take the first len(level_4_points) images from the tree data
+                num_images_to_show = min(len(level_4_points), len(tree_data["child_images"]))
+                
+                for i in range(num_images_to_show):
+                    child_img = tree_data["child_images"][i]
+                    child_img_path = child_img["path"]
+                    child_img_rel = child_img_path.replace("/data/", "/trees/")
+                    child_img_src = _encode_image(child_img_rel)
+                    
+                    if child_img_src:
+                        child_img_components.append(
+                            html.Div([
+                                html.Img(src=child_img_src, style={"maxWidth": "160px", "maxHeight": "160px", "objectFit": "contain", "border": "1px solid #ccc"}),
+                                html.P(f"Image {i+1}/{num_images_to_show}", style={"fontSize": "0.7rem", "color": "#666", "margin": "0.2rem 0 0 0", "textAlign": "center"})
+                            ], style={"margin": "0.5rem 0"})
+                        )
+            
+            if not child_img_components:
+                child_img_components = [html.P("No images available", style={"color": "#6c757d", "fontStyle": "italic"})]
+            
+            child_img_container = html.Div(child_img_components, style={"margin": 0, "display": "flex", "flexDirection": "column", "alignItems": "center"})
             
             if selected_level == 4:
-                current_level = create_level_component(4, child_img_component, True)
+                current_level = create_level_component(4, child_img_container, True)
             elif selected_level < 4:
-                levels_below.append(create_level_component(4, child_img_component))
+                levels_below.append(create_level_component(4, child_img_container))
         
         # Combine all levels
         all_levels = levels_above + ([current_level] if current_level else []) + levels_below
