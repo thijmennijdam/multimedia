@@ -49,25 +49,34 @@ python hierchical_datasets/preprocess.py \
 python projection_methods/create_projections.py \
     --dataset-path hierchical_datasets/GRIT \
     --methods horopca \
-    --n-project 200 \
+    --n-project 720 \
     --plot 
 
 python projection_methods/create_projections.py \
     --dataset-path hierchical_datasets/GRIT \
     --methods cosne \
-    --n-project 200 \
+    --n-project 720 \
+    --cosne-perplexity 250 \
     --plot 
 
 python projection_methods/create_projections.py \
     --dataset-path hierchical_datasets/ImageNet \
     --methods horopca \
-    --n-project 200 \
+    --n-project 500 \
     --plot \
     --children-per-tree 5
 
 python projection_methods/create_projections.py \
     --dataset-path hierchical_datasets/ImageNet \
     --methods cosne \
-    --n-project 200 \
+    --n-project 500 \
     --plot \
     --children-per-tree 5
+
+python projection_methods/create_projections.py \
+    --dataset-path hierchical_datasets/ImageNet \
+    --n-project 500 \
+    --methods cosne \
+    --cosne-perplexity 250 \
+    --plot
+
