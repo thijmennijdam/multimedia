@@ -219,12 +219,15 @@ def _config_panel() -> html.Div:
             ),
         ],
         style={
-            "width": "240px",
+            "width": "20vw",
+            "minWidth": "240px",
+            "maxWidth": "300px",
             "padding": "1rem",
             "backgroundColor": "white",
             "borderRadius": "8px",
             "boxShadow": "0 1px 3px rgba(0,0,0,0.1)",
             "flexShrink": 0,
+            "overflowY": "auto",
         },
     )
 
@@ -259,12 +262,15 @@ def _centre_panel() -> html.Div:
                     ),
                 ],
                 style={
-                    "width": "100%",
-                    "height": "100%",
-                    "maxWidth": "800px",
-                    "maxHeight": "800px",
+                    "display": "flex",
+                    "width": "min(85vh, 50vw)",
+                    "height": "min(85vh, 50vw)",
                     "aspectRatio": "1 / 1",
                     "margin": "auto",
+                    "maxWidth": "100%",
+                    "maxHeight": "100%",
+                    "flexShrink": 0,
+                    "flexGrow": 0,
                 },
             ),
             html.Div(
@@ -277,11 +283,12 @@ def _centre_panel() -> html.Div:
                             figure=None,
                             style={
                                 "width": "100%", 
-                                "height": "75vh", 
-                                "maxWidth": "700px", 
-                                "maxHeight": "1050px",
-                                "minWidth": "400px",
-                                "minHeight": "600px"
+                                "height": "100%",
+                                "aspectRatio": "2 / 3",
+                                "maxWidth": "50vh",
+                                "maxHeight": "75vh",
+                                "minWidth": "300px",
+                                "minHeight": "450px"
                             },
                             config={
                                 "displayModeBar": True,
@@ -302,7 +309,7 @@ def _centre_panel() -> html.Div:
                                 ]
                             },
                         ),
-                    ], style={"flex": "1", "display": "flex", "flexDirection": "column", "minWidth": "0", "overflow": "visible", "maxWidth": "700px"}),
+                    ], style={"flex": "1", "display": "flex", "flexDirection": "column", "minWidth": "0", "overflow": "visible", "alignItems": "center", "justifyContent": "center"}),
                     html.Div([
                         html.H5("CO-SNE", style={"textAlign": "center", "margin": "0 0 1rem 0", "color": "#333"}),
                         dcc.Graph(
@@ -310,11 +317,12 @@ def _centre_panel() -> html.Div:
                             figure=None,
                             style={
                                 "width": "100%", 
-                                "height": "75vh", 
-                                "maxWidth": "700px", 
-                                "maxHeight": "1050px",
-                                "minWidth": "400px",
-                                "minHeight": "600px"
+                                "height": "100%",
+                                "aspectRatio": "2 / 3",
+                                "maxWidth": "50vh",
+                                "maxHeight": "75vh",
+                                "minWidth": "300px",
+                                "minHeight": "450px"
                             },
                             config={
                                 "displayModeBar": True,
@@ -335,23 +343,24 @@ def _centre_panel() -> html.Div:
                                 ]
                             },
                         ),
-                    ], style={"flex": "1", "display": "flex", "flexDirection": "column"}),
+                    ], style={"flex": "1", "display": "flex", "flexDirection": "column", "alignItems": "center", "justifyContent": "center"}),
                 ],
                 style={
                     "display": "none",
                     "width": "100%",
                     "height": "100%",
-                    "maxWidth": "1400px",
-                    "maxHeight": "1200px",
                     "margin": "auto",
-                    "gap": "1rem",
+                    "gap": "2rem",
                     "flexDirection": "row",
                     "overflow": "visible",
+                    "alignItems": "center",
+                    "justifyContent": "center",
                 },
             ),
         ],
         style={
             "flex": 1,
+            "width": "60vw",
             "padding": "1rem",
             "backgroundColor": "white",
             "borderRadius": "8px",
@@ -442,7 +451,9 @@ def _cmp_panel() -> html.Div:
             html.Div(id="cmp")
         ],
         style={
-            "width": "320px",
+            "width": "18vw",
+            "minWidth": "300px",
+            "maxWidth": "350px",
             "padding": "1rem",
             "backgroundColor": "white",
             "borderRadius": "8px",
