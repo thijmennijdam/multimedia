@@ -275,7 +275,7 @@ def _centre_panel() -> html.Div:
                         dcc.Graph(
                             id="scatter-disk-1",
                             figure=None,
-                            style={"width": "100%", "height": "100%", "minWidth": "400px"},
+                            style={"width": "700px", "height": "1050px"},
                             config={
                                 "displayModeBar": True,
                                 "displaylogo": False,
@@ -301,7 +301,7 @@ def _centre_panel() -> html.Div:
                         dcc.Graph(
                             id="scatter-disk-2",
                             figure=None,
-                            style={"width": "100%", "height": "100%", "minWidth": "400px"},
+                            style={"width": "700px", "height": "1050px"},
                             config={
                                 "displayModeBar": True,
                                 "displaylogo": False,
@@ -328,7 +328,7 @@ def _centre_panel() -> html.Div:
                     "width": "100%",
                     "height": "100%",
                     "maxWidth": "1400px",
-                    "maxHeight": "700px",
+                    "maxHeight": "1200px",
                     "margin": "auto",
                     "gap": "1rem",
                     "flexDirection": "row",
