@@ -390,8 +390,9 @@ def _create_full_interactive_scatter(x, y, labels, target_names, emb_labels, tit
             )
             traces.append(neighbor_trace)
 
-    # Add tree connections
-    if tree_connections:
+    # Store tree connections for later arrow annotation (like single view)
+    tree_arrow_annotations = []
+    if tree_connections and points:
         for conn in tree_connections:
             idx1, idx2 = conn
             if idx1 < len(x) and idx2 < len(x):
@@ -409,6 +410,20 @@ def _create_full_interactive_scatter(x, y, labels, target_names, emb_labels, tit
                     name="Tree connections"
                 )
                 traces.append(line_trace)
+                
+                # Store arrow annotation info (same as single view)
+                tree_arrow_annotations.append({
+                    'x': x2, 'y': y2,
+                    'ax': x1, 'ay': y1,
+                    'xref': 'x', 'yref': 'y',
+                    'axref': 'x', 'ayref': 'y',
+                    'arrowhead': 2,
+                    'arrowsize': 1.5,
+                    'arrowwidth': 2,
+                    'arrowcolor': 'gold',
+                    'showarrow': True,
+                    'text': '',
+                })
 
     # Add selected points as a separate trace
     if sel:
@@ -452,8 +467,11 @@ def _create_full_interactive_scatter(x, y, labels, target_names, emb_labels, tit
         )
         traces.insert(0, circle_trace)
 
-    
     fig = go.Figure(data=traces)
+    
+    # Add arrow annotations for tree connections (same as single view)
+    annotations = tree_arrow_annotations
+    
     fig.update_layout(
         title=title,
         xaxis=dict(scaleanchor="y", scaleratio=1),
@@ -468,6 +486,7 @@ def _create_full_interactive_scatter(x, y, labels, target_names, emb_labels, tit
             xanchor="center",
             x=0.5
         ),
+        annotations=annotations,
         dragmode='pan',
     )
     return fig
@@ -2138,7 +2157,7 @@ def register_callbacks(app: dash.Dash) -> None:
         emb_labels = emb_data.get("labels", [])
         
         # Create the figure with all mode features
-        fig = _create_full_interactive_scatter(dx, dy, labels, target_names, emb_labels, "", sel, neighbor_indices, tree_connections, interp_transformed, mode)
+        fig = _create_full_interactive_scatter(dx, dy, labels, target_names, emb_labels, "", sel, neighbor_indices, tree_connections, interp_transformed, mode, points=points)
         return fig
 
     @app.callback(
@@ -2293,7 +2312,7 @@ def register_callbacks(app: dash.Dash) -> None:
         emb_labels = emb_data.get("labels", [])
         
         # Create the figure with all mode features
-        fig = _create_full_interactive_scatter(dx, dy, labels, target_names, emb_labels, "", sel, neighbor_indices, tree_connections, interp_transformed, mode)
+        fig = _create_full_interactive_scatter(dx, dy, labels, target_names, emb_labels, "", sel, neighbor_indices, tree_connections, interp_transformed, mode, points=points)
         return fig
 
 
