@@ -25,6 +25,10 @@ def build_app(debug: bool = False) -> dash.Dash:
     return app
 
 
+# Create app instance for Heroku
+app = build_app(debug=False)
+server = app.server  # This is what Heroku will use
+
 if __name__ == "__main__":
     app = build_app(debug=True)
     app.run(debug=True, host="0.0.0.0", port=8080)
