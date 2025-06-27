@@ -40,4 +40,4 @@ HIVE provides an interactive interface for visualizing and exploring hierarchica
 - Validating hyperbolic space representations
 - Educational visualization of hyperbolic geometry
 
-Perfect for researchers and practitioners working with hierarchical data, knowledge graphs, or hyperbolic embeddings.
+The tool is meant for researchers and practitioners working with hierarchical data, knowledge graphs, or hyperbolic embeddings.
