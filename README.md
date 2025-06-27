@@ -2,13 +2,31 @@
 
 An interactive dashboard for exploring hierarchical data in hyperbolic space using the Poincaré disk model.
 
-## Quick Start
+## Setup Instructions
+
+### Prerequisites
+First, install uv if you haven't already:
+```bash
+# Install uv (if not already installed)
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
+
+### Running the Dashboard
 
 ```bash
-# Install dependencies
+# 1. Create a virtual environment
+uv venv
+
+# 2. Activate the virtual environment
+# On Linux/Mac:
+source .venv/bin/activate
+# On Windows:
+# .venv\Scripts\activate
+
+# 3. Install dependencies
 uv sync
 
-# Run the dashboard
+# 4. Run the dashboard
 uv run src/main.py
 ```
 
